@@ -55,7 +55,6 @@ struct VcoEngine {
 	float_4 phase[4] = {};
 	MinBlepBuffer<32> sawMinBlepBuffer[4];
 	MinBlepBuffer<32> sqrMinBlepBuffer[4];
-	float_4 triState[4] = {};
 
 	// Process one SIMD group (4 voices), returns 4 waveforms via output parameters
 	// g: SIMD group index (0-3)
@@ -110,9 +109,11 @@ struct VcoEngine {
 
 		sqr = simd::ifelse(phase[g] < pwm, 1.f, -1.f) + sqrMinBlepBuffer[g].process();
 
-		// === TRIANGLE via integration ===
-		triState[g] = triState[g] * 0.999f + sqr * 4.f * freq * sampleTime;
-		tri = triState[g];
+		// === TRIANGLE via direct calculation (normalized to ±1) ===
+		// Triangle from phase: rises 0->0.5, falls 0.5->1
+		tri = simd::ifelse(phase[g] < 0.5f,
+			4.f * phase[g] - 1.f,           // -1 to +1 as phase goes 0 to 0.5
+			3.f - 4.f * phase[g]);          // +1 to -1 as phase goes 0.5 to 1
 
 		// === SINE (no antialiasing needed) ===
 		sine = simd::sin(2.f * float(M_PI) * phase[g]);
@@ -255,6 +256,10 @@ struct HydraQuartetVCO : Module {
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
 		float subLevel = params[SUB_LEVEL_PARAM].getValue();
 
+		// Fixed output scaling - divide by 3 (typical number of active waveforms)
+		// User controls final level via individual waveform volumes
+		const float outputScale = 1.f / 3.f;
+
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
 			int groupChannels = std::min(channels - c, 4);
@@ -291,36 +296,35 @@ struct HydraQuartetVCO : Module {
 			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1);
 			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2);
 
-			// Sub-oscillator: -1 octave below VCO1 base (ignores detune for stable foundation)
-			float_4 subPitch = basePitch + octave1 - 1.f;  // VCO1 base pitch minus 1 octave
+			// Sub-oscillator: -1 octave below VCO1 base (simplified, no MinBLEP)
+			float_4 subPitch = basePitch + octave1 - 1.f;
 			float_4 subFreq = dsp::FREQ_C4 * dsp::exp2_taylor5(subPitch);
-			subFreq = simd::clamp(subFreq, 0.1f, sampleRate / 2.f);
+			subFreq = simd::clamp(subFreq, 1.f, 20000.f);
 
-			// Sub phase accumulation
-			float_4 subDelta = subFreq * sampleTime;
-			subPhase[g] += subDelta;
+			// Simple phase accumulation
+			subPhase[g] += subFreq * sampleTime;
 			subPhase[g] -= simd::floor(subPhase[g]);
 
-			// Generate both waveforms
+			// Generate waveforms (simple, no MinBLEP)
 			float_4 subSquare = simd::ifelse(subPhase[g] < 0.5f, 1.f, -1.f);
 			float_4 subSine = simd::sin(2.f * float(M_PI) * subPhase[g]);
 
 			// Select based on switch
 			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
 
-			// Output to dedicated SUB jack (full level, before mixing)
-			outputs[SUB_OUTPUT].setVoltageSimd(subOut * 5.f, c);
+			// Output to dedicated SUB jack (reduced to ±2V for testing)
+			outputs[SUB_OUTPUT].setVoltageSimd(subOut * 2.f, c);
 
 			// Mix both VCOs with independent volume controls, plus sub-oscillator
-			float_4 mixed = tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
+			float_4 mixed = (tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
 			              + tri2 * triVol2 + sqr2 * sqrVol2 + sine2 * sinVol2 + saw2 * sawVol2
-			              + subOut * subLevel;
+			              + subOut * subLevel) * outputScale;
 
-			// DC filtering - process per-voice (not in critical path)
+			// DC filtering - process per-voice
 			for (int i = 0; i < groupChannels; i++) {
 				dcFilters[c + i].setCutoffFreq(10.f / sampleRate);
-				dcFilters[c + i].process(mixed[i] * 5.f);
-				mixed[i] = dcFilters[c + i].highpass();
+				dcFilters[c + i].process(mixed[i]);
+				mixed[i] = dcFilters[c + i].highpass() * 2.f;  // Reduced to ±2V for testing
 			}
 
 			outputs[AUDIO_OUTPUT].setVoltageSimd(mixed, c);
