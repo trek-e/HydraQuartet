@@ -129,6 +129,7 @@ struct HydraQuartetVCO : Module {
 		SIN1_PARAM,
 		SAW1_PARAM,
 		PWM1_PARAM,
+		PWM1_ATT_PARAM,
 		SYNC1_PARAM,
 		// VCO2 Section
 		OCTAVE2_PARAM,
@@ -138,6 +139,7 @@ struct HydraQuartetVCO : Module {
 		SIN2_PARAM,
 		SAW2_PARAM,
 		PWM2_PARAM,
+		PWM2_ATT_PARAM,
 		SYNC2_PARAM,
 		FM_PARAM,
 		PARAMS_LEN
@@ -159,6 +161,8 @@ struct HydraQuartetVCO : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		PWM1_CV_LIGHT,
+		PWM2_CV_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -180,6 +184,7 @@ struct HydraQuartetVCO : Module {
 		configParam(SIN1_PARAM, 0.f, 1.f, 1.f, "VCO1 Sine");
 		configParam(SAW1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sawtooth");
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
+		configParam(PWM1_ATT_PARAM, -1.f, 1.f, 0.f, "VCO1 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
 
 		// VCO2 Parameters
@@ -190,6 +195,7 @@ struct HydraQuartetVCO : Module {
 		configParam(SIN2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sine");
 		configParam(SAW2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sawtooth");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
+		configParam(PWM2_ATT_PARAM, -1.f, 1.f, 0.f, "VCO2 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
 		configParam(FM_PARAM, 0.f, 1.f, 0.f, "FM Amount");
 
@@ -232,9 +238,9 @@ struct HydraQuartetVCO : Module {
 		float sinVol2 = params[SIN2_PARAM].getValue();
 		float sawVol2 = params[SAW2_PARAM].getValue();
 
-		// Broadcast scalar PWM to SIMD
-		float_4 pwm1_4 = pwm1;
-		float_4 pwm2_4 = pwm2;
+		// Read PWM CV attenuverters
+		float pwm1Att = params[PWM1_ATT_PARAM].getValue();
+		float pwm2Att = params[PWM2_ATT_PARAM].getValue();
 
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
@@ -253,6 +259,18 @@ struct HydraQuartetVCO : Module {
 			float_4 pitch2 = basePitch + octave2;
 			float_4 freq2 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
 			freq2 = simd::clamp(freq2, 0.1f, sampleRate / 2.f);
+
+			// Read polyphonic PWM CV
+			float_4 pwm1CV = inputs[PWM1_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 pwm2CV = inputs[PWM2_INPUT].getPolyVoltageSimd<float_4>(c);
+
+			// Apply attenuverter: +/-5V * att * 0.1 = +/-0.5 contribution (full sweep range)
+			float_4 pwm1_4 = pwm1 + pwm1CV * pwm1Att * 0.1f;
+			float_4 pwm2_4 = pwm2 + pwm2CV * pwm2Att * 0.1f;
+
+			// Clamp to safe PWM range (avoid DC at extremes)
+			pwm1_4 = simd::clamp(pwm1_4, 0.01f, 0.99f);
+			pwm2_4 = simd::clamp(pwm2_4, 0.01f, 0.99f);
 
 			// Process both VCO engines
 			float_4 saw1, sqr1, tri1, sine1;
@@ -285,6 +303,27 @@ struct HydraQuartetVCO : Module {
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
 		outputs[MIX_OUTPUT].setVoltage(mixSum[0] / channels);
+
+		// PWM CV activity indicators
+		if (inputs[PWM1_INPUT].isConnected()) {
+			float peakCV = 0.f;
+			for (int i = 0; i < channels; i++) {
+				peakCV = std::max(peakCV, std::abs(inputs[PWM1_INPUT].getVoltage(i)));
+			}
+			lights[PWM1_CV_LIGHT].setBrightness(peakCV / 5.f);
+		} else {
+			lights[PWM1_CV_LIGHT].setBrightness(0.f);
+		}
+
+		if (inputs[PWM2_INPUT].isConnected()) {
+			float peakCV = 0.f;
+			for (int i = 0; i < channels; i++) {
+				peakCV = std::max(peakCV, std::abs(inputs[PWM2_INPUT].getVoltage(i)));
+			}
+			lights[PWM2_CV_LIGHT].setBrightness(peakCV / 5.f);
+		} else {
+			lights[PWM2_CV_LIGHT].setBrightness(0.f);
+		}
 	}
 };
 
