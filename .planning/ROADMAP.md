@@ -25,6 +25,12 @@ This roadmap delivers the Triax VCO module in 8 phases, progressing from foundat
 
 **Dependencies:** None (starting point)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md - SDK setup and 36 HP panel design
+- [ ] 01-02-PLAN.md - Polyphonic module implementation with V/Oct tracking
+
 **Requirements:**
 - PANEL-01: Wide panel (30+ HP) with all controls visible
 - PANEL-02: Follows VCV Rack panel guidelines (spacing, labeling, colors)
@@ -193,7 +199,7 @@ This roadmap delivers the Triax VCO module in 8 phases, progressing from foundat
 
 | Phase | Status | Requirements | Completion |
 |-------|--------|--------------|------------|
-| 1 - Foundation & Panel | Pending | 9 | 0% |
+| 1 - Foundation & Panel | Planned | 9 | 0% |
 | 2 - Core Oscillator | Pending | 3 | 0% |
 | 3 - SIMD Polyphony | Pending | 1 | 0% |
 | 4 - Dual VCO Architecture | Pending | 5 | 0% |
