@@ -31,93 +31,93 @@
 
   <!-- Title -->
   <text
-     style="font-size:6px;font-family:sans-serif;fill:#8888aa;text-anchor:middle"
+     style="font-size:8px;font-family:sans-serif;font-weight:bold;fill:#8888aa;text-anchor:middle"
      x="91.44"
-     y="8">TRIAX VCO</text>
+     y="9">TRIAX VCO</text>
 
   <!-- VCO1 Section Label -->
   <text
-     style="font-size:4px;font-family:sans-serif;fill:#6688aa;text-anchor:middle"
+     style="font-size:5px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
      x="35"
-     y="15">VCO 1</text>
+     y="17">VCO 1</text>
 
   <!-- VCO2 Section Label -->
   <text
-     style="font-size:4px;font-family:sans-serif;fill:#6688aa;text-anchor:middle"
+     style="font-size:5px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
      x="147"
-     y="15">VCO 2</text>
+     y="17">VCO 2</text>
 
   <!-- Center Section Label -->
   <text
-     style="font-size:3px;font-family:sans-serif;fill:#6688aa;text-anchor:middle"
+     style="font-size:4px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
      x="91.44"
-     y="78">GLOBAL</text>
+     y="75">GLOBAL</text>
 
   <!-- VCO1 Octave Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="15.24" y="20">OCTAVE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="15.24" y="21">OCTAVE</text>
 
   <!-- VCO1 Detune Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="35.56" y="20">DETUNE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="45" y="21">DETUNE</text>
 
   <!-- VCO1 Waveform Labels -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="10.16" y="40">TRI</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="25.4" y="40">SQR</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="40.64" y="40">SIN</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="55.88" y="40">SAW</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="10.16" y="38">TRI</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="25.4" y="38">SQR</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="40.64" y="38">SIN</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="55.88" y="38">SAW</text>
 
   <!-- VCO1 PWM Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="15.24" y="60">PWM</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="15.24" y="58">PWM</text>
 
   <!-- VCO1 Sync Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="35.56" y="60">SYNC</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="35.56" y="58">SYNC</text>
 
   <!-- VCO1 PWM CV Label -->
-  <text style="font-size:2px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="55.88" y="60">PWM CV</text>
+  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="55.88" y="58">PWM CV</text>
 
   <!-- VCO2 Octave Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="147.32" y="20">OCTAVE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="137" y="21">OCTAVE</text>
 
   <!-- VCO2 Fine Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="167.64" y="20">FINE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="167.64" y="21">FINE</text>
 
   <!-- VCO2 Waveform Labels -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="127.0" y="40">TRI</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="142.24" y="40">SQR</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="157.48" y="40">SIN</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="172.72" y="40">SAW</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="127.0" y="38">TRI</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="142.24" y="38">SQR</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="157.48" y="38">SIN</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="172.72" y="38">SAW</text>
 
   <!-- VCO2 PWM Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="127.0" y="60">PWM</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="127.0" y="58">PWM</text>
 
   <!-- VCO2 Sync Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="147.32" y="60">SYNC</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="147.32" y="58">SYNC</text>
 
   <!-- VCO2 FM Label -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#aa66aa;text-anchor:middle" x="167.64" y="60">FM</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa66aa;text-anchor:middle" x="167.64" y="58">FM AMT</text>
 
   <!-- VCO2 PWM CV Label -->
-  <text style="font-size:2px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="127.0" y="80">PWM CV</text>
+  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="127.0" y="78">PWM CV</text>
 
   <!-- VCO2 FM CV Label -->
-  <text style="font-size:2px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="147.32" y="80">FM CV</text>
+  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="147.32" y="78">FM CV</text>
 
   <!-- Global Section Labels -->
-  <text style="font-size:2px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="91.44" y="82">V/OCT</text>
-  <text style="font-size:2px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="91.44" y="97">GATE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="91.44" y="80">V/OCT</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="91.44" y="95">GATE</text>
 
   <!-- Output Section - Darker plate for outputs (PANEL-03) -->
   <rect
      style="fill:url(#outputPlate);fill-opacity:1;stroke:#4a6878;stroke-width:0.3"
-     width="25"
-     height="22"
-     x="78.94"
-     y="105"
+     width="28"
+     height="24"
+     x="77.44"
+     y="103"
      rx="1"
      ry="1" />
 
   <!-- Output Labels on plate -->
-  <text style="font-size:2px;font-family:sans-serif;fill:#aaddff;text-anchor:middle" x="91.44" y="112">AUDIO</text>
-  <text style="font-size:2px;font-family:sans-serif;fill:#aaddff;text-anchor:middle" x="91.44" y="123">MIX</text>
+  <text style="font-size:3.5px;font-family:sans-serif;font-weight:bold;fill:#aaddff;text-anchor:middle" x="91.44" y="110">AUDIO</text>
+  <text style="font-size:3.5px;font-family:sans-serif;font-weight:bold;fill:#aaddff;text-anchor:middle" x="91.44" y="122">MIX</text>
 
   <!-- Section divider lines -->
   <line x1="66" y1="12" x2="66" y2="118" style="stroke:#3a3a5e;stroke-width:0.3" />
@@ -127,36 +127,36 @@
   <g inkscape:label="components" id="components" style="display:none">
 
     <!-- VCO1 Parameters (red) -->
-    <circle cx="15.24" cy="25.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE1" />
-    <circle cx="35.56" cy="25.0" r="4" style="fill:#ff0000" inkscape:label="DETUNE1" />
-    <circle cx="10.16" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="TRI1" />
-    <circle cx="25.4" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SQR1" />
-    <circle cx="40.64" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SIN1" />
-    <circle cx="55.88" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SAW1" />
-    <circle cx="15.24" cy="65.0" r="4" style="fill:#ff0000" inkscape:label="PWM1" />
-    <circle cx="35.56" cy="65.0" r="2" style="fill:#ff0000" inkscape:label="SYNC1" />
+    <circle cx="15.24" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE1" />
+    <circle cx="45" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="DETUNE1" />
+    <circle cx="10.16" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="TRI1" />
+    <circle cx="25.4" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SQR1" />
+    <circle cx="40.64" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SIN1" />
+    <circle cx="55.88" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SAW1" />
+    <circle cx="15.24" cy="68.0" r="4" style="fill:#ff0000" inkscape:label="PWM1" />
+    <circle cx="35.56" cy="68.0" r="2" style="fill:#ff0000" inkscape:label="SYNC1" />
 
     <!-- VCO2 Parameters (red) -->
-    <circle cx="147.32" cy="25.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE2" />
-    <circle cx="167.64" cy="25.0" r="4" style="fill:#ff0000" inkscape:label="FINE2" />
-    <circle cx="127.0" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="TRI2" />
-    <circle cx="142.24" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SQR2" />
-    <circle cx="157.48" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SIN2" />
-    <circle cx="172.72" cy="45.0" r="4" style="fill:#ff0000" inkscape:label="SAW2" />
-    <circle cx="127.0" cy="65.0" r="4" style="fill:#ff0000" inkscape:label="PWM2" />
-    <circle cx="147.32" cy="65.0" r="2" style="fill:#ff0000" inkscape:label="SYNC2" />
-    <circle cx="167.64" cy="65.0" r="4" style="fill:#ff0000" inkscape:label="FM" />
+    <circle cx="137" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE2" />
+    <circle cx="167.64" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="FINE2" />
+    <circle cx="127.0" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="TRI2" />
+    <circle cx="142.24" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SQR2" />
+    <circle cx="157.48" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SIN2" />
+    <circle cx="172.72" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SAW2" />
+    <circle cx="127.0" cy="68.0" r="4" style="fill:#ff0000" inkscape:label="PWM2" />
+    <circle cx="147.32" cy="68.0" r="2" style="fill:#ff0000" inkscape:label="SYNC2" />
+    <circle cx="167.64" cy="68.0" r="4" style="fill:#ff0000" inkscape:label="FM" />
 
     <!-- Input ports (green) -->
     <circle cx="91.44" cy="85.0" r="4" style="fill:#00ff00" inkscape:label="VOCT" />
     <circle cx="91.44" cy="100.0" r="4" style="fill:#00ff00" inkscape:label="GATE" />
-    <circle cx="55.88" cy="65.0" r="4" style="fill:#00ff00" inkscape:label="PWM1" />
+    <circle cx="55.88" cy="68.0" r="4" style="fill:#00ff00" inkscape:label="PWM1" />
     <circle cx="127.0" cy="85.0" r="4" style="fill:#00ff00" inkscape:label="PWM2" />
     <circle cx="147.32" cy="85.0" r="4" style="fill:#00ff00" inkscape:label="FM" />
 
     <!-- Output ports (blue) -->
     <circle cx="91.44" cy="115.0" r="4" style="fill:#0000ff" inkscape:label="AUDIO" />
-    <circle cx="91.44" cy="122.0" r="4" style="fill:#0000ff" inkscape:label="MIX" />
+    <circle cx="91.44" cy="125.0" r="4" style="fill:#0000ff" inkscape:label="MIX" />
 
   </g>
 

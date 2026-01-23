@@ -58,7 +58,7 @@ struct TriaxVCO : Module {
 		configParam(DETUNE1_PARAM, 0.f, 1.f, 0.f, "VCO1 Detune");
 		configParam(TRI1_PARAM, 0.f, 1.f, 0.f, "VCO1 Triangle");
 		configParam(SQR1_PARAM, 0.f, 1.f, 1.f, "VCO1 Square");
-		configParam(SIN1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sine");
+		configParam(SIN1_PARAM, 0.f, 1.f, 1.f, "VCO1 Sine");
 		configParam(SAW1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sawtooth");
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
@@ -90,6 +90,9 @@ struct TriaxVCO : Module {
 		// Get channel count from V/Oct input (minimum 1)
 		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
 
+		// Read SIN1 volume knob (placeholder - Phase 2 will add all waveforms)
+		float sinVolume = params[SIN1_PARAM].getValue();
+
 		// Mix accumulator for mono sum
 		float mix = 0.f;
 
@@ -107,8 +110,9 @@ struct TriaxVCO : Module {
 			phase[c / 4] += deltaPhase;
 			phase[c / 4] -= simd::floor(phase[c / 4]); // Wrap to [0, 1)
 
-			// Generate simple sine wave (placeholder for real oscillator)
-			float_4 output = simd::sin(2.f * M_PI * phase[c / 4]) * 5.f;
+			// Generate simple sine wave scaled by SIN1 volume knob
+			// Phase 2 will add triangle, square, sawtooth with antialiasing
+			float_4 output = simd::sin(2.f * M_PI * phase[c / 4]) * 5.f * sinVolume;
 
 			// Write to polyphonic output
 			outputs[AUDIO_OUTPUT].setVoltageSimd(output, c);
@@ -140,37 +144,37 @@ struct TriaxVCOWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		// VCO1 Section (left side)
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 25.0)), module, TriaxVCO::OCTAVE1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.56, 25.0)), module, TriaxVCO::DETUNE1_PARAM));
+		// VCO1 Section (left side) - positions match SVG component layer
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 28.0)), module, TriaxVCO::OCTAVE1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.0, 28.0)), module, TriaxVCO::DETUNE1_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 45.0)), module, TriaxVCO::TRI1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 45.0)), module, TriaxVCO::SQR1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 45.0)), module, TriaxVCO::SIN1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 45.0)), module, TriaxVCO::SAW1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 48.0)), module, TriaxVCO::TRI1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 48.0)), module, TriaxVCO::SQR1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 48.0)), module, TriaxVCO::SIN1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 48.0)), module, TriaxVCO::SAW1_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 65.0)), module, TriaxVCO::PWM1_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 65.0)), module, TriaxVCO::SYNC1_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 65.0)), module, TriaxVCO::PWM1_INPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 68.0)), module, TriaxVCO::PWM1_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 68.0)), module, TriaxVCO::SYNC1_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 68.0)), module, TriaxVCO::PWM1_INPUT));
 
 		// Center Global Section
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, TriaxVCO::VOCT_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 100.0)), module, TriaxVCO::GATE_INPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 115.0)), module, TriaxVCO::AUDIO_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 115.0)), module, TriaxVCO::MIX_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 125.0)), module, TriaxVCO::MIX_OUTPUT));
 
-		// VCO2 Section (right side)
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(147.32, 25.0)), module, TriaxVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 25.0)), module, TriaxVCO::FINE2_PARAM));
+		// VCO2 Section (right side) - positions match SVG component layer
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(137.0, 28.0)), module, TriaxVCO::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 28.0)), module, TriaxVCO::FINE2_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 45.0)), module, TriaxVCO::TRI2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(142.24, 45.0)), module, TriaxVCO::SQR2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(157.48, 45.0)), module, TriaxVCO::SIN2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(172.72, 45.0)), module, TriaxVCO::SAW2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 48.0)), module, TriaxVCO::TRI2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(142.24, 48.0)), module, TriaxVCO::SQR2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(157.48, 48.0)), module, TriaxVCO::SIN2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(172.72, 48.0)), module, TriaxVCO::SAW2_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 65.0)), module, TriaxVCO::PWM2_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 65.0)), module, TriaxVCO::SYNC2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 65.0)), module, TriaxVCO::FM_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 68.0)), module, TriaxVCO::PWM2_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 68.0)), module, TriaxVCO::SYNC2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 68.0)), module, TriaxVCO::FM_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, TriaxVCO::PWM2_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, TriaxVCO::FM_INPUT));
 	}
