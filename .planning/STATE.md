@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 3 complete
+**Session:** Phase 4 complete
 
 ---
 
@@ -19,37 +19,38 @@
 
 ## Current Position
 
-**Phase:** 3 - SIMD Polyphony COMPLETE
-**Status:** Ready for Phase 4
-**Progress:** 3/8 phases complete
+**Phase:** 4 - Dual VCO Architecture COMPLETE
+**Status:** Ready for Phase 5
+**Progress:** 4/8 phases complete
 
 ```
-[███████████████░░░░░░░░░░░░░░░░░░░░░░] 38%
+[██████████████████████░░░░░░░░░░░░░░░] 50%
 ```
 
-**Next Action:** Plan Phase 4 (Dual VCO Architecture)
+**Next Action:** Plan Phase 5 (PWM & Sub-Oscillator)
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 3/8
+- Phases complete: 4/8
 - Phases in progress: 0/8
-- Phases pending: 5/8
+- Phases pending: 4/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 13 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-03)
-- Remaining: 21
+- Completed: 18 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, PITCH-01, PITCH-02, PITCH-03)
+- Remaining: 16
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
 - Polyphonic I/O verified: YES (8 voices, V/Oct tracking, mix output)
 - Antialiasing verified: YES (MinBLEP on saw/square, triangle via integration)
 - SIMD optimization verified: YES (0.8% CPU at 8 voices, float_4 processing)
-- CPU budget verified: YES (<5% target, achieved 0.8%)
+- CPU budget verified: YES (<5% target, achieved ~1.6% with dual VCO)
+- Dual VCO verified: YES (VcoEngine struct, independent pitch control)
 - Through-zero FM quality verified: No (Phase 6)
 
 ---
@@ -57,6 +58,14 @@
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 4 Complete (2026-01-23):**
+- VcoEngine struct encapsulates all per-oscillator state (phase, MinBLEP buffers, triState)
+- DC filters remain module members (operate on mixed output, not per-VCO)
+- VCO1 receives detune, VCO2 is reference oscillator (0 detune = perfect unison)
+- Detune range 0-50 cents via V/Oct conversion (detuneVolts = knob * 50/1200)
+- Both VCOs processed in same SIMD loop with independent frequency calculations
+- Human verified: dual oscillators, beating effect, octave switches, ~1.6% CPU
 
 **Phase 3 Complete (2026-01-23):**
 - Custom MinBlepBuffer<32> template struct with lane-based discontinuity insertion
@@ -93,25 +102,23 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 3 SIMD Polyphony fully verified by user
-- MinBlepBuffer template struct with lane-based insertions
-- Process loop using getPolyVoltageSimd/setVoltageSimd
-- 0.8% CPU usage (far below 5% target)
-- All waveforms sound identical to Phase 2 (no quality regression)
-- Renamed project from Triax to HydraQuartet
+- Phase 4 Dual VCO Architecture fully verified by user
+- VcoEngine struct extracted from inline DSP
+- Dual vco1/vco2 instances with independent SIMD state
+- Octave switches (-2 to +2) for both VCOs
+- Detune knob on VCO1 (0-50 cents) for beating/thickness effect
+- Independent waveform volume controls (8 total: 4 per VCO)
+- ~1.6% CPU (approximately 2x Phase 3 baseline as expected)
 
 ### What Comes Next
-1. Run `/gsd:plan-phase 4` to plan Dual VCO Architecture
-2. Duplicate SIMD pattern for VCO2
-3. Add octave switches and detune control
+1. Run `/gsd:plan-phase 5` to plan PWM & Sub-Oscillator
+2. Wire PWM CV inputs for both VCOs
+3. Add sub-oscillator output for VCO1
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - Complete SIMD refactor, renamed from TriaxVCO
-- res/HydraQuartetVCO.svg - Renamed from TriaxVCO
-- plugin.json - Updated slug/brand to HydraQuartet
-- .planning/phases/03-simd-polyphony/03-01-SUMMARY.md - created
-- .planning/phases/03-simd-polyphony/03-VERIFICATION.md - created
+- src/HydraQuartetVCO.cpp - VcoEngine struct, dual oscillator wiring
+- .planning/phases/04-dual-vco-architecture/04-01-SUMMARY.md - created
 
 ---
 
-*Last updated: 2026-01-23 after Phase 3 verification*
+*Last updated: 2026-01-23 after Phase 4 verification*
