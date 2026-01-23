@@ -1,4 +1,7 @@
 #include "plugin.hpp"
+#include <cmath>
+
+using simd::float_4;
 
 
 struct TriaxVCO : Module {
@@ -44,6 +47,9 @@ struct TriaxVCO : Module {
 		LIGHTS_LEN
 	};
 
+	// Phase state for 16 channels (4 groups of 4 for SIMD)
+	float_4 phase[4] = {};
+
 	TriaxVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -81,7 +87,44 @@ struct TriaxVCO : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Placeholder - actual oscillator implementation in Phase 2
+		// Get channel count from V/Oct input (minimum 1)
+		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
+
+		// Mix accumulator for mono sum
+		float mix = 0.f;
+
+		// Process 4 channels at a time (SIMD)
+		for (int c = 0; c < channels; c += 4) {
+			// Get V/Oct pitch (polyphonic, spreads mono to all if mono source)
+			float_4 pitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
+
+			// Convert V/Oct to frequency
+			// 0V = C4 (261.6256 Hz), 1V = C5, etc.
+			float_4 freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
+
+			// Accumulate phase
+			float_4 deltaPhase = freq * args.sampleTime;
+			phase[c / 4] += deltaPhase;
+			phase[c / 4] -= simd::floor(phase[c / 4]); // Wrap to [0, 1)
+
+			// Generate simple sine wave (placeholder for real oscillator)
+			float_4 output = simd::sin(2.f * M_PI * phase[c / 4]) * 5.f;
+
+			// Write to polyphonic output
+			outputs[AUDIO_OUTPUT].setVoltageSimd(output, c);
+
+			// Accumulate to mix (sum all active channels in this SIMD block)
+			int blockChannels = std::min(4, channels - c);
+			for (int i = 0; i < blockChannels; i++) {
+				mix += output[i];
+			}
+		}
+
+		// Set output channel count (CRITICAL for polyphonic operation)
+		outputs[AUDIO_OUTPUT].setChannels(channels);
+
+		// Mix output: average of all voices
+		outputs[MIX_OUTPUT].setVoltage(mix / channels);
 	}
 };
 
