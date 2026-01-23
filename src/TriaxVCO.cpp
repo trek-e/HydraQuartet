@@ -8,7 +8,6 @@ struct VCO1Voice {
 	dsp::MinBlepGenerator<16, 16, float> sawMinBlep;
 	dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
 	dsp::TRCFilter<float> dcFilter;
-	float dcFilterState = 0.f;
 	float triState = 0.f;  // Integrator state for triangle
 };
 
@@ -103,6 +102,10 @@ struct TriaxVCO : Module {
 
 		// Read VCO1 parameters (outside loop - same for all voices)
 		float pwm1 = params[PWM1_PARAM].getValue();
+		float triVol = params[TRI1_PARAM].getValue();
+		float sqrVol = params[SQR1_PARAM].getValue();
+		float sinVol = params[SIN1_PARAM].getValue();
+		float sawVol = params[SAW1_PARAM].getValue();
 		float sampleTime = args.sampleTime;
 		float sampleRate = args.sampleRate;
 
@@ -171,8 +174,14 @@ struct TriaxVCO : Module {
 			// Store updated phase back
 			phase[c / 4][c % 4] = phaseNow;
 
-			// Temporary output: sine only (Task 3 will add mixing)
-			float output = sine * 5.f;
+			// Mix all 4 waveforms with volume controls
+			// Each waveform is [-1, +1], scale to [-5V, +5V] after mixing
+			float mixed = tri * triVol + sqr * sqrVol + sine * sinVol + saw * sawVol;
+
+			// DC blocking on final mixed output (10 Hz highpass)
+			voice.dcFilter.setCutoffFreq(10.f / sampleRate);
+			voice.dcFilter.process(mixed * 5.f);
+			float output = voice.dcFilter.highpass();
 
 			outputs[AUDIO_OUTPUT].setVoltage(output, c);
 			mix += output;
