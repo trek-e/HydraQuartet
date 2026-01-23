@@ -391,6 +391,14 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// PWM1 CV activity LED - positioned near the input port
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 68.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
 
+		// Sub-oscillator controls (VCO1 section, near bottom)
+		// Sub level knob
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 88.0)), module, HydraQuartetVCO::SUB_LEVEL_PARAM));
+		// Sub waveform switch (toggle between square and sine)
+		addParam(createParamCentered<CKSS>(mm2px(Vec(25.4, 88.0)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
+		// Sub output jack
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64, 88.0)), module, HydraQuartetVCO::SUB_OUTPUT));
+
 		// Center Global Section
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 100.0)), module, HydraQuartetVCO::GATE_INPUT));
