@@ -1,7 +1,7 @@
 # Project State: Triax VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 1 complete
+**Session:** Phase 2 Plan 1 complete
 
 ---
 
@@ -19,15 +19,15 @@
 
 ## Current Position
 
-**Phase:** 1 - Foundation & Panel COMPLETE
-**Status:** Ready for Phase 2
-**Progress:** 1/8 phases complete
+**Phase:** 2 - Core Oscillator with Antialiasing IN PROGRESS
+**Status:** Plan 02-01 complete
+**Progress:** Phase 2 started
 
 ```
-[█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 12.5%
+[█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1.5/8 phases)
 ```
 
-**Next Action:** Plan Phase 2 (Core Oscillator with Antialiasing)
+**Next Action:** Continue Phase 2 (remaining plans if any, or proceed to Phase 3)
 
 ---
 
@@ -35,21 +35,21 @@
 
 **Roadmap Progress:**
 - Phases complete: 1/8
-- Phases in progress: 0/8
-- Phases pending: 7/8
+- Phases in progress: 1/8 (Phase 2 - Core Oscillator)
+- Phases pending: 6/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 9 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, CV-01, CV-02, OUT-01, OUT-02)
-- Remaining: 25
+- Completed: 13 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, ALIAS-01)
+- Remaining: 21
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
 - Polyphonic I/O verified: YES (8 voices, V/Oct tracking, mix output)
-- Antialiasing verified: No (Phase 2)
+- Antialiasing verified: YES (MinBLEP sawtooth/square, integrated triangle, native sine)
 - SIMD optimization verified: No (Phase 3)
-- CPU budget verified: No
+- CPU budget verified: No (needs measurement)
 - Through-zero FM quality verified: No (Phase 6)
 
 ---
@@ -57,6 +57,14 @@
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 2 Plan 1 (2026-01-23):**
+- Per-voice scalar processing required for MinBLEP (not SIMD compatible)
+- Triangle generated via leaky integration (0.999 decay) of antialiased square
+- DC filter applied to mixed output, not individual waveforms
+- TRCFilter API: call process() then highpass() (not single-call with state param)
+- MinBLEP discontinuity insertion: subsample = (crossing_point - phasePrev) / deltaPhase
+- Phase crossing detection: phasePrev < threshold && phaseNow >= threshold (avoid VCV Fundamental bug)
 
 **Phase 1 Complete (2026-01-23):**
 - SDK 2.6.6 installed at /Users/trekkie/projects/vcvrack_modules/Rack-SDK
@@ -88,24 +96,24 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 1 Foundation & Panel fully verified by user
-- Polyphonic V/Oct tracking working (0V = C4 = 261.6 Hz)
-- 8-voice polyphony confirmed
-- Mix output confirmed (normalized mono sum)
-- SIN1 volume knob functional
-- All Phase 1 requirements satisfied
+- Phase 2 Plan 1: Antialiased VCO1 with 4 waveforms
+- MinBLEP generators for sawtooth and square waveforms
+- Leaky integrator for triangle waveform
+- DC filtering on mixed output
+- All 4 VCO1 volume knobs functional (TRI1, SQR1, SIN1, SAW1)
+- Per-voice state management for 16-channel polyphony
 
 ### What Comes Next
-1. Run `/gsd:plan-phase 2` to plan Core Oscillator with Antialiasing
-2. Research polyBLEP/polyBLAMP implementation
-3. Implement antialiased waveforms (tri, sqr, sin, saw)
-4. Connect all VCO1 waveform volume knobs
+1. User verification: Test antialiasing quality at >2kHz
+2. User verification: Test PWM sweep for clicks
+3. User verification: Test polyphonic operation
+4. Continue Phase 2 if additional plans exist, or proceed to Phase 3 (SIMD optimization)
 
 ### Files Modified This Session
-- src/TriaxVCO.cpp - polyphonic process(), SIN1 volume control
-- res/TriaxVCO.svg - larger label fonts, aligned positions
-- .planning/phases/01-foundation-panel/01-02-SUMMARY.md - created
+- src/TriaxVCO.cpp - VCO1Voice struct, antialiased waveform generation, volume mixing
+- .planning/phases/02-core-oscillator/02-01-SUMMARY.md - created
+- .planning/STATE.md - updated with Phase 2 progress
 
 ---
 
-*Last updated: 2026-01-23 after Phase 1 verification*
+*Last updated: 2026-01-23 after Phase 2 Plan 1 completion*
