@@ -1,14 +1,52 @@
 #include "plugin.hpp"
 #include <cmath>
+#include <cstring>
 
 using simd::float_4;
 
-// Per-voice state for VCO1 antialiasing
-struct VCO1Voice {
-	dsp::MinBlepGenerator<16, 16, float> sawMinBlep;
-	dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
-	dsp::TRCFilter<float> dcFilter;
-	float triState = 0.f;  // Integrator state for triangle
+// Constants for MinBLEP generation
+static constexpr int MINBLEP_Z = 16;  // Zero crossings
+static constexpr int MINBLEP_O = 16;  // Oversample factor
+
+// Static MinBLEP impulse table (shared lookup, generated once)
+struct MinBlepTable {
+	float impulse[2 * MINBLEP_Z * MINBLEP_O + 1];
+
+	MinBlepTable() {
+		dsp::minBlepImpulse(MINBLEP_Z, MINBLEP_O, impulse);
+		impulse[2 * MINBLEP_Z * MINBLEP_O] = 1.f;
+	}
+};
+static MinBlepTable minBlepTable;
+
+// SIMD-compatible MinBLEP buffer with stride support
+// Stores 4 interleaved lanes for efficient SIMD processing
+template <int N>
+struct MinBlepBuffer {
+	float_4 buffer[2 * N] = {};
+	int pos = 0;
+
+	// Insert discontinuity with stride=4 for a single lane
+	// p: subsample position (-1 < p <= 0)
+	// x: discontinuity magnitude
+	// lane: which SIMD lane (0-3)
+	void insertDiscontinuity(float p, float x, int lane) {
+		if (!(-1.f < p && p <= 0.f))
+			return;
+		for (int j = 0; j < 2 * MINBLEP_Z; j++) {
+			float minBlepIndex = ((float)j - p) * MINBLEP_O;
+			int index = (pos + j) % (2 * N);
+			// Access specific lane using array indexing
+			buffer[index][lane] += x * (-1.f + math::interpolateLinear(minBlepTable.impulse, minBlepIndex));
+		}
+	}
+
+	float_4 process() {
+		float_4 v = buffer[pos];
+		buffer[pos] = float_4(0.f);
+		pos = (pos + 1) % (2 * N);
+		return v;
+	}
 };
 
 struct TriaxVCO : Module {
@@ -57,8 +95,13 @@ struct TriaxVCO : Module {
 	// Phase state for 16 channels (4 groups of 4 for SIMD)
 	float_4 phase[4] = {};
 
-	// Per-voice state for VCO1 antialiasing (16 channels max)
-	VCO1Voice vco1Voices[16];
+	// SIMD voice group state (4 groups x 4 voices = 16 max)
+	MinBlepBuffer<32> sawMinBlepBuffer[4];
+	MinBlepBuffer<32> sqrMinBlepBuffer[4];
+	float_4 triState[4] = {};  // Triangle integrator state per SIMD group
+
+	// DC filters kept scalar (not in hot path)
+	dsp::TRCFilter<float> dcFilters[16];
 
 	TriaxVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -109,89 +152,100 @@ struct TriaxVCO : Module {
 		float sampleTime = args.sampleTime;
 		float sampleRate = args.sampleRate;
 
-		// Mix accumulator for mono sum
-		float mix = 0.f;
+		// Broadcast scalar PWM to SIMD
+		float_4 pwm4 = pwm1;
 
-		// Process each voice individually (MinBLEP is per-voice)
-		for (int c = 0; c < channels; c++) {
-			// Get V/Oct pitch for this voice
-			float pitch = inputs[VOCT_INPUT].getVoltage(c);
+		// Process in SIMD groups of 4 voices
+		for (int c = 0; c < channels; c += 4) {
+			int groupChannels = std::min(channels - c, 4);
+			int g = c / 4;  // SIMD group index
+
+			// Load 4 channels of V/Oct using SIMD
+			float_4 pitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
 
 			// Convert V/Oct to frequency (0V = C4 = 261.6 Hz)
-			float freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
+			float_4 freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
 
-			// Clamp frequency to safe range (prevent numerical issues)
-			freq = clamp(freq, 0.1f, sampleRate / 2.f);
+			// Clamp frequency to safe range
+			freq = simd::clamp(freq, 0.1f, sampleRate / 2.f);
 
-			// Get per-voice state
-			VCO1Voice& voice = vco1Voices[c];
+			// Phase accumulation with SIMD
+			float_4 deltaPhase = simd::clamp(freq * sampleTime, 0.f, 0.49f);
+			float_4 oldPhase = phase[g];
+			phase[g] += deltaPhase;
 
-			// Update phase
-			float deltaPhase = freq * sampleTime;
-			float phasePrev = phase[c / 4][c % 4];
-			float phaseNow = phasePrev + deltaPhase;
+			// Detect phase wrap
+			float_4 wrapped = phase[g] >= 1.f;
+			phase[g] -= simd::floor(phase[g]);  // Handles large FM jumps
 
-			// === SAWTOOTH with MinBLEP ===
-			// Detect discontinuity at phase wrap (1.0 -> 0.0)
-			if (phaseNow >= 1.f) {
-				phaseNow -= 1.f;
-				float subsample = phaseNow / deltaPhase;
-				// Sawtooth drops from +1 to -1, magnitude -2
-				voice.sawMinBlep.insertDiscontinuity(subsample - 1.f, -2.f);
+			// === SAWTOOTH with strided MinBLEP ===
+			int wrapMask = simd::movemask(wrapped);
+			if (wrapMask) {
+				for (int i = 0; i < 4; i++) {
+					if (wrapMask & (1 << i)) {
+						float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
+						sawMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
+					}
+				}
+			}
+			float_4 saw = 2.f * phase[g] - 1.f + sawMinBlepBuffer[g].process();
+
+			// === SQUARE with PWM using strided MinBLEP ===
+			// Falling edge detection (phase crosses PWM threshold)
+			float_4 fallingEdge = (oldPhase < pwm4) & (phase[g] >= pwm4);
+			int fallMask = simd::movemask(fallingEdge);
+			if (fallMask) {
+				for (int i = 0; i < 4; i++) {
+					if (fallMask & (1 << i)) {
+						float subsample = (pwm4[i] - oldPhase[i]) / deltaPhase[i] - 1.f;
+						sqrMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
+					}
+				}
 			}
 
-			// Generate naive sawtooth [-1, +1]
-			float saw = 2.f * phaseNow - 1.f;
-			saw += voice.sawMinBlep.process();
-
-			// === SQUARE with MinBLEP ===
-			// Rising edge at phase 0 (wrap detection)
-			if (phasePrev + deltaPhase >= 1.f && phasePrev < 1.f) {
-				float subsample = phaseNow / deltaPhase;
-				voice.sqrMinBlep.insertDiscontinuity(subsample - 1.f, 2.f);  // -1 to +1
+			// Rising edge on wrap
+			if (wrapMask) {
+				for (int i = 0; i < 4; i++) {
+					if (wrapMask & (1 << i)) {
+						float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
+						sqrMinBlepBuffer[g].insertDiscontinuity(subsample, 2.f, i);
+					}
+				}
 			}
 
-			// Falling edge at pulse width threshold
-			// CRITICAL: Only insert when phase CROSSES, not when parameter changes
-			if (phasePrev < pwm1 && phaseNow >= pwm1) {
-				float subsample = (pwm1 - phasePrev) / deltaPhase;
-				voice.sqrMinBlep.insertDiscontinuity(subsample - 1.f, -2.f);  // +1 to -1
-			}
-
-			// Generate naive square
-			float sqr = (phaseNow < pwm1) ? 1.f : -1.f;
-			sqr += voice.sqrMinBlep.process();
+			float_4 sqr = simd::ifelse(phase[g] < pwm4, 1.f, -1.f) + sqrMinBlepBuffer[g].process();
 
 			// === TRIANGLE via integration ===
-			// Integrate antialiased square with leaky integrator
-			// Scale by 4 * freq to normalize amplitude
-			voice.triState = voice.triState * 0.999f + sqr * 4.f * freq * sampleTime;
-			float tri = voice.triState;
+			triState[g] = triState[g] * 0.999f + sqr * 4.f * freq * sampleTime;
+			float_4 tri = triState[g];
 
 			// === SINE (no antialiasing needed) ===
-			float sine = std::sin(2.f * M_PI * phaseNow);
-
-			// Store updated phase back
-			phase[c / 4][c % 4] = phaseNow;
+			float_4 sine = simd::sin(2.f * float(M_PI) * phase[g]);
 
 			// Mix all 4 waveforms with volume controls
-			// Each waveform is [-1, +1], scale to [-5V, +5V] after mixing
-			float mixed = tri * triVol + sqr * sqrVol + sine * sinVol + saw * sawVol;
+			float_4 mixed = tri * triVol + sqr * sqrVol + sine * sinVol + saw * sawVol;
 
-			// DC blocking on final mixed output (10 Hz highpass)
-			voice.dcFilter.setCutoffFreq(10.f / sampleRate);
-			voice.dcFilter.process(mixed * 5.f);
-			float output = voice.dcFilter.highpass();
+			// DC filtering - process per-voice (not in critical path)
+			for (int i = 0; i < groupChannels; i++) {
+				dcFilters[c + i].setCutoffFreq(10.f / sampleRate);
+				dcFilters[c + i].process(mixed[i] * 5.f);
+				mixed[i] = dcFilters[c + i].highpass();
+			}
 
-			outputs[AUDIO_OUTPUT].setVoltage(output, c);
-			mix += output;
+			outputs[AUDIO_OUTPUT].setVoltageSimd(mixed, c);
 		}
 
 		// Set output channel count (CRITICAL for polyphonic operation)
 		outputs[AUDIO_OUTPUT].setChannels(channels);
 
-		// Mix output: average of all voices
-		outputs[MIX_OUTPUT].setVoltage(mix / channels);
+		// Mix output using horizontal sum for efficiency
+		float_4 mixSum = 0.f;
+		for (int g = 0; g < (channels + 3) / 4; g++) {
+			mixSum += outputs[AUDIO_OUTPUT].getVoltageSimd<float_4>(g * 4);
+		}
+		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
+		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
+		outputs[MIX_OUTPUT].setVoltage(mixSum[0] / channels);
 	}
 };
 
