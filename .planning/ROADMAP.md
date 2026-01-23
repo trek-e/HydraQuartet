@@ -60,7 +60,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md - MinBLEP antialiased waveforms with VCO1 volume controls
+- [x] 02-01-PLAN.md - MinBLEP antialiased waveforms with VCO1 volume controls
 
 **Requirements:**
 - FOUND-04: MinBLEP antialiasing on all harmonically rich waveforms
@@ -205,7 +205,7 @@ Plans:
 | Phase | Status | Requirements | Completion |
 |-------|--------|--------------|------------|
 | 1 - Foundation & Panel | Complete | 9 | 100% |
-| 2 - Core Oscillator | Planned | 3 | 0% |
+| 2 - Core Oscillator | Complete | 3 | 100% |
 | 3 - SIMD Polyphony | Pending | 1 | 0% |
 | 4 - Dual VCO Architecture | Pending | 5 | 0% |
 | 5 - PWM & Sub-Oscillator | Pending | 5 | 0% |
@@ -213,7 +213,7 @@ Plans:
 | 7 - Hard Sync | Pending | 4 | 0% |
 | 8 - XOR Waveshaping | Pending | 3 | 0% |
 
-**Overall:** 9/34 requirements complete (26%)
+**Overall:** 12/34 requirements complete (35%)
 
 ---
 
