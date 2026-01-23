@@ -51,7 +51,7 @@ The established libraries/tools for this domain:
 
 ```
 src/
-├── TriaxVCO.cpp          # Main module, process() orchestrates SIMD groups
+├── HydraQuartetVCO.cpp          # Main module, process() orchestrates SIMD groups
 └── (inline structs)
     ├── VCO1Engine<T>     # Templated engine: T = float or float_4
     ├── MinBlepBuffer<N,T># Strided buffer for SIMD-compatible MinBLEP

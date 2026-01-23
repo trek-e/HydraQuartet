@@ -22,7 +22,7 @@ tech-stack:
 
 key-files:
   created: []
-  modified: [src/TriaxVCO.cpp]
+  modified: [src/HydraQuartetVCO.cpp]
 
 key-decisions:
   - "Per-voice scalar processing required for MinBLEP (not SIMD compatible)"
@@ -68,7 +68,7 @@ Each task was committed atomically:
 3. **Task 3: Connect VCO1 volume knobs and mix waveforms** - `b0031be` (feat)
 
 ## Files Created/Modified
-- `src/TriaxVCO.cpp` - VCO1Voice struct, antialiased waveform generation, volume mixing
+- `src/HydraQuartetVCO.cpp` - VCO1Voice struct, antialiased waveform generation, volume mixing
 
 ## Decisions Made
 
@@ -95,7 +95,7 @@ Each task was committed atomically:
 - **Found during:** Task 3 (Connect volume knobs)
 - **Issue:** Plan specified `dcFilter.process(state, input)` but SDK requires `process(input)` then `highpass()` getter. Code wouldn't compile.
 - **Fix:** Changed to two-call pattern: `voice.dcFilter.process(mixed * 5.f); float output = voice.dcFilter.highpass();`
-- **Files modified:** src/TriaxVCO.cpp (VCO1Voice struct and process() method)
+- **Files modified:** src/HydraQuartetVCO.cpp (VCO1Voice struct and process() method)
 - **Verification:** Code compiles cleanly, no warnings
 - **Committed in:** b0031be (Task 3 commit)
 

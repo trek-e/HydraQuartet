@@ -1,4 +1,4 @@
-# Requirements: Triax VCO
+# Requirements: HydraQuartet VCO
 
 **Defined:** 2026-01-22
 **Core Value:** Rich, musical polyphonic oscillator with dual-VCO-per-voice architecture and through-zero FM that stays in tune

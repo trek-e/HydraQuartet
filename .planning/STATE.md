@@ -1,4 +1,4 @@
-# Project State: Triax VCO
+# Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
 **Session:** Phase 2 complete
@@ -99,7 +99,7 @@
 3. Measure CPU improvement vs current scalar implementation
 
 ### Files Modified This Session
-- src/TriaxVCO.cpp - VCO1Voice struct, antialiased waveforms, volume mixing
+- src/HydraQuartetVCO.cpp - VCO1Voice struct, antialiased waveforms, volume mixing
 - .planning/phases/02-core-oscillator/02-01-SUMMARY.md - created
 - .planning/phases/02-core-oscillator/02-VERIFICATION.md - created
 

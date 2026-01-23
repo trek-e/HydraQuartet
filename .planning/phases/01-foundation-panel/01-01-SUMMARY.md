@@ -5,14 +5,14 @@
 
 ## What Was Built
 
-A complete VCV Rack plugin scaffold for the Triax VCO module with a 36 HP panel design. The plugin compiles successfully and is ready for oscillator implementation in subsequent plans.
+A complete VCV Rack plugin scaffold for the HydraQuartet VCO module with a 36 HP panel design. The plugin compiles successfully and is ready for oscillator implementation in subsequent plans.
 
 ### Plugin Infrastructure
 - Downloaded and configured VCV Rack SDK 2.6.6 for macOS arm64
-- Created plugin manifest with "Triax" slug and "TriaxVCO" module
+- Created plugin manifest with "HydraQuartet" slug and "HydraQuartetVCO" module
 - Set up Makefile with correct RACK_DIR path
 - Created plugin.hpp/cpp with Model declaration
-- Created TriaxVCO.cpp with all parameter, input, and output enums
+- Created HydraQuartetVCO.cpp with all parameter, input, and output enums
 
 ### Panel Design
 - 36 HP (182.88mm) x 128.5mm (Eurorack 3U standard)
@@ -25,7 +25,7 @@ A complete VCV Rack plugin scaffold for the Triax VCO module with a 36 HP panel 
 
 1. **SDK Location:** Downloaded SDK 2.6.6 to `/Users/trekkie/projects/vcvrack_modules/Rack-SDK` with Makefile using `RACK_DIR ?= ../Rack-SDK`
 
-2. **Module Name:** TriaxVCO (single module in Triax plugin) with tags: Oscillator, Polyphonic, Hardware Clone
+2. **Module Name:** HydraQuartetVCO (single module in HydraQuartet plugin) with tags: Oscillator, Polyphonic, Hardware Clone
 
 3. **Panel Layout:**
    - VCO1 section: ~66mm (13 HP equivalent)
@@ -44,8 +44,8 @@ A complete VCV Rack plugin scaffold for the Triax VCO module with a 36 HP panel 
 | `Makefile` | Build configuration pointing to SDK |
 | `src/plugin.hpp` | Plugin-level declarations |
 | `src/plugin.cpp` | Plugin initialization |
-| `src/TriaxVCO.cpp` | Module with params/inputs/outputs defined |
-| `res/TriaxVCO.svg` | 36 HP panel with all controls laid out |
+| `src/HydraQuartetVCO.cpp` | Module with params/inputs/outputs defined |
+| `res/HydraQuartetVCO.svg` | 36 HP panel with all controls laid out |
 | `.gitignore` | Ignores build artifacts |
 
 ## Verification Results
@@ -53,7 +53,7 @@ A complete VCV Rack plugin scaffold for the Triax VCO module with a 36 HP panel 
 | Check | Result |
 |-------|--------|
 | `make` compiles | PASS - plugin.dylib created |
-| Panel exists | PASS - res/TriaxVCO.svg (163 lines) |
+| Panel exists | PASS - res/HydraQuartetVCO.svg (163 lines) |
 | Panel is 36 HP | PASS - 182.88mm x 128.5mm |
 | Component layer present | PASS - 17 params, 5 inputs, 2 outputs |
 | Outputs distinguished | PASS - gradient plate background |
@@ -62,9 +62,9 @@ A complete VCV Rack plugin scaffold for the Triax VCO module with a 36 HP panel 
 
 Plan 01-02 (Polyphonic module implementation) can proceed:
 
-1. **Scaffold ready:** `modelTriaxVCO` is declared in plugin.hpp and added in plugin.cpp
-2. **Enums complete:** All `ParamId`, `InputId`, `OutputId` enums defined in TriaxVCO.cpp
-3. **Panel positions:** Widget positions in TriaxVCOWidget match component layer positions
+1. **Scaffold ready:** `modelHydraQuartetVCO` is declared in plugin.hpp and added in plugin.cpp
+2. **Enums complete:** All `ParamId`, `InputId`, `OutputId` enums defined in HydraQuartetVCO.cpp
+3. **Panel positions:** Widget positions in HydraQuartetVCOWidget match component layer positions
 4. **Build works:** Clean compile with `make`
 
 ### SDK Environment

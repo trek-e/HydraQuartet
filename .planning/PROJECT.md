@@ -1,4 +1,4 @@
-# Triax VCO
+# HydraQuartet VCO
 
 ## What This Is
 

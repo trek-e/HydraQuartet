@@ -1,9 +1,9 @@
 {
-  "slug": "Triax",
-  "name": "Triax",
+  "slug": "HydraQuartet",
+  "name": "HydraQuartet",
   "version": "2.0.0",
   "license": "GPL-3.0-or-later",
-  "brand": "Triax",
+  "brand": "HydraQuartet",
   "author": "",
   "authorEmail": "",
   "authorUrl": "",
@@ -14,8 +14,8 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "TriaxVCO",
-      "name": "Triax VCO",
+      "slug": "HydraQuartetVCO",
+      "name": "HydraQuartet VCO",
       "description": "8-voice polyphonic dual-VCO with through-zero FM",
       "tags": ["Oscillator", "Polyphonic", "Hardware Clone"]
     }

@@ -45,7 +45,7 @@ human_verification:
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `src/TriaxVCO.cpp` | Antialiased polyphonic VCO1 with 4 waveforms | ✓ VERIFIED | EXISTS (247 lines), SUBSTANTIVE (no stubs/TODOs), contains MinBlepGenerator (lines 8-9), per-voice state array (line 61), all waveforms generated (lines 134-172) |
+| `src/HydraQuartetVCO.cpp` | Antialiased polyphonic VCO1 with 4 waveforms | ✓ VERIFIED | EXISTS (247 lines), SUBSTANTIVE (no stubs/TODOs), contains MinBlepGenerator (lines 8-9), per-voice state array (line 61), all waveforms generated (lines 134-172) |
 
 **Artifact Quality Checks:**
 - **Existence:** File exists at expected path
@@ -177,7 +177,7 @@ Scanned for:
 
 **Automated verification:** PASSED
 - All 5 observable truths have supporting infrastructure verified
-- Required artifact (TriaxVCO.cpp) exists, is substantive (247 lines), contains MinBlepGenerator, and compiles
+- Required artifact (HydraQuartetVCO.cpp) exists, is substantive (247 lines), contains MinBlepGenerator, and compiles
 - All 4 key wiring patterns verified (saw MinBLEP, square PWM, triangle integration, volume mixing)
 - All 3 Phase 2 requirements structurally satisfied
 - Zero anti-patterns detected

@@ -1,6 +1,6 @@
 # Stack Research: VCV Rack Polyphonic VCO Module
 
-**Project:** Triax VCO (8-voice polyphonic dual-VCO)
+**Project:** HydraQuartet VCO (8-voice polyphonic dual-VCO)
 **Platform:** VCV Rack 2.x
 **Researched:** 2026-01-22
 **Current Rack Version:** 2.6.6 (released November 2024)

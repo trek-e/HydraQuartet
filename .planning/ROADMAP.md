@@ -1,4 +1,4 @@
-# Roadmap: Triax VCO
+# Roadmap: HydraQuartet VCO
 
 **Project:** 8-voice polyphonic dual-VCO module for VCV Rack
 **Core Value:** Rich, musical polyphonic oscillator with dual-VCO-per-voice architecture and through-zero FM that stays in tune
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This roadmap delivers the Triax VCO module in 8 phases, progressing from foundation through dual-oscillator architecture to advanced cross-modulation features. The phase structure respects critical architectural dependencies: antialiasing and SIMD optimization must be established early and cannot be retrofitted. Through-zero FM and hard sync receive dedicated phases due to their complexity and quality requirements.
+This roadmap delivers the HydraQuartet VCO module in 8 phases, progressing from foundation through dual-oscillator architecture to advanced cross-modulation features. The phase structure respects critical architectural dependencies: antialiasing and SIMD optimization must be established early and cannot be retrofitted. Through-zero FM and hard sync receive dedicated phases due to their complexity and quality requirements.
 
 **Total Requirements:** 34 v1 requirements
 **Phase Count:** 8 phases

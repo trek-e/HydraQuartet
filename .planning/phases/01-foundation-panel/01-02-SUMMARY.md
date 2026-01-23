@@ -32,8 +32,8 @@ A fully functional polyphonic VCO module with 8-voice support, accurate V/Oct tr
 
 | File | Changes |
 |------|---------|
-| `src/TriaxVCO.cpp` | Added process() with SIMD polyphonic processing, SIN1 volume control |
-| `res/TriaxVCO.svg` | Increased label font sizes, aligned component positions |
+| `src/HydraQuartetVCO.cpp` | Added process() with SIMD polyphonic processing, SIN1 volume control |
+| `res/HydraQuartetVCO.svg` | Increased label font sizes, aligned component positions |
 
 ## Verification Results
 

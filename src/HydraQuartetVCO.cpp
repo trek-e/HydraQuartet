@@ -49,7 +49,7 @@ struct MinBlepBuffer {
 	}
 };
 
-struct TriaxVCO : Module {
+struct HydraQuartetVCO : Module {
 	enum ParamId {
 		// VCO1 Section
 		OCTAVE1_PARAM,
@@ -103,7 +103,7 @@ struct TriaxVCO : Module {
 	// DC filters kept scalar (not in hot path)
 	dsp::TRCFilter<float> dcFilters[16];
 
-	TriaxVCO() {
+	HydraQuartetVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
 		// VCO1 Parameters
@@ -250,10 +250,10 @@ struct TriaxVCO : Module {
 };
 
 
-struct TriaxVCOWidget : ModuleWidget {
-	TriaxVCOWidget(TriaxVCO* module) {
+struct HydraQuartetVCOWidget : ModuleWidget {
+	HydraQuartetVCOWidget(HydraQuartetVCO* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/TriaxVCO.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/HydraQuartetVCO.svg")));
 
 		// Screws
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -262,40 +262,40 @@ struct TriaxVCOWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// VCO1 Section (left side) - positions match SVG component layer
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 28.0)), module, TriaxVCO::OCTAVE1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.0, 28.0)), module, TriaxVCO::DETUNE1_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 28.0)), module, HydraQuartetVCO::OCTAVE1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.0, 28.0)), module, HydraQuartetVCO::DETUNE1_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 48.0)), module, TriaxVCO::TRI1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 48.0)), module, TriaxVCO::SQR1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 48.0)), module, TriaxVCO::SIN1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 48.0)), module, TriaxVCO::SAW1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 48.0)), module, HydraQuartetVCO::TRI1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 48.0)), module, HydraQuartetVCO::SQR1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 48.0)), module, HydraQuartetVCO::SIN1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 48.0)), module, HydraQuartetVCO::SAW1_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 68.0)), module, TriaxVCO::PWM1_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 68.0)), module, TriaxVCO::SYNC1_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 68.0)), module, TriaxVCO::PWM1_INPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 68.0)), module, HydraQuartetVCO::PWM1_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 68.0)), module, HydraQuartetVCO::SYNC1_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 68.0)), module, HydraQuartetVCO::PWM1_INPUT));
 
 		// Center Global Section
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, TriaxVCO::VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 100.0)), module, TriaxVCO::GATE_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 115.0)), module, TriaxVCO::AUDIO_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 125.0)), module, TriaxVCO::MIX_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 100.0)), module, HydraQuartetVCO::GATE_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 115.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 125.0)), module, HydraQuartetVCO::MIX_OUTPUT));
 
 		// VCO2 Section (right side) - positions match SVG component layer
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(137.0, 28.0)), module, TriaxVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 28.0)), module, TriaxVCO::FINE2_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(137.0, 28.0)), module, HydraQuartetVCO::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 28.0)), module, HydraQuartetVCO::FINE2_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 48.0)), module, TriaxVCO::TRI2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(142.24, 48.0)), module, TriaxVCO::SQR2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(157.48, 48.0)), module, TriaxVCO::SIN2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(172.72, 48.0)), module, TriaxVCO::SAW2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 48.0)), module, HydraQuartetVCO::TRI2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(142.24, 48.0)), module, HydraQuartetVCO::SQR2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(157.48, 48.0)), module, HydraQuartetVCO::SIN2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(172.72, 48.0)), module, HydraQuartetVCO::SAW2_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 68.0)), module, TriaxVCO::PWM2_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 68.0)), module, TriaxVCO::SYNC2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 68.0)), module, TriaxVCO::FM_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, TriaxVCO::PWM2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, TriaxVCO::FM_INPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 68.0)), module, HydraQuartetVCO::PWM2_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 68.0)), module, HydraQuartetVCO::SYNC2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 68.0)), module, HydraQuartetVCO::FM_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, HydraQuartetVCO::PWM2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, HydraQuartetVCO::FM_INPUT));
 	}
 };
 
 
-Model* modelTriaxVCO = createModel<TriaxVCO, TriaxVCOWidget>("TriaxVCO");
+Model* modelHydraQuartetVCO = createModel<HydraQuartetVCO, HydraQuartetVCOWidget>("HydraQuartetVCO");

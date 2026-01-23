@@ -54,8 +54,8 @@ The established libraries/tools for antialiased oscillators in VCV Rack:
 ### Recommended Project Structure
 ```
 src/
-├── TriaxVCO.cpp         # Main module with oscillator DSP
-│   ├── struct TriaxVCO
+├── HydraQuartetVCO.cpp         # Main module with oscillator DSP
+│   ├── struct HydraQuartetVCO
 │   │   ├── MinBlepGenerator instances (per-voice)
 │   │   ├── Phase accumulator (per-voice)
 │   │   ├── DC filters (per-voice)
