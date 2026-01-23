@@ -101,38 +101,81 @@ struct TriaxVCO : Module {
 		// Get channel count from V/Oct input (minimum 1)
 		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
 
-		// Read SIN1 volume knob (placeholder - Phase 2 will add all waveforms)
-		float sinVolume = params[SIN1_PARAM].getValue();
+		// Read VCO1 parameters (outside loop - same for all voices)
+		float pwm1 = params[PWM1_PARAM].getValue();
+		float sampleTime = args.sampleTime;
+		float sampleRate = args.sampleRate;
 
 		// Mix accumulator for mono sum
 		float mix = 0.f;
 
-		// Process 4 channels at a time (SIMD)
-		for (int c = 0; c < channels; c += 4) {
-			// Get V/Oct pitch (polyphonic, spreads mono to all if mono source)
-			float_4 pitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
+		// Process each voice individually (MinBLEP is per-voice)
+		for (int c = 0; c < channels; c++) {
+			// Get V/Oct pitch for this voice
+			float pitch = inputs[VOCT_INPUT].getVoltage(c);
 
-			// Convert V/Oct to frequency
-			// 0V = C4 (261.6256 Hz), 1V = C5, etc.
-			float_4 freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
+			// Convert V/Oct to frequency (0V = C4 = 261.6 Hz)
+			float freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
 
-			// Accumulate phase
-			float_4 deltaPhase = freq * args.sampleTime;
-			phase[c / 4] += deltaPhase;
-			phase[c / 4] -= simd::floor(phase[c / 4]); // Wrap to [0, 1)
+			// Clamp frequency to safe range (prevent numerical issues)
+			freq = clamp(freq, 0.1f, sampleRate / 2.f);
 
-			// Generate simple sine wave scaled by SIN1 volume knob
-			// Phase 2 will add triangle, square, sawtooth with antialiasing
-			float_4 output = simd::sin(2.f * M_PI * phase[c / 4]) * 5.f * sinVolume;
+			// Get per-voice state
+			VCO1Voice& voice = vco1Voices[c];
 
-			// Write to polyphonic output
-			outputs[AUDIO_OUTPUT].setVoltageSimd(output, c);
+			// Update phase
+			float deltaPhase = freq * sampleTime;
+			float phasePrev = phase[c / 4][c % 4];
+			float phaseNow = phasePrev + deltaPhase;
 
-			// Accumulate to mix (sum all active channels in this SIMD block)
-			int blockChannels = std::min(4, channels - c);
-			for (int i = 0; i < blockChannels; i++) {
-				mix += output[i];
+			// === SAWTOOTH with MinBLEP ===
+			// Detect discontinuity at phase wrap (1.0 -> 0.0)
+			if (phaseNow >= 1.f) {
+				phaseNow -= 1.f;
+				float subsample = phaseNow / deltaPhase;
+				// Sawtooth drops from +1 to -1, magnitude -2
+				voice.sawMinBlep.insertDiscontinuity(subsample - 1.f, -2.f);
 			}
+
+			// Generate naive sawtooth [-1, +1]
+			float saw = 2.f * phaseNow - 1.f;
+			saw += voice.sawMinBlep.process();
+
+			// === SQUARE with MinBLEP ===
+			// Rising edge at phase 0 (wrap detection)
+			if (phasePrev + deltaPhase >= 1.f && phasePrev < 1.f) {
+				float subsample = phaseNow / deltaPhase;
+				voice.sqrMinBlep.insertDiscontinuity(subsample - 1.f, 2.f);  // -1 to +1
+			}
+
+			// Falling edge at pulse width threshold
+			// CRITICAL: Only insert when phase CROSSES, not when parameter changes
+			if (phasePrev < pwm1 && phaseNow >= pwm1) {
+				float subsample = (pwm1 - phasePrev) / deltaPhase;
+				voice.sqrMinBlep.insertDiscontinuity(subsample - 1.f, -2.f);  // +1 to -1
+			}
+
+			// Generate naive square
+			float sqr = (phaseNow < pwm1) ? 1.f : -1.f;
+			sqr += voice.sqrMinBlep.process();
+
+			// === TRIANGLE via integration ===
+			// Integrate antialiased square with leaky integrator
+			// Scale by 4 * freq to normalize amplitude
+			voice.triState = voice.triState * 0.999f + sqr * 4.f * freq * sampleTime;
+			float tri = voice.triState;
+
+			// === SINE (no antialiasing needed) ===
+			float sine = std::sin(2.f * M_PI * phaseNow);
+
+			// Store updated phase back
+			phase[c / 4][c % 4] = phaseNow;
+
+			// Temporary output: sine only (Task 3 will add mixing)
+			float output = sine * 5.f;
+
+			outputs[AUDIO_OUTPUT].setVoltage(output, c);
+			mix += output;
 		}
 
 		// Set output channel count (CRITICAL for polyphonic operation)
