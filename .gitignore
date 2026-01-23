@@ -1,0 +1,13 @@
+# Ignore all dotfiles except git dotfiles
+.*
+!.git*
+!.planning
+
+# Binaries and build targets
+*.a
+*.so
+*.dylib
+*.dll
+/build
+/dep
+/dist
