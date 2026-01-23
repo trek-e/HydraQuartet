@@ -350,7 +350,11 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 68.0)), module, HydraQuartetVCO::PWM1_PARAM));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 68.0)), module, HydraQuartetVCO::SYNC1_PARAM));
+		// PWM1 attenuverter - small knob above the CV input
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(55.88, 58.0)), module, HydraQuartetVCO::PWM1_ATT_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 68.0)), module, HydraQuartetVCO::PWM1_INPUT));
+		// PWM1 CV activity LED - positioned near the input port
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 68.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
 
 		// Center Global Section
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
@@ -370,7 +374,11 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 68.0)), module, HydraQuartetVCO::PWM2_PARAM));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 68.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 68.0)), module, HydraQuartetVCO::FM_PARAM));
+		// PWM2 attenuverter - small knob above the CV input
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(127.0, 75.0)), module, HydraQuartetVCO::PWM2_ATT_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, HydraQuartetVCO::PWM2_INPUT));
+		// PWM2 CV activity LED - positioned near the input port
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(131.0, 85.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, HydraQuartetVCO::FM_INPUT));
 	}
 };
