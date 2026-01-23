@@ -209,17 +209,32 @@ struct HydraQuartetVCO : Module {
 		// Get channel count from V/Oct input (minimum 1)
 		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
 
-		// Read VCO1 parameters (outside loop - same for all voices)
-		float pwm1 = params[PWM1_PARAM].getValue();
-		float triVol = params[TRI1_PARAM].getValue();
-		float sqrVol = params[SQR1_PARAM].getValue();
-		float sinVol = params[SIN1_PARAM].getValue();
-		float sawVol = params[SAW1_PARAM].getValue();
 		float sampleTime = args.sampleTime;
 		float sampleRate = args.sampleRate;
 
+		// Read pitch control parameters (outside loop - same for all voices)
+		float octave1 = std::round(params[OCTAVE1_PARAM].getValue());  // -2 to +2
+		float octave2 = std::round(params[OCTAVE2_PARAM].getValue());  // -2 to +2
+		float detuneKnob = params[DETUNE1_PARAM].getValue();           // 0 to 1
+		float detuneVolts = detuneKnob * (50.f / 1200.f);              // 0-50 cents in V/Oct
+
+		// Read VCO1 parameters
+		float pwm1 = params[PWM1_PARAM].getValue();
+		float triVol1 = params[TRI1_PARAM].getValue();
+		float sqrVol1 = params[SQR1_PARAM].getValue();
+		float sinVol1 = params[SIN1_PARAM].getValue();
+		float sawVol1 = params[SAW1_PARAM].getValue();
+
+		// Read VCO2 parameters
+		float pwm2 = params[PWM2_PARAM].getValue();
+		float triVol2 = params[TRI2_PARAM].getValue();
+		float sqrVol2 = params[SQR2_PARAM].getValue();
+		float sinVol2 = params[SIN2_PARAM].getValue();
+		float sawVol2 = params[SAW2_PARAM].getValue();
+
 		// Broadcast scalar PWM to SIMD
-		float_4 pwm4 = pwm1;
+		float_4 pwm1_4 = pwm1;
+		float_4 pwm2_4 = pwm2;
 
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
@@ -227,20 +242,27 @@ struct HydraQuartetVCO : Module {
 			int g = c / 4;  // SIMD group index
 
 			// Load 4 channels of V/Oct using SIMD
-			float_4 pitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 basePitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
 
-			// Convert V/Oct to frequency (0V = C4 = 261.6 Hz)
-			float_4 freq = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch);
+			// VCO1: base + octave + detune (VCO1 gets detune for thickness)
+			float_4 pitch1 = basePitch + octave1 + detuneVolts;
+			float_4 freq1 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch1);
+			freq1 = simd::clamp(freq1, 0.1f, sampleRate / 2.f);
 
-			// Clamp frequency to safe range
-			freq = simd::clamp(freq, 0.1f, sampleRate / 2.f);
+			// VCO2: base + octave (reference oscillator, no detune)
+			float_4 pitch2 = basePitch + octave2;
+			float_4 freq2 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
+			freq2 = simd::clamp(freq2, 0.1f, sampleRate / 2.f);
 
-			// Process VCO1 through engine
+			// Process both VCO engines
 			float_4 saw1, sqr1, tri1, sine1;
-			vco1.process(g, freq, sampleTime, pwm4, saw1, sqr1, tri1, sine1);
+			float_4 saw2, sqr2, tri2, sine2;
+			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1);
+			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2);
 
-			// Mix VCO1 waveforms with volume controls
-			float_4 mixed = tri1 * triVol + sqr1 * sqrVol + sine1 * sinVol + saw1 * sawVol;
+			// Mix both VCOs with independent volume controls
+			float_4 mixed = tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
+			              + tri2 * triVol2 + sqr2 * sqrVol2 + sine2 * sinVol2 + saw2 * sawVol2;
 
 			// DC filtering - process per-voice (not in critical path)
 			for (int i = 0; i < groupChannels; i++) {
