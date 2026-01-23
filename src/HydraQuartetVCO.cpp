@@ -131,6 +131,8 @@ struct HydraQuartetVCO : Module {
 		PWM1_PARAM,
 		PWM1_ATT_PARAM,
 		SYNC1_PARAM,
+		SUB_WAVE_PARAM,
+		SUB_LEVEL_PARAM,
 		// VCO2 Section
 		OCTAVE2_PARAM,
 		FINE2_PARAM,
@@ -158,6 +160,7 @@ struct HydraQuartetVCO : Module {
 	enum OutputId {
 		AUDIO_OUTPUT,
 		MIX_OUTPUT,
+		SUB_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -169,6 +172,9 @@ struct HydraQuartetVCO : Module {
 	// Dual VCO engines (each encapsulates phase, MinBLEP buffers, tri state)
 	VcoEngine vco1;
 	VcoEngine vco2;
+
+	// Sub-oscillator state (tracks VCO1 at -1 octave)
+	float_4 subPhase[4] = {};
 
 	// DC filters kept scalar (not in hot path, operate on mixed output)
 	dsp::TRCFilter<float> dcFilters[16];
@@ -186,6 +192,8 @@ struct HydraQuartetVCO : Module {
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
 		configParam(PWM1_ATT_PARAM, -1.f, 1.f, 0.f, "VCO1 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
+		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
+		configParam(SUB_LEVEL_PARAM, 0.f, 1.f, 0.f, "Sub Level", "%", 0.f, 100.f);
 
 		// VCO2 Parameters
 		configSwitch(OCTAVE2_PARAM, -2.f, 2.f, 0.f, "VCO2 Octave", {"-2", "-1", "0", "+1", "+2"});
@@ -209,6 +217,7 @@ struct HydraQuartetVCO : Module {
 		// Outputs
 		configOutput(AUDIO_OUTPUT, "Polyphonic Audio");
 		configOutput(MIX_OUTPUT, "Mix");
+		configOutput(SUB_OUTPUT, "Sub-Oscillator");
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -241,6 +250,10 @@ struct HydraQuartetVCO : Module {
 		// Read PWM CV attenuverters
 		float pwm1Att = params[PWM1_ATT_PARAM].getValue();
 		float pwm2Att = params[PWM2_ATT_PARAM].getValue();
+
+		// Read sub-oscillator parameters
+		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
+		float subLevel = params[SUB_LEVEL_PARAM].getValue();
 
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
@@ -278,9 +291,30 @@ struct HydraQuartetVCO : Module {
 			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1);
 			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2);
 
-			// Mix both VCOs with independent volume controls
+			// Sub-oscillator: -1 octave below VCO1 base (ignores detune for stable foundation)
+			float_4 subPitch = basePitch + octave1 - 1.f;  // VCO1 base pitch minus 1 octave
+			float_4 subFreq = dsp::FREQ_C4 * dsp::exp2_taylor5(subPitch);
+			subFreq = simd::clamp(subFreq, 0.1f, sampleRate / 2.f);
+
+			// Sub phase accumulation
+			float_4 subDelta = subFreq * sampleTime;
+			subPhase[g] += subDelta;
+			subPhase[g] -= simd::floor(subPhase[g]);
+
+			// Generate both waveforms
+			float_4 subSquare = simd::ifelse(subPhase[g] < 0.5f, 1.f, -1.f);
+			float_4 subSine = simd::sin(2.f * float(M_PI) * subPhase[g]);
+
+			// Select based on switch
+			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
+
+			// Output to dedicated SUB jack (full level, before mixing)
+			outputs[SUB_OUTPUT].setVoltageSimd(subOut * 5.f, c);
+
+			// Mix both VCOs with independent volume controls, plus sub-oscillator
 			float_4 mixed = tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
-			              + tri2 * triVol2 + sqr2 * sqrVol2 + sine2 * sinVol2 + saw2 * sawVol2;
+			              + tri2 * triVol2 + sqr2 * sqrVol2 + sine2 * sinVol2 + saw2 * sawVol2
+			              + subOut * subLevel;
 
 			// DC filtering - process per-voice (not in critical path)
 			for (int i = 0; i < groupChannels; i++) {
@@ -294,6 +328,7 @@ struct HydraQuartetVCO : Module {
 
 		// Set output channel count (CRITICAL for polyphonic operation)
 		outputs[AUDIO_OUTPUT].setChannels(channels);
+		outputs[SUB_OUTPUT].setChannels(channels);
 
 		// Mix output using horizontal sum for efficiency
 		float_4 mixSum = 0.f;
