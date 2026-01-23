@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 4 complete
+**Session:** Phase 5 Plan 1 complete (PWM CV Inputs)
 
 ---
 
@@ -19,30 +19,31 @@
 
 ## Current Position
 
-**Phase:** 4 - Dual VCO Architecture COMPLETE
-**Status:** Ready for Phase 5
-**Progress:** 4/8 phases complete
+**Phase:** 5 - PWM & Sub-Oscillator IN PROGRESS
+**Plan:** 1 of 2 complete (PWM CV Inputs)
+**Status:** Plan 1 complete, ready for Plan 2
+**Progress:** 4.5/8 phases complete
 
 ```
-[██████████████████████░░░░░░░░░░░░░░░] 50%
+[████████████████████████░░░░░░░░░░░░░] 56%
 ```
 
-**Next Action:** Plan Phase 5 (PWM & Sub-Oscillator)
+**Next Action:** Execute Phase 5 Plan 2 (Sub-Oscillator)
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 4/8
-- Phases in progress: 0/8
-- Phases pending: 4/8
+- Phases complete: 4/8 (Phase 5 in progress)
+- Phases in progress: 1/8
+- Phases pending: 3/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 18 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, PITCH-01, PITCH-02, PITCH-03)
-- Remaining: 16
+- Completed: 18 + PWM CV (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, PITCH-01, PITCH-02, PITCH-03, partial PWM-01)
+- Remaining: 15
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
@@ -51,6 +52,7 @@
 - SIMD optimization verified: YES (0.8% CPU at 8 voices, float_4 processing)
 - CPU budget verified: YES (<5% target, achieved ~1.6% with dual VCO)
 - Dual VCO verified: YES (VcoEngine struct, independent pitch control)
+- PWM CV modulation verified: YES (polyphonic CV, attenuverters, LED indicators)
 - Through-zero FM quality verified: No (Phase 6)
 
 ---
@@ -58,6 +60,13 @@
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 5 Plan 1 Complete (2026-01-23):**
+- PWM CV scaled at 0.1 factor: +/-5V * att gives +/-0.5 PWM contribution (full sweep)
+- PWM clamped to 0.01-0.99 to avoid DC offset at extremes
+- LED brightness based on peak CV across all polyphonic channels
+- Trimpot used for attenuverters (smaller than main knobs)
+- Bipolar CV pattern: base + cv * att * scale, clamped to safe range
 
 **Phase 4 Complete (2026-01-23):**
 - VcoEngine struct encapsulates all per-oscillator state (phase, MinBLEP buffers, triState)
@@ -102,23 +111,22 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 4 Dual VCO Architecture fully verified by user
-- VcoEngine struct extracted from inline DSP
-- Dual vco1/vco2 instances with independent SIMD state
-- Octave switches (-2 to +2) for both VCOs
-- Detune knob on VCO1 (0-50 cents) for beating/thickness effect
-- Independent waveform volume controls (8 total: 4 per VCO)
-- ~1.6% CPU (approximately 2x Phase 3 baseline as expected)
+- Phase 5 Plan 1 (PWM CV Inputs) executed successfully
+- PWM1_ATT_PARAM and PWM2_ATT_PARAM added for bipolar attenuverters
+- PWM1_CV_LIGHT and PWM2_CV_LIGHT added for CV activity indicators
+- Polyphonic PWM CV processing via getPolyVoltageSimd
+- PWM clamped to 0.01-0.99 for DC safety
+- Widget updated with Trimpot and SmallLight<GreenLight> components
 
 ### What Comes Next
-1. Run `/gsd:plan-phase 5` to plan PWM & Sub-Oscillator
-2. Wire PWM CV inputs for both VCOs
-3. Add sub-oscillator output for VCO1
+1. Execute Phase 5 Plan 2 (Sub-Oscillator)
+2. Add sub-oscillator derived from VCO1 frequency
+3. Waveform switch (square/sine) and dedicated output
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - VcoEngine struct, dual oscillator wiring
-- .planning/phases/04-dual-vco-architecture/04-01-SUMMARY.md - created
+- src/HydraQuartetVCO.cpp - PWM CV attenuverters, LED lights, polyphonic CV processing
+- .planning/phases/05-pwm-sub-oscillator/05-01-SUMMARY.md - created
 
 ---
 
-*Last updated: 2026-01-23 after Phase 4 verification*
+*Last updated: 2026-01-23 after Phase 5 Plan 1 completion*
