@@ -104,6 +104,11 @@ Plans:
 
 **Dependencies:** Phase 3 (SIMD must be established before doubling oscillator count)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md - VcoEngine extraction with dual oscillator wiring and pitch controls
+
 **Requirements:**
 - WAVE-02: VCO2 outputs four waveforms: triangle, square, sine, sawtooth
 - WAVE-03: Each waveform has individual volume control (complete - VCO2 added)
@@ -212,7 +217,7 @@ Plans:
 | 1 - Foundation & Panel | Complete | 9 | 100% |
 | 2 - Core Oscillator | Complete | 3 | 100% |
 | 3 - SIMD Polyphony | Complete | 1 | 100% |
-| 4 - Dual VCO Architecture | Pending | 5 | 0% |
+| 4 - Dual VCO Architecture | Planned | 5 | 0% |
 | 5 - PWM & Sub-Oscillator | Pending | 5 | 0% |
 | 6 - Through-Zero FM | Pending | 5 | 0% |
 | 7 - Hard Sync | Pending | 4 | 0% |
