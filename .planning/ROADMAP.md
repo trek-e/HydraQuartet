@@ -28,8 +28,8 @@ This roadmap delivers the Triax VCO module in 8 phases, progressing from foundat
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md - SDK setup and 36 HP panel design
-- [ ] 01-02-PLAN.md - Polyphonic module implementation with V/Oct tracking
+- [x] 01-01-PLAN.md - SDK setup and 36 HP panel design
+- [x] 01-02-PLAN.md - Polyphonic module implementation with V/Oct tracking
 
 **Requirements:**
 - PANEL-01: Wide panel (30+ HP) with all controls visible
@@ -56,6 +56,11 @@ Plans:
 **Goal:** Single VCO producing all waveforms with verified antialiasing quality
 
 **Dependencies:** Phase 1 (infrastructure)
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md - MinBLEP antialiased waveforms with VCO1 volume controls
 
 **Requirements:**
 - FOUND-04: MinBLEP antialiasing on all harmonically rich waveforms
@@ -199,8 +204,8 @@ Plans:
 
 | Phase | Status | Requirements | Completion |
 |-------|--------|--------------|------------|
-| 1 - Foundation & Panel | Planned | 9 | 0% |
-| 2 - Core Oscillator | Pending | 3 | 0% |
+| 1 - Foundation & Panel | Complete | 9 | 100% |
+| 2 - Core Oscillator | Planned | 3 | 0% |
 | 3 - SIMD Polyphony | Pending | 1 | 0% |
 | 4 - Dual VCO Architecture | Pending | 5 | 0% |
 | 5 - PWM & Sub-Oscillator | Pending | 5 | 0% |
@@ -208,7 +213,7 @@ Plans:
 | 7 - Hard Sync | Pending | 4 | 0% |
 | 8 - XOR Waveshaping | Pending | 3 | 0% |
 
-**Overall:** 0/34 requirements complete (0%)
+**Overall:** 9/34 requirements complete (26%)
 
 ---
 
@@ -244,4 +249,4 @@ The following requirements are deferred to v2 and not in this roadmap:
 
 ---
 
-*Last updated: 2026-01-22*
+*Last updated: 2026-01-23*
