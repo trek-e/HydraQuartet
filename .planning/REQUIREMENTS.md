@@ -136,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-04 | Phase 2 | Pending |
 | WAVE-01 | Phase 2 | Pending |
 | WAVE-03 | Phase 2 | Pending |
-| FOUND-03 | Phase 3 | Pending |
+| FOUND-03 | Phase 3 | Complete |
 | WAVE-02 | Phase 4 | Pending |
 | PITCH-01 | Phase 4 | Pending |
 | PITCH-02 | Phase 4 | Pending |

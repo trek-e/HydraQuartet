@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 2 complete
+**Session:** Phase 3 complete
 
 ---
 
@@ -19,37 +19,37 @@
 
 ## Current Position
 
-**Phase:** 2 - Core Oscillator with Antialiasing COMPLETE
-**Status:** Ready for Phase 3
-**Progress:** 2/8 phases complete
+**Phase:** 3 - SIMD Polyphony COMPLETE
+**Status:** Ready for Phase 4
+**Progress:** 3/8 phases complete
 
 ```
-[██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25%
+[███████████████░░░░░░░░░░░░░░░░░░░░░░] 38%
 ```
 
-**Next Action:** Plan Phase 3 (SIMD Polyphony)
+**Next Action:** Plan Phase 4 (Dual VCO Architecture)
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 2/8
+- Phases complete: 3/8
 - Phases in progress: 0/8
-- Phases pending: 6/8
+- Phases pending: 5/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 12 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-03)
-- Remaining: 22
+- Completed: 13 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-03)
+- Remaining: 21
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
 - Polyphonic I/O verified: YES (8 voices, V/Oct tracking, mix output)
 - Antialiasing verified: YES (MinBLEP on saw/square, triangle via integration)
-- SIMD optimization verified: No (Phase 3)
-- CPU budget verified: No
+- SIMD optimization verified: YES (0.8% CPU at 8 voices, float_4 processing)
+- CPU budget verified: YES (<5% target, achieved 0.8%)
 - Through-zero FM quality verified: No (Phase 6)
 
 ---
@@ -58,14 +58,21 @@
 
 ### Key Decisions Made
 
+**Phase 3 Complete (2026-01-23):**
+- Custom MinBlepBuffer<32> template struct with lane-based discontinuity insertion
+- Process loop iterates in groups of 4 using getPolyVoltageSimd<float_4>
+- All 4 waveforms using float_4 SIMD (saw, square, triangle, sine)
+- simd::movemask() to identify lanes needing MinBLEP insertions
+- simd::ifelse() for branchless PWM edge detection
+- Horizontal sum via _mm_hadd_ps for efficient mix output
+- DC filters kept scalar (not in hot path)
+- Human verified: 0.8% CPU (far below 5% target), all waveforms clean
+
 **Phase 2 Complete (2026-01-23):**
-- MinBLEP antialiasing using `dsp::MinBlepGenerator<16, 16, float>`
-- Per-voice state in VCO1Voice struct (sawMinBlep, sqrMinBlep, dcFilter, triState)
-- Changed from SIMD loop to scalar per-voice loop for MinBLEP compatibility
+- MinBLEP antialiasing using dsp::MinBlepGenerator<16, 16, float>
 - Triangle wave via leaky integrator (0.999 decay) of antialiased square
 - PWM edge detection avoids VCV Fundamental click bug (only insert on phase crossing)
 - DC filtering on mixed output with 10Hz highpass
-- Human verified: sawtooth clean, PWM click-free, triangle smooth, polyphony working
 
 **Phase 1 Complete (2026-01-23):**
 - SDK 2.6.6 installed at /Users/trekkie/projects/vcvrack_modules/Rack-SDK
@@ -86,23 +93,25 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 2 Core Oscillator with Antialiasing fully verified by user
-- MinBLEP antialiasing working on sawtooth and square
-- Triangle via square integration sounds smooth
-- PWM sweep click-free (VCV Fundamental bug avoided)
-- All 4 VCO1 waveform volume knobs functional
-- 8-voice polyphony verified
+- Phase 3 SIMD Polyphony fully verified by user
+- MinBlepBuffer template struct with lane-based insertions
+- Process loop using getPolyVoltageSimd/setVoltageSimd
+- 0.8% CPU usage (far below 5% target)
+- All waveforms sound identical to Phase 2 (no quality regression)
+- Renamed project from Triax to HydraQuartet
 
 ### What Comes Next
-1. Run `/gsd:plan-phase 3` to plan SIMD Polyphony
-2. Template oscillator core for float_4 SIMD processing
-3. Measure CPU improvement vs current scalar implementation
+1. Run `/gsd:plan-phase 4` to plan Dual VCO Architecture
+2. Duplicate SIMD pattern for VCO2
+3. Add octave switches and detune control
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - VCO1Voice struct, antialiased waveforms, volume mixing
-- .planning/phases/02-core-oscillator/02-01-SUMMARY.md - created
-- .planning/phases/02-core-oscillator/02-VERIFICATION.md - created
+- src/HydraQuartetVCO.cpp - Complete SIMD refactor, renamed from TriaxVCO
+- res/HydraQuartetVCO.svg - Renamed from TriaxVCO
+- plugin.json - Updated slug/brand to HydraQuartet
+- .planning/phases/03-simd-polyphony/03-01-SUMMARY.md - created
+- .planning/phases/03-simd-polyphony/03-VERIFICATION.md - created
 
 ---
 
-*Last updated: 2026-01-23 after Phase 2 verification*
+*Last updated: 2026-01-23 after Phase 3 verification*
