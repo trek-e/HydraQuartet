@@ -82,6 +82,11 @@ Plans:
 
 **Dependencies:** Phase 2 (oscillator core must be complete before templating)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md - SIMD float_4 engine with strided MinBLEP antialiasing
+
 **Requirements:**
 - FOUND-03: SIMD optimization using float_4 for CPU efficiency
 
@@ -206,7 +211,7 @@ Plans:
 |-------|--------|--------------|------------|
 | 1 - Foundation & Panel | Complete | 9 | 100% |
 | 2 - Core Oscillator | Complete | 3 | 100% |
-| 3 - SIMD Polyphony | Pending | 1 | 0% |
+| 3 - SIMD Polyphony | Planned | 1 | 0% |
 | 4 - Dual VCO Architecture | Pending | 5 | 0% |
 | 5 - PWM & Sub-Oscillator | Pending | 5 | 0% |
 | 6 - Through-Zero FM | Pending | 5 | 0% |
