@@ -76,7 +76,7 @@ struct VcoEngine {
 		int wrapMask = simd::movemask(wrapped);
 		if (wrapMask) {
 			for (int i = 0; i < 4; i++) {
-				if (wrapMask & (1 << i)) {
+				if ((wrapMask & (1 << i)) && deltaPhase[i] > 0.f) {
 					float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
 					sawMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
 				}
@@ -90,7 +90,7 @@ struct VcoEngine {
 		int fallMask = simd::movemask(fallingEdge);
 		if (fallMask) {
 			for (int i = 0; i < 4; i++) {
-				if (fallMask & (1 << i)) {
+				if ((fallMask & (1 << i)) && deltaPhase[i] > 0.f) {
 					float subsample = (pwm[i] - oldPhase[i]) / deltaPhase[i] - 1.f;
 					sqrMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
 				}
@@ -100,7 +100,7 @@ struct VcoEngine {
 		// Rising edge on wrap
 		if (wrapMask) {
 			for (int i = 0; i < 4; i++) {
-				if (wrapMask & (1 << i)) {
+				if ((wrapMask & (1 << i)) && deltaPhase[i] > 0.f) {
 					float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
 					sqrMinBlepBuffer[g].insertDiscontinuity(subsample, 2.f, i);
 				}
@@ -120,6 +120,8 @@ struct VcoEngine {
 	}
 };
 
+// Maximum polyphony: 16 voices (4 SIMD groups of 4 voices each)
+// Arrays are sized for this limit; process() enforces bounds checking
 struct HydraQuartetVCO : Module {
 	enum ParamId {
 		// VCO1 Section
@@ -222,8 +224,8 @@ struct HydraQuartetVCO : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Get channel count from V/Oct input (minimum 1)
-		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
+		// Get channel count from V/Oct input (bounded to valid range 1-16)
+		int channels = clamp(inputs[VOCT_INPUT].getChannels(), 1, 16);
 
 		float sampleTime = args.sampleTime;
 		float sampleRate = args.sampleRate;
@@ -313,7 +315,12 @@ struct HydraQuartetVCO : Module {
 			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
 
 			// Output to dedicated SUB jack (reduced to ±2V for testing)
-			outputs[SUB_OUTPUT].setVoltageSimd(subOut * 2.f, c);
+			// Sanitize: subOut is mathematically bounded but defend against upstream NaN
+			float_4 subVoltage = subOut * 2.f;
+			for (int i = 0; i < 4; i++) {
+				if (!std::isfinite(subVoltage[i])) subVoltage[i] = 0.f;
+			}
+			outputs[SUB_OUTPUT].setVoltageSimd(subVoltage, c);
 
 			// Mix both VCOs with independent volume controls, plus sub-oscillator
 			float_4 mixed = (tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
@@ -324,7 +331,9 @@ struct HydraQuartetVCO : Module {
 			for (int i = 0; i < groupChannels; i++) {
 				dcFilters[c + i].setCutoffFreq(10.f / sampleRate);
 				dcFilters[c + i].process(mixed[i]);
-				mixed[i] = dcFilters[c + i].highpass() * 2.f;  // Reduced to ±2V for testing
+				float out = dcFilters[c + i].highpass() * 2.f;  // Reduced to ±2V for testing
+				// Sanitize output: replace NaN/Inf with 0 to prevent propagation
+				mixed[i] = std::isfinite(out) ? out : 0.f;
 			}
 
 			outputs[AUDIO_OUTPUT].setVoltageSimd(mixed, c);
@@ -341,7 +350,9 @@ struct HydraQuartetVCO : Module {
 		}
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
-		outputs[MIX_OUTPUT].setVoltage(mixSum[0] / channels);
+		float mixOut = mixSum[0] / channels;
+		// Sanitize mix output
+		outputs[MIX_OUTPUT].setVoltage(std::isfinite(mixOut) ? mixOut : 0.f);
 
 		// PWM CV activity indicators
 		if (inputs[PWM1_INPUT].isConnected()) {
