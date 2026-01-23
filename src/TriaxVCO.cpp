@@ -3,6 +3,14 @@
 
 using simd::float_4;
 
+// Per-voice state for VCO1 antialiasing
+struct VCO1Voice {
+	dsp::MinBlepGenerator<16, 16, float> sawMinBlep;
+	dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
+	dsp::TRCFilter<float> dcFilter;
+	float dcFilterState = 0.f;
+	float triState = 0.f;  // Integrator state for triangle
+};
 
 struct TriaxVCO : Module {
 	enum ParamId {
@@ -49,6 +57,9 @@ struct TriaxVCO : Module {
 
 	// Phase state for 16 channels (4 groups of 4 for SIMD)
 	float_4 phase[4] = {};
+
+	// Per-voice state for VCO1 antialiasing (16 channels max)
+	VCO1Voice vco1Voices[16];
 
 	TriaxVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
