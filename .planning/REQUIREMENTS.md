@@ -124,46 +124,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | TBD | Pending |
-| FOUND-02 | TBD | Pending |
-| FOUND-03 | TBD | Pending |
-| FOUND-04 | TBD | Pending |
-| WAVE-01 | TBD | Pending |
-| WAVE-02 | TBD | Pending |
-| WAVE-03 | TBD | Pending |
-| WAVE-04 | TBD | Pending |
-| WAVE-05 | TBD | Pending |
-| PITCH-01 | TBD | Pending |
-| PITCH-02 | TBD | Pending |
-| PITCH-03 | TBD | Pending |
-| PWM-01 | TBD | Pending |
-| PWM-02 | TBD | Pending |
-| PWM-03 | TBD | Pending |
-| PWM-04 | TBD | Pending |
-| PWM-05 | TBD | Pending |
-| FM-01 | TBD | Pending |
-| FM-02 | TBD | Pending |
-| FM-03 | TBD | Pending |
-| FM-04 | TBD | Pending |
-| FM-05 | TBD | Pending |
-| SYNC-01 | TBD | Pending |
-| SYNC-02 | TBD | Pending |
-| SYNC-03 | TBD | Pending |
-| SYNC-04 | TBD | Pending |
-| OUT-01 | TBD | Pending |
-| OUT-02 | TBD | Pending |
-| CV-01 | TBD | Pending |
-| CV-02 | TBD | Pending |
-| CV-03 | TBD | Pending |
-| PANEL-01 | TBD | Pending |
-| PANEL-02 | TBD | Pending |
-| PANEL-03 | TBD | Pending |
+| PANEL-01 | Phase 1 | Pending |
+| PANEL-02 | Phase 1 | Pending |
+| PANEL-03 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| CV-01 | Phase 1 | Pending |
+| CV-02 | Phase 1 | Pending |
+| OUT-01 | Phase 1 | Pending |
+| OUT-02 | Phase 1 | Pending |
+| FOUND-04 | Phase 2 | Pending |
+| WAVE-01 | Phase 2 | Pending |
+| WAVE-03 | Phase 2 | Pending |
+| FOUND-03 | Phase 3 | Pending |
+| WAVE-02 | Phase 4 | Pending |
+| PITCH-01 | Phase 4 | Pending |
+| PITCH-02 | Phase 4 | Pending |
+| PITCH-03 | Phase 4 | Pending |
+| PWM-01 | Phase 5 | Pending |
+| PWM-02 | Phase 5 | Pending |
+| PWM-03 | Phase 5 | Pending |
+| PWM-04 | Phase 5 | Pending |
+| WAVE-04 | Phase 5 | Pending |
+| FM-01 | Phase 6 | Pending |
+| FM-02 | Phase 6 | Pending |
+| FM-03 | Phase 6 | Pending |
+| FM-04 | Phase 6 | Pending |
+| FM-05 | Phase 6 | Pending |
+| SYNC-01 | Phase 7 | Pending |
+| SYNC-02 | Phase 7 | Pending |
+| SYNC-03 | Phase 7 | Pending |
+| SYNC-04 | Phase 7 | Pending |
+| WAVE-05 | Phase 8 | Pending |
+| PWM-05 | Phase 8 | Pending |
+| CV-03 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33 (pending roadmap creation)
+- v1 requirements: 34 total
+- Mapped to phases: 34
+- Unmapped: 0 (100% coverage)
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-22 after initial definition*
+*Last updated: 2026-01-22 after roadmap creation*
