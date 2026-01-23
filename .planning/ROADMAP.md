@@ -131,6 +131,12 @@ Plans:
 
 **Dependencies:** Phase 4 (requires dual VCO architecture)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md - PWM CV wiring with attenuverters and LED indicators
+- [ ] 05-02-PLAN.md - Sub-oscillator with waveform switch and dedicated output
+
 **Requirements:**
 - PWM-01: VCO1 has PWM knob controlling square wave pulse width
 - PWM-02: VCO1 has PWM CV input
@@ -218,7 +224,7 @@ Plans:
 | 2 - Core Oscillator | Complete | 3 | 100% |
 | 3 - SIMD Polyphony | Complete | 1 | 100% |
 | 4 - Dual VCO Architecture | Complete | 5 | 100% |
-| 5 - PWM & Sub-Oscillator | Pending | 5 | 0% |
+| 5 - PWM & Sub-Oscillator | Planned | 5 | 0% |
 | 6 - Through-Zero FM | Pending | 5 | 0% |
 | 7 - Hard Sync | Pending | 4 | 0% |
 | 8 - XOR Waveshaping | Pending | 3 | 0% |
