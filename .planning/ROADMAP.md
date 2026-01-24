@@ -212,6 +212,13 @@ Plans:
 
 **Dependencies:** Phase 5 (requires PWM from both VCOs), Phase 7 (completes modulation features)
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md - XOR ring modulation DSP with MinBLEP antialiasing
+- [ ] 08-02-PLAN.md - Waveform volume CV inputs (6 polyphonic inputs)
+- [ ] 08-03-PLAN.md - Panel update to 40HP, XOR UI, soft clipping
+
 **Requirements:**
 - WAVE-05: VCO2 has XOR output (combines pulse waves of VCO1 and VCO2)
 - PWM-05: PWM affects XOR output (both VCOs' PWM shape the XOR waveform)
@@ -237,9 +244,9 @@ Plans:
 | 5 - PWM & Sub-Oscillator | Complete | 5 | 100% |
 | 6 - Through-Zero FM | Complete | 5 | 100% |
 | 7 - Hard Sync | Complete | 4 | 100% |
-| 8 - XOR Waveshaping | Pending | 3 | 0% |
+| 8 - XOR Waveshaping | Planned | 3 | 0% |
 
-**Overall:** 32/34 requirements complete (94%)
+**Overall:** 31/34 requirements complete (91%)
 
 ---
 
