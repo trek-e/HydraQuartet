@@ -811,15 +811,16 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
 		// Grid spacing: 15mm horizontal, 20mm vertical
 		// Starting position: x=161mm, y=25mm (mirroring VCO1 from right)
+		const float vco2X0 = 146.f;  // Extra column to left of grid
 		const float vco2X1 = 161.f, vco2X2 = 176.f, vco2X3 = 191.f;
 		const float vco2Y1 = 25.f, vco2Y2 = 45.f, vco2Y3 = 65.f;
 
-		// Row 1: FM, Pipe Length (Octave), Fine Tune
+		// Row 1: FM, Pipe Length (Octave) - Fine Tune moved to Row 2
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y1)), module, HydraQuartetVCO::FM_PARAM));
 		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco2X2, vco2Y1)), module, HydraQuartetVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y1)), module, HydraQuartetVCO::FINE2_PARAM));
 
-		// Row 2: Sin, Triangle, XOR
+		// Row 2: Fine Tune (left of grid), Sin, Triangle, XOR
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X0, vco2Y2)), module, HydraQuartetVCO::FINE2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y2)), module, HydraQuartetVCO::SIN2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y2)), module, HydraQuartetVCO::TRI2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y2)), module, HydraQuartetVCO::XOR_PARAM));
