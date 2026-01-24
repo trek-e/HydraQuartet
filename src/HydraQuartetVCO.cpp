@@ -237,17 +237,22 @@ struct VcoEngine {
 // Arrays are sized for this limit; process() enforces bounds checking
 struct HydraQuartetVCO : Module {
 	enum ParamId {
-		// VCO1 Section
-		OCTAVE1_PARAM,
+		// VCO1 Section (3x3 grid)
+		// Row 1: Detune, Octave (Pipe Length), FM Source
 		DETUNE1_PARAM,
+		OCTAVE1_PARAM,
+		FM_SOURCE_PARAM,
+		// Row 2: Sub, Triangle, Sine
+		SUB_LEVEL_PARAM,
 		TRI1_PARAM,
-		SQR1_PARAM,
 		SIN1_PARAM,
-		SAW1_PARAM,
+		// Row 3: PW, Square, Saw
 		PWM1_PARAM,
+		SQR1_PARAM,
+		SAW1_PARAM,
+		// Other VCO1 controls
 		SYNC1_PARAM,
 		SUB_WAVE_PARAM,
-		SUB_LEVEL_PARAM,
 		// VCO2 Section
 		OCTAVE2_PARAM,
 		FINE2_PARAM,
@@ -326,17 +331,22 @@ struct HydraQuartetVCO : Module {
 	HydraQuartetVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		// VCO1 Parameters
-		configSwitch(OCTAVE1_PARAM, -2.f, 2.f, 0.f, "VCO1 Octave", {"-2", "-1", "0", "+1", "+2"});
+		// VCO1 Parameters (3x3 grid layout)
+		// Row 1: Detune, Octave (Pipe Length), FM Source
 		configParam(DETUNE1_PARAM, 0.f, 1.f, 0.f, "VCO1 Detune");
+		configSwitch(OCTAVE1_PARAM, -2.f, 2.f, 0.f, "VCO1 Pipe Length", {"16'", "8'", "4'", "2'", "1'"});
+		configSwitch(FM_SOURCE_PARAM, 0.f, 4.f, 0.f, "FM Source", {"Sine", "Triangle", "Saw", "Square", "Sub"});
+		// Row 2: Sub, Triangle, Sine
+		configParam(SUB_LEVEL_PARAM, 0.f, 10.f, 0.f, "Sub Level");
 		configParam(TRI1_PARAM, 0.f, 10.f, 0.f, "VCO1 Triangle");
-		configParam(SQR1_PARAM, 0.f, 10.f, 1.f, "VCO1 Square");
 		configParam(SIN1_PARAM, 0.f, 10.f, 1.f, "VCO1 Sine");
-		configParam(SAW1_PARAM, 0.f, 10.f, 0.f, "VCO1 Sawtooth");
+		// Row 3: PW, Square, Saw
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
+		configParam(SQR1_PARAM, 0.f, 10.f, 1.f, "VCO1 Square");
+		configParam(SAW1_PARAM, 0.f, 10.f, 0.f, "VCO1 Sawtooth");
+		// Other VCO1 controls
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
-		configParam(SUB_LEVEL_PARAM, 0.f, 10.f, 0.f, "Sub Level");
 
 		// VCO2 Parameters
 		configSwitch(OCTAVE2_PARAM, -2.f, 2.f, 0.f, "VCO2 Octave", {"-2", "-1", "0", "+1", "+2"});
@@ -416,6 +426,7 @@ struct HydraQuartetVCO : Module {
 
 		// Read FM parameters
 		float fmKnob = params[FM_PARAM].getValue();  // 0 to 1
+		int fmSource = (int)std::round(params[FM_SOURCE_PARAM].getValue());  // 0=Sin, 1=Tri, 2=Saw, 3=Sqr, 4=Sub
 
 		// Read sub-oscillator parameters
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
@@ -459,30 +470,7 @@ struct HydraQuartetVCO : Module {
 
 			// VCO2: base + octave (reference oscillator, no detune)
 			float_4 pitch2 = basePitch + octave2;
-			float_4 freq2 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
-
-			// Through-zero linear FM: VCO1 modulates VCO2 frequency
-			// Read FM CV (auto-detect poly/mono)
-			float_4 fmCV;
-			int fmChannels = inputs[FM_INPUT].getChannels();
-			if (fmChannels > 1) {
-				// Polyphonic: per-voice modulation
-				fmCV = inputs[FM_INPUT].getPolyVoltageSimd<float_4>(c);
-			} else {
-				// Monophonic: broadcast to all voices
-				fmCV = float_4(inputs[FM_INPUT].getVoltage());
-			}
-
-			// Calculate per-voice FM depth: knob + (CV * scale)
-			// CV adds to knob: +/-5V * 0.1 = +/-0.5 contribution
-			float_4 fmDepth = fmKnob + fmCV * 0.1f;
-			fmDepth = simd::clamp(fmDepth, 0.f, 2.f);
-
-			// Apply linear FM: freq2 += freq1 * fmDepth
-			freq2 += freq1 * fmDepth;
-
-			// Clamp to prevent extreme values
-			freq2 = simd::clamp(freq2, 0.1f, sampleRate / 2.f);
+			float_4 freq2Base = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
 
 			// Read polyphonic PWM CV
 			float_4 pwm1CV = inputs[PWM1_INPUT].getPolyVoltageSimd<float_4>(c);
@@ -512,11 +500,54 @@ struct HydraQuartetVCO : Module {
 			float_4 sqr2Vol_4 = sqr2CVConnected ? simd::clamp(sqr2CV, 0.f, 10.f) : float_4(sqr2Knob);
 			float_4 saw2Vol_4 = saw2CVConnected ? simd::clamp(saw2CV, 0.f, 10.f) : float_4(saw2Knob);
 
-			// Phase 1: Process both VCO engines to get wrap masks (stores oldPhase, deltaPhase internally)
+			// Phase 1: Process VCO1 first to get waveforms for FM source
 			float_4 saw1, sqr1, tri1, sine1;
-			float_4 saw2, sqr2, tri2, sine2, xorOut;
-			int vco1WrapMask, vco2WrapMask;
+			int vco1WrapMask;
 			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1, vco1WrapMask);
+
+			// Sub-oscillator: -1 octave below VCO1 base (need this early for FM source)
+			float_4 subPitch = basePitch + octave1 - 1.f;
+			float_4 subFreq = dsp::FREQ_C4 * dsp::exp2_taylor5(subPitch);
+			subFreq = simd::clamp(subFreq, 1.f, 20000.f);
+			subPhase[g] += subFreq * sampleTime;
+			subPhase[g] -= simd::floor(subPhase[g]);
+			float_4 subSquare = simd::ifelse(subPhase[g] < 0.5f, 1.f, -1.f);
+			float_4 subSine = simd::sin(2.f * float(M_PI) * subPhase[g]);
+			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
+
+			// Select FM source waveform (0=Sin, 1=Tri, 2=Saw, 3=Sqr, 4=Sub)
+			float_4 fmModulator;
+			switch (fmSource) {
+				case 0: fmModulator = sine1; break;
+				case 1: fmModulator = tri1; break;
+				case 2: fmModulator = saw1; break;
+				case 3: fmModulator = sqr1; break;
+				case 4: fmModulator = subOut; break;
+				default: fmModulator = sine1; break;
+			}
+
+			// Through-zero linear FM: selected VCO1 waveform modulates VCO2 frequency
+			// Read FM CV (auto-detect poly/mono)
+			float_4 fmCV;
+			int fmChannels = inputs[FM_INPUT].getChannels();
+			if (fmChannels > 1) {
+				fmCV = inputs[FM_INPUT].getPolyVoltageSimd<float_4>(c);
+			} else {
+				fmCV = float_4(inputs[FM_INPUT].getVoltage());
+			}
+
+			// Calculate per-voice FM depth: knob + (CV * scale)
+			float_4 fmDepth = fmKnob + fmCV * 0.1f;
+			fmDepth = simd::clamp(fmDepth, 0.f, 2.f);
+
+			// Apply linear FM using selected waveform as modulator
+			// fmModulator is ±1, so freq2 = freq2Base * (1 + fmModulator * fmDepth)
+			float_4 freq2 = freq2Base + freq2Base * fmModulator * fmDepth;
+			freq2 = simd::clamp(freq2, 0.1f, sampleRate / 2.f);
+
+			// Phase 2: Process VCO2 with FM-modulated frequency
+			float_4 saw2, sqr2, tri2, sine2, xorOut;
+			int vco2WrapMask;
 			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2, vco2WrapMask, sqr1, &xorOut);
 
 			// Track VCO1 square edges for XOR MinBLEP (XOR = sqr1 * sqr2)
@@ -563,23 +594,7 @@ struct HydraQuartetVCO : Module {
 				               saw2, sqr2, tri2);  // Output params modified by reference
 			}
 
-			// Sub-oscillator: -1 octave below VCO1 base (simplified, no MinBLEP)
-			float_4 subPitch = basePitch + octave1 - 1.f;
-			float_4 subFreq = dsp::FREQ_C4 * dsp::exp2_taylor5(subPitch);
-			subFreq = simd::clamp(subFreq, 1.f, 20000.f);
-
-			// Simple phase accumulation
-			subPhase[g] += subFreq * sampleTime;
-			subPhase[g] -= simd::floor(subPhase[g]);
-
-			// Generate waveforms (simple, no MinBLEP)
-			float_4 subSquare = simd::ifelse(subPhase[g] < 0.5f, 1.f, -1.f);
-			float_4 subSine = simd::sin(2.f * float(M_PI) * subPhase[g]);
-
-			// Select based on switch
-			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
-
-			// Output to dedicated SUB jack (reduced to ±2V for testing)
+			// Output sub to dedicated SUB jack (reduced to ±2V for testing)
 			// Sanitize: subOut is mathematically bounded but defend against upstream NaN
 			float_4 subVoltage = subOut * 2.f;
 			for (int i = 0; i < 4; i++) {
@@ -695,36 +710,43 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		// VCO1 Section (left side) - positions match SVG component layer
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 28.0)), module, HydraQuartetVCO::OCTAVE1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.0, 28.0)), module, HydraQuartetVCO::DETUNE1_PARAM));
+		// VCO1 Section - 3x3 grid in upper left
+		// Grid spacing: 15mm horizontal, 20mm vertical
+		// Starting position: x=12mm, y=25mm
+		const float vco1X1 = 12.f, vco1X2 = 27.f, vco1X3 = 42.f;
+		const float vco1Y1 = 25.f, vco1Y2 = 45.f, vco1Y3 = 65.f;
 
-		// VCO1 waveform volume knobs
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 48.0)), module, HydraQuartetVCO::TRI1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 48.0)), module, HydraQuartetVCO::SQR1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 48.0)), module, HydraQuartetVCO::SIN1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 48.0)), module, HydraQuartetVCO::SAW1_PARAM));
+		// Row 1: Detune, Pipe Length (Octave), FM Source
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y1)), module, HydraQuartetVCO::DETUNE1_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X2, vco1Y1)), module, HydraQuartetVCO::OCTAVE1_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X3, vco1Y1)), module, HydraQuartetVCO::FM_SOURCE_PARAM));
 
-		// VCO1 waveform CV inputs (below SQR and SAW knobs)
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 58.0)), module, HydraQuartetVCO::SQR1_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 58.0)), module, HydraQuartetVCO::SAW1_CV_INPUT));
+		// Row 2: Sub, Triangle, Sine
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y2)), module, HydraQuartetVCO::SUB_LEVEL_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y2)), module, HydraQuartetVCO::TRI1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y2)), module, HydraQuartetVCO::SIN1_PARAM));
 
-		// VCO1 PWM and Sync row
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 78.0)), module, HydraQuartetVCO::PWM1_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 78.0)), module, HydraQuartetVCO::SYNC1_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 78.0)), module, HydraQuartetVCO::PWM1_INPUT));
-		// PWM1 CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 78.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
+		// Row 3: PW, Square, Saw
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y3)), module, HydraQuartetVCO::PWM1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y3)), module, HydraQuartetVCO::SQR1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y3)), module, HydraQuartetVCO::SAW1_PARAM));
 
-		// Sub-oscillator controls (VCO1 section, near bottom)
-		// Sub level knob
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 88.0)), module, HydraQuartetVCO::SUB_LEVEL_PARAM));
-		// Sub waveform switch (toggle between square and sine)
-		addParam(createParamCentered<CKSS>(mm2px(Vec(25.4, 88.0)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
-		// Sub output jack
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64, 88.0)), module, HydraQuartetVCO::SUB_OUTPUT));
-		// Sub CV input
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 98.0)), module, HydraQuartetVCO::SUB_CV_INPUT));
+		// VCO1 CV inputs and additional controls (below 3x3 grid)
+		const float vco1Y4 = 82.f;
+		// Sub waveform switch and output
+		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X1, vco1Y4)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y4)), module, HydraQuartetVCO::SUB_OUTPUT));
+		// Sync switch
+		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X3, vco1Y4)), module, HydraQuartetVCO::SYNC1_PARAM));
+
+		// CV inputs row
+		const float vco1Y5 = 95.f;
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1, vco1Y5)), module, HydraQuartetVCO::SUB_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X2, vco1Y5)), module, HydraQuartetVCO::SQR1_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X3, vco1Y5)), module, HydraQuartetVCO::SAW1_CV_INPUT));
+		// PWM CV input
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y5)), module, HydraQuartetVCO::PWM1_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco1X1 + 14.f, vco1Y5)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
 
 		// Center Global Section (40HP center = 101.6mm)
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
