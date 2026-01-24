@@ -74,6 +74,7 @@ struct VcoEngine {
 	MinBlepBuffer<32> sawMinBlepBuffer[4];
 	MinBlepBuffer<32> sqrMinBlepBuffer[4];
 	MinBlepBuffer<32> triMinBlepBuffer[4];
+	MinBlepBuffer<32> xorMinBlepBuffer[4];  // XOR discontinuity tracking
 
 	// Process one SIMD group (4 voices), returns 4 waveforms via output parameters
 	// g: SIMD group index (0-3)
@@ -232,6 +233,13 @@ struct HydraQuartetVCO : Module {
 		// VCO2
 		PWM2_INPUT,
 		FM_INPUT,
+		// Waveform volume CV inputs
+		SAW1_CV_INPUT,
+		SQR1_CV_INPUT,
+		SUB_CV_INPUT,
+		XOR_CV_INPUT,
+		SQR2_CV_INPUT,
+		SAW2_CV_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -310,6 +318,14 @@ struct HydraQuartetVCO : Module {
 		configInput(PWM1_INPUT, "VCO1 PWM CV");
 		configInput(PWM2_INPUT, "VCO2 PWM CV");
 		configInput(FM_INPUT, "FM CV");
+
+		// Waveform volume CV inputs
+		configInput(SAW1_CV_INPUT, "SAW1 Volume CV");
+		configInput(SQR1_CV_INPUT, "SQR1 Volume CV");
+		configInput(SUB_CV_INPUT, "Sub Volume CV");
+		configInput(XOR_CV_INPUT, "XOR Volume CV");
+		configInput(SQR2_CV_INPUT, "SQR2 Volume CV");
+		configInput(SAW2_CV_INPUT, "SAW2 Volume CV");
 
 		// Outputs
 		configOutput(AUDIO_OUTPUT, "Polyphonic Audio");
