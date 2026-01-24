@@ -186,6 +186,11 @@ Plans:
 
 **Dependencies:** Phase 5 (requires dual VCO), research insights from Phase 6 (sync antialiasing)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md - Hard sync DSP with MinBLEP antialiasing
+
 **Requirements:**
 - SYNC-01: VCO1 has sync switch: Off / Hard (syncs to VCO2)
 - SYNC-02: VCO2 has sync switch: Off / Hard (syncs to VCO1)
@@ -270,4 +275,4 @@ The following requirements are deferred to v2 and not in this roadmap:
 
 ---
 
-*Last updated: 2026-01-23*
+*Last updated: 2026-01-24*
