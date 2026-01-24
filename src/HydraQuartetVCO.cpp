@@ -245,7 +245,6 @@ struct HydraQuartetVCO : Module {
 		SIN1_PARAM,
 		SAW1_PARAM,
 		PWM1_PARAM,
-		PWM1_ATT_PARAM,
 		SYNC1_PARAM,
 		SUB_WAVE_PARAM,
 		SUB_LEVEL_PARAM,
@@ -258,10 +257,8 @@ struct HydraQuartetVCO : Module {
 		SAW2_PARAM,
 		XOR_PARAM,  // XOR volume control
 		PWM2_PARAM,
-		PWM2_ATT_PARAM,
 		SYNC2_PARAM,
 		FM_PARAM,
-		FM_ATT_PARAM,  // FM CV attenuverter
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -337,7 +334,6 @@ struct HydraQuartetVCO : Module {
 		configParam(SIN1_PARAM, 0.f, 10.f, 1.f, "VCO1 Sine");
 		configParam(SAW1_PARAM, 0.f, 10.f, 0.f, "VCO1 Sawtooth");
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
-		configParam(PWM1_ATT_PARAM, -1.f, 1.f, 0.f, "VCO1 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
 		configParam(SUB_LEVEL_PARAM, 0.f, 10.f, 0.f, "Sub Level");
@@ -351,10 +347,8 @@ struct HydraQuartetVCO : Module {
 		configParam(SAW2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sawtooth");
 		configParam(XOR_PARAM, 0.f, 10.f, 0.f, "XOR Volume");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
-		configParam(PWM2_ATT_PARAM, -1.f, 1.f, 0.f, "VCO2 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
 		configParam(FM_PARAM, 0.f, 1.f, 0.f, "FM Amount");
-		configParam(FM_ATT_PARAM, -1.f, 1.f, 0.f, "FM CV Attenuverter", "%", 0.f, 100.f);
 
 		// Inputs
 		configInput(VOCT_INPUT, "V/Oct");
@@ -420,13 +414,8 @@ struct HydraQuartetVCO : Module {
 		float triVol2 = params[TRI2_PARAM].getValue();
 		float sinVol2 = params[SIN2_PARAM].getValue();
 
-		// Read PWM CV attenuverters
-		float pwm1Att = params[PWM1_ATT_PARAM].getValue();
-		float pwm2Att = params[PWM2_ATT_PARAM].getValue();
-
 		// Read FM parameters
 		float fmKnob = params[FM_PARAM].getValue();  // 0 to 1
-		float fmAtt = params[FM_ATT_PARAM].getValue();  // -1 to 1
 
 		// Read sub-oscillator parameters
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
@@ -484,8 +473,9 @@ struct HydraQuartetVCO : Module {
 				fmCV = float_4(inputs[FM_INPUT].getVoltage());
 			}
 
-			// Calculate per-voice FM depth: knob + (CV * attenuverter * scale)
-			float_4 fmDepth = fmKnob + fmCV * fmAtt * 0.1f;
+			// Calculate per-voice FM depth: knob + (CV * scale)
+			// CV adds to knob: +/-5V * 0.1 = +/-0.5 contribution
+			float_4 fmDepth = fmKnob + fmCV * 0.1f;
 			fmDepth = simd::clamp(fmDepth, 0.f, 2.f);
 
 			// Apply linear FM: freq2 += freq1 * fmDepth
@@ -498,9 +488,9 @@ struct HydraQuartetVCO : Module {
 			float_4 pwm1CV = inputs[PWM1_INPUT].getPolyVoltageSimd<float_4>(c);
 			float_4 pwm2CV = inputs[PWM2_INPUT].getPolyVoltageSimd<float_4>(c);
 
-			// Apply attenuverter: +/-5V * att * 0.1 = +/-0.5 contribution (full sweep range)
-			float_4 pwm1_4 = pwm1 + pwm1CV * pwm1Att * 0.1f;
-			float_4 pwm2_4 = pwm2 + pwm2CV * pwm2Att * 0.1f;
+			// Apply CV: +/-5V * 0.1 = +/-0.5 contribution (full sweep range)
+			float_4 pwm1_4 = pwm1 + pwm1CV * 0.1f;
+			float_4 pwm2_4 = pwm2 + pwm2CV * 0.1f;
 
 			// Clamp to safe PWM range (avoid DC at extremes)
 			pwm1_4 = simd::clamp(pwm1_4, 0.01f, 0.99f);
@@ -722,8 +712,6 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// VCO1 PWM and Sync row
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 78.0)), module, HydraQuartetVCO::PWM1_PARAM));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 78.0)), module, HydraQuartetVCO::SYNC1_PARAM));
-		// PWM1 attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(55.88, 68.0)), module, HydraQuartetVCO::PWM1_ATT_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 78.0)), module, HydraQuartetVCO::PWM1_INPUT));
 		// PWM1 CV activity LED - positioned near the input port
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 78.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
@@ -764,16 +752,12 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(137.16, 78.0)), module, HydraQuartetVCO::PWM2_PARAM));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(157.48, 78.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(177.8, 78.0)), module, HydraQuartetVCO::FM_PARAM));
-		// PWM2 attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(137.16, 88.0)), module, HydraQuartetVCO::PWM2_ATT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(137.16, 98.0)), module, HydraQuartetVCO::PWM2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(137.16, 88.0)), module, HydraQuartetVCO::PWM2_INPUT));
 		// PWM2 CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(141.16, 98.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
-		// FM attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(157.48, 88.0)), module, HydraQuartetVCO::FM_ATT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(157.48, 98.0)), module, HydraQuartetVCO::FM_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(141.16, 88.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(157.48, 88.0)), module, HydraQuartetVCO::FM_INPUT));
 		// FM CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(161.48, 98.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(161.48, 88.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
 
 		// Per-voice outputs (bottom of panel, split left/right around global section)
 		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right (shifted for 40HP)
