@@ -189,7 +189,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md - Hard sync DSP with MinBLEP antialiasing
+- [x] 07-01-PLAN.md - Hard sync DSP with MinBLEP antialiasing
 
 **Requirements:**
 - SYNC-01: VCO1 has sync switch: Off / Hard (syncs to VCO2)
@@ -236,10 +236,10 @@ Plans:
 | 4 - Dual VCO Architecture | Complete | 5 | 100% |
 | 5 - PWM & Sub-Oscillator | Complete | 5 | 100% |
 | 6 - Through-Zero FM | Complete | 5 | 100% |
-| 7 - Hard Sync | Pending | 4 | 0% |
+| 7 - Hard Sync | Complete | 4 | 100% |
 | 8 - XOR Waveshaping | Pending | 3 | 0% |
 
-**Overall:** 28/34 requirements complete (82%)
+**Overall:** 32/34 requirements complete (94%)
 
 ---
 
