@@ -295,6 +295,10 @@ struct HydraQuartetVCO : Module {
 		float pwm1Att = params[PWM1_ATT_PARAM].getValue();
 		float pwm2Att = params[PWM2_ATT_PARAM].getValue();
 
+		// Read FM parameters
+		float fmKnob = params[FM_PARAM].getValue();  // 0 to 1
+		float fmAtt = params[FM_ATT_PARAM].getValue();  // -1 to 1
+
 		// Read sub-oscillator parameters
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
 		float subLevel = params[SUB_LEVEL_PARAM].getValue();
@@ -319,6 +323,27 @@ struct HydraQuartetVCO : Module {
 			// VCO2: base + octave (reference oscillator, no detune)
 			float_4 pitch2 = basePitch + octave2;
 			float_4 freq2 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
+
+			// Through-zero linear FM: VCO1 modulates VCO2 frequency
+			// Read FM CV (auto-detect poly/mono)
+			float_4 fmCV;
+			int fmChannels = inputs[FM_INPUT].getChannels();
+			if (fmChannels > 1) {
+				// Polyphonic: per-voice modulation
+				fmCV = inputs[FM_INPUT].getPolyVoltageSimd<float_4>(c);
+			} else {
+				// Monophonic: broadcast to all voices
+				fmCV = float_4(inputs[FM_INPUT].getVoltage());
+			}
+
+			// Calculate per-voice FM depth: knob + (CV * attenuverter * scale)
+			float_4 fmDepth = fmKnob + fmCV * fmAtt * 0.1f;
+			fmDepth = simd::clamp(fmDepth, 0.f, 2.f);
+
+			// Apply linear FM: freq2 += freq1 * fmDepth
+			freq2 += freq1 * fmDepth;
+
+			// Clamp to prevent extreme values
 			freq2 = simd::clamp(freq2, 0.1f, sampleRate / 2.f);
 
 			// Read polyphonic PWM CV
