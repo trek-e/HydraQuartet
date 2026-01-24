@@ -253,6 +253,7 @@ struct HydraQuartetVCO : Module {
 		// Other VCO1 controls
 		SYNC1_PARAM,
 		SUB_WAVE_PARAM,
+		VIBRATO1_PARAM,
 		// VCO2 Section (3x3 grid)
 		// Row 1: FM, Pipe Length (Octave), Fine Tune
 		FM_PARAM,
@@ -268,6 +269,7 @@ struct HydraQuartetVCO : Module {
 		PWM2_PARAM,
 		// Other VCO2 controls
 		SYNC2_PARAM,
+		VIBRATO2_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -332,6 +334,9 @@ struct HydraQuartetVCO : Module {
 	// DC filters kept scalar (not in hot path, operate on mixed output)
 	dsp::TRCFilter<float> dcFilters[16];
 
+	// Vibrato LFO state (shared sine LFO at ~5.5Hz)
+	float vibratoPhase = 0.f;
+
 	HydraQuartetVCO() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -351,6 +356,7 @@ struct HydraQuartetVCO : Module {
 		// Other VCO1 controls
 		configSwitch(SYNC1_PARAM, 0.f, 2.f, 1.f, "VCO1 Sync", {"Hard", "Off", "Soft"});  // Center = Off
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
+		configParam(VIBRATO1_PARAM, 0.f, 1.f, 0.f, "VCO1 Vibrato", "%", 0.f, 100.f);
 
 		// VCO2 Parameters (3x3 grid layout)
 		// Row 1: FM, Pipe Length (Octave), Fine Tune
@@ -367,6 +373,7 @@ struct HydraQuartetVCO : Module {
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
 		// Other VCO2 controls
 		configSwitch(SYNC2_PARAM, 0.f, 2.f, 1.f, "VCO2 Sync", {"Hard", "Off", "Soft"});  // Center = Off
+		configParam(VIBRATO2_PARAM, 0.f, 1.f, 0.f, "VCO2 Vibrato", "%", 0.f, 100.f);
 
 		// Inputs
 		configInput(VOCT_INPUT, "V/Oct");
@@ -464,6 +471,20 @@ struct HydraQuartetVCO : Module {
 		bool sync2Hard = (sync2Mode == 0);
 		bool sync2Soft = (sync2Mode == 2);
 
+		// Read vibrato parameters (0-1 range)
+		float vibrato1Depth = params[VIBRATO1_PARAM].getValue();
+		float vibrato2Depth = params[VIBRATO2_PARAM].getValue();
+
+		// Update vibrato LFO (5.5 Hz sine, typical vibrato rate)
+		const float vibratoRate = 5.5f;
+		vibratoPhase += vibratoRate * sampleTime;
+		if (vibratoPhase >= 1.f) vibratoPhase -= 1.f;
+		float vibratoLfo = std::sin(vibratoPhase * 2.f * M_PI);
+
+		// Vibrato modulation in V/Oct (max +/- 0.5 semitone = +/- 1/24 volt)
+		float vibratoMod1 = vibratoLfo * vibrato1Depth * (0.5f / 12.f);
+		float vibratoMod2 = vibratoLfo * vibrato2Depth * (0.5f / 12.f);
+
 		// Read waveform volume knobs (for CV-replaces-knob pattern)
 		float saw1Knob = params[SAW1_PARAM].getValue();
 		float sqr1Knob = params[SQR1_PARAM].getValue();
@@ -488,13 +509,13 @@ struct HydraQuartetVCO : Module {
 			// Load 4 channels of V/Oct using SIMD
 			float_4 basePitch = inputs[VOCT_INPUT].getPolyVoltageSimd<float_4>(c);
 
-			// VCO1: base + octave + detune (VCO1 gets detune for thickness)
-			float_4 pitch1 = basePitch + octave1 + detuneVolts;
+			// VCO1: base + octave + detune + vibrato (VCO1 gets detune for thickness)
+			float_4 pitch1 = basePitch + octave1 + detuneVolts + vibratoMod1;
 			float_4 freq1 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch1);
 			freq1 = simd::clamp(freq1, 0.1f, sampleRate / 2.f);
 
-			// VCO2: base + octave + fine tune
-			float_4 pitch2 = basePitch + octave2 + fineTuneVolts;
+			// VCO2: base + octave + fine tune + vibrato
+			float_4 pitch2 = basePitch + octave2 + fineTuneVolts + vibratoMod2;
 			float_4 freq2Base = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
 
 			// Read polyphonic PWM CV
@@ -763,6 +784,7 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// Grid spacing: 15mm horizontal, 20mm vertical
 		// Starting position: x=12mm, y=25mm
 		const float vco1X1 = 12.f, vco1X2 = 27.f, vco1X3 = 42.f;
+		const float vco1X4 = 57.f;  // Extra column to right of grid for Vibrato
 		const float vco1Y1 = 25.f, vco1Y2 = 45.f, vco1Y3 = 65.f;
 
 		// Row 1: Detune, Pipe Length (Octave), FM Source
@@ -770,10 +792,11 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X2, vco1Y1)), module, HydraQuartetVCO::OCTAVE1_PARAM));
 		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X3, vco1Y1)), module, HydraQuartetVCO::FM_SOURCE_PARAM));
 
-		// Row 2: Sub, Triangle, Sine
+		// Row 2: Sub, Triangle, Sine, Vibrato
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y2)), module, HydraQuartetVCO::SUB_LEVEL_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y2)), module, HydraQuartetVCO::TRI1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y2)), module, HydraQuartetVCO::SIN1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X4, vco1Y2)), module, HydraQuartetVCO::VIBRATO1_PARAM));
 
 		// Row 3: PW, Square, Saw
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y3)), module, HydraQuartetVCO::PWM1_PARAM));
@@ -811,16 +834,17 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
 		// Grid spacing: 15mm horizontal, 20mm vertical
 		// Starting position: x=161mm, y=25mm (mirroring VCO1 from right)
-		const float vco2X0 = 146.f;  // Extra column to left of grid
+		const float vco2X0 = 146.f;  // Extra column to left of grid for Vibrato
 		const float vco2X1 = 161.f, vco2X2 = 176.f, vco2X3 = 191.f;
 		const float vco2Y1 = 25.f, vco2Y2 = 45.f, vco2Y3 = 65.f;
 
-		// Row 1: FM, Pipe Length (Octave) - Fine Tune moved to Row 2
+		// Row 1: FM, Pipe Length (Octave), Fine Tune
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y1)), module, HydraQuartetVCO::FM_PARAM));
 		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco2X2, vco2Y1)), module, HydraQuartetVCO::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y1)), module, HydraQuartetVCO::FINE2_PARAM));
 
-		// Row 2: Fine Tune (left of grid), Sin, Triangle, XOR
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X0, vco2Y2)), module, HydraQuartetVCO::FINE2_PARAM));
+		// Row 2: Vibrato (left of grid), Sin, Triangle, XOR
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X0, vco2Y2)), module, HydraQuartetVCO::VIBRATO2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y2)), module, HydraQuartetVCO::SIN2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y2)), module, HydraQuartetVCO::TRI2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y2)), module, HydraQuartetVCO::XOR_PARAM));
