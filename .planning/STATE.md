@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 8 Plan 2 complete (Waveform Volume CV Inputs)
+**Session:** Phase 8 Plan 1 complete (XOR Ring Modulation DSP)
 
 ---
 
@@ -20,8 +20,8 @@
 ## Current Position
 
 **Phase:** 8 - XOR Waveshaping (IN PROGRESS)
-**Plan:** 2 of 3 complete
-**Status:** Plan 08-02 complete, ready for Plan 08-03
+**Plan:** 2 of 3 complete (Plan 08-01 just completed)
+**Status:** Plan 08-01 complete, Plan 08-02 already complete, ready for Plan 08-03
 **Progress:** 7.67/8 phases complete (Phase 8 is 67% complete)
 
 ```
@@ -62,6 +62,15 @@
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 8 Plan 1 Complete (2026-01-23):**
+- XOR calculated as raw multiplication (sqr1 * sqr2) with MinBLEP antialiasing
+- Split edge tracking: VCO2 edges in VcoEngine, VCO1 edges at module level
+- VcoEngine::process() extended with optional sqr1Input and xorOut parameters
+- Variable named 'xorOut' not 'xor' (xor is C++ reserved keyword)
+- Optional output pattern: nullptr check enables XOR generation only when needed
+- Discontinuity magnitude: 2 * other_sqr (correctly accounts for square wave amplitude)
+- Four edge types tracked: VCO1 wrap, VCO1 PWM fall, VCO2 wrap, VCO2 PWM fall
 
 **Phase 8 Plan 2 Complete (2026-01-23):**
 - CV replaces knob when patched (not additive) for SAW1, SQR1, SUB, XOR, SQR2, SAW2
@@ -135,22 +144,24 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 8 Plan 2 (Waveform Volume CV Inputs) complete
-- 6 polyphonic CV inputs: SAW1_CV, SQR1_CV, SUB_CV, XOR_CV, SQR2_CV, SAW2_CV
-- CV-replaces-knob pattern with 0-10V direct mapping to 0-10 volume
-- Per-voice volume automation via getPolyVoltageSimd<float_4>
-- Updated mix calculation to use float_4 volume variables
-- Removed duplicate volume variable declarations (auto-fix)
+- Phase 8 Plan 1 (XOR Ring Modulation DSP) complete
+- XOR output calculated via ring modulation (sqr1 * sqr2)
+- Full MinBLEP antialiasing with 4 edge types tracked
+- VcoEngine extended with xorMinBlepBuffer and optional XOR parameters
+- Module-level xorFromVco1MinBlep buffer for VCO1 edge tracking
+- XOR discontinuity magnitude correctly calculated as 2 * other_sqr
 
 ### What Comes Next
-1. Execute Plan 08-03 (XOR Volume Knob & Integration)
-2. Complete Phase 8 (final phase)
-3. Final module verification
+1. Plan 08-02 already complete (Waveform Volume CV Inputs)
+2. Execute Plan 08-03 (XOR Volume Knob & Integration)
+3. Complete Phase 8 (final phase)
+4. Final module verification
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - 6 CV inputs, CV-replaces-knob logic, updated mix calculation
-- .planning/phases/08-xor-waveshaping/08-02-SUMMARY.md - created
+- src/HydraQuartetVCO.cpp - XOR ring modulation DSP with MinBLEP antialiasing
+- .planning/phases/08-xor-waveshaping/08-01-SUMMARY.md - created
+- .planning/STATE.md - updated with Plan 08-01 completion
 
 ---
 
-*Last updated: 2026-01-23 after Phase 8 Plan 2 complete*
+*Last updated: 2026-01-23 after Phase 8 Plan 1 complete*
