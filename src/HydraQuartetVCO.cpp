@@ -605,11 +605,20 @@ struct HydraQuartetVCO : Module {
 			              + xorOut * xorVol_4
 			              ) * outputScale;
 
-			// DC filtering - process per-voice
+			// DC filtering and soft clipping - process per-voice
 			for (int i = 0; i < groupChannels; i++) {
 				dcFilters[c + i].setCutoffFreq(10.f / sampleRate);
 				dcFilters[c + i].process(mixed[i]);
-				float out = dcFilters[c + i].highpass() * 2.f;  // Reduced to ±2V for testing
+				float dcFiltered = dcFilters[c + i].highpass();
+
+				// Soft clipping with tanh
+				// Scale factor 3.0: saturates at approximately +/-3V input
+				// This prevents harsh digital clipping when many waveforms sum
+				float softClipped = 3.f * std::tanh(dcFiltered / 3.f);
+
+				// Apply output scaling (+/-2V for testing, +/-5V for production)
+				float out = softClipped * 2.f;
+
 				// Sanitize output: replace NaN/Inf with 0 to prevent propagation
 				mixed[i] = std::isfinite(out) ? out : 0.f;
 
