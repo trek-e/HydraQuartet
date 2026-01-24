@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-24
-**Session:** Phase 6 Plan 1 complete (Through-Zero FM)
+**Session:** Phase 7 Plan 1 complete (Hard Sync)
 
 ---
 
@@ -12,38 +12,38 @@
 **What Makes This Different:**
 - 16 oscillators total (2 VCOs per voice x 8 voices)
 - Through-zero FM that produces wave shaping in tune when VCOs at same pitch
-- Cross-sync and XOR waveshaping for complex timbres
+- Hard sync with MinBLEP antialiasing for classic sync sweeps
 - SIMD-optimized for acceptable CPU usage with massive oscillator count
 
 ---
 
 ## Current Position
 
-**Phase:** 6 - Through-Zero FM COMPLETE
+**Phase:** 7 - Hard Sync
 **Plan:** 1 of 1 complete
-**Status:** Phase 6 complete, ready for Phase 7
-**Progress:** 6/8 phases complete
+**Status:** Phase 7 complete, ready for Phase 8
+**Progress:** 7/8 phases complete
 
 ```
-[████████████████████████████████████░░] 75%
+[█████████████████████████████████████████░░] 87.5%
 ```
 
-**Next Action:** Plan Phase 7 (Cross-Sync)
+**Next Action:** Plan Phase 8 (Final phase)
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 6/8
+- Phases complete: 7/8
 - Phases in progress: 0/8
-- Phases pending: 2/8
+- Phases pending: 1/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 27 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, WAVE-04, PITCH-01, PITCH-02, PITCH-03, PWM-01, PWM-02, PWM-03, PWM-04, FM-01, FM-02, FM-03, FM-04, FM-05)
-- Remaining: 7
+- Completed: 30 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, WAVE-04, PITCH-01, PITCH-02, PITCH-03, PWM-01, PWM-02, PWM-03, PWM-04, FM-01, FM-02, FM-03, FM-04, FM-05, SYNC-01, SYNC-02, SYNC-03)
+- Remaining: 4
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
@@ -55,12 +55,21 @@
 - PWM CV modulation verified: YES (polyphonic CV, attenuverters, LED indicators)
 - Sub-oscillator verified: YES (-1 octave tracking, square/sine switch, dedicated output)
 - Through-zero FM quality verified: YES (linear FM, maintains pitch at unison, poly/mono CV)
+- Hard sync verified: YES (bidirectional, MinBLEP antialiased, subsample-accurate)
 
 ---
 
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 7 Plan 1 Complete (2026-01-24):**
+- Separate waveform generation phase: process() generates waveforms, applySync() resets and regenerates
+- Triangle gets dedicated triMinBlepBuffer for sync antialiasing (parallel to saw/sqr buffers)
+- Sine excluded from MinBLEP antialiasing (continuous waveform, accepted aliasing limitation)
+- Skip sync when slave or master frequency is negative (FM protection, prevents crashes)
+- Output params passed by reference and updated in applySync() (no one-sample delay)
+- Bidirectional sync order: both VCOs process() first, then both applySync() calls (prevents order dependency)
 
 **Phase 6 Plan 1 Complete (2026-01-24):**
 - Linear FM applied after exponential pitch conversion (maintains tuning at unison)
@@ -113,31 +122,27 @@
 
 **Known Issue:** Panel labels use SVG text elements which don't render in VCV Rack. User must convert to paths in Inkscape.
 
-### Research Flags for Future Phases
-
-- Phase 7 can leverage Phase 6 research: Sync antialiasing similar to FM approaches
-- Cross-sync may need special handling for MinBLEP compatibility
-
 ---
 
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 6 Plan 1 (Through-Zero FM) complete
-- Linear FM: VCO1 modulates VCO2 frequency (freq2 += freq1 * fmDepth)
-- Auto-detecting poly/mono FM CV input with attenuverter
-- FM_CV_LIGHT indicator for CV activity
-- Maintains pitch at unison for wave shaping synthesis
+- Phase 7 Plan 1 (Hard Sync) complete
+- Bidirectional hard sync: VCO1 syncs to VCO2, VCO2 syncs to VCO1
+- applySync() method with subsample-accurate phase reset
+- MinBLEP antialiasing for sawtooth, square, and triangle waveforms
+- Triangle gets dedicated triMinBlepBuffer for sync discontinuities
+- Negative frequency protection (skip sync if FM drives freq negative)
 
 ### What Comes Next
-1. Plan Phase 7 (Cross-Sync)
-2. Research cross-sync antialiasing strategies
-3. Implement hard sync between VCOs
+1. Plan Phase 8 (final phase)
+2. Complete any remaining requirements
+3. Final testing and verification
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - FM_ATT_PARAM, FM_CV_LIGHT, through-zero FM DSP, widget controls
-- .planning/phases/06-through-zero-fm/06-01-SUMMARY.md - created
+- src/HydraQuartetVCO.cpp - triMinBlepBuffer, applySync() method, bidirectional sync logic, wrapMask return
+- .planning/phases/07-hard-sync/07-01-SUMMARY.md - created
 
 ---
 
-*Last updated: 2026-01-24 after Phase 6 Plan 1 completion*
+*Last updated: 2026-01-24 after Phase 7 Plan 1 completion*
