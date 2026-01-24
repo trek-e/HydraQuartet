@@ -819,9 +819,6 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1, vco1Y5)), module, HydraQuartetVCO::SUB_CV_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X2, vco1Y5)), module, HydraQuartetVCO::SQR1_CV_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X3, vco1Y5)), module, HydraQuartetVCO::SAW1_CV_INPUT));
-		// PWM CV input
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y5)), module, HydraQuartetVCO::PWM1_INPUT));
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco1X1 + 14.f, vco1Y5)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
 
 		// Center Sync Section (top middle, 40HP center = 101.6mm)
 		// 3-position horizontal switches: Hard - Off - Soft
@@ -838,7 +835,8 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// Sub output in center area
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 95.0)), module, HydraQuartetVCO::SUB_OUTPUT));
 
-		// Lower left corner: V/Oct input
+		// Lower left corner: PWM CV above V/Oct
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 110.0)), module, HydraQuartetVCO::PWM1_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 123.0)), module, HydraQuartetVCO::VOCT_INPUT));
 
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
