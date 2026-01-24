@@ -312,6 +312,7 @@ struct HydraQuartetVCO : Module {
 		GATE6_OUTPUT,
 		GATE7_OUTPUT,
 		GATE8_OUTPUT,
+		GATE_MIX_OUTPUT,  // Mono gate (OR of all gates)
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -414,6 +415,7 @@ struct HydraQuartetVCO : Module {
 		configOutput(GATE6_OUTPUT, "Gate 6");
 		configOutput(GATE7_OUTPUT, "Gate 7");
 		configOutput(GATE8_OUTPUT, "Gate 8");
+		configOutput(GATE_MIX_OUTPUT, "Gate Mix");
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -713,13 +715,17 @@ struct HydraQuartetVCO : Module {
 
 		// Per-voice gate pass-through (voices 1-8)
 		int gateChannels = inputs[GATE_INPUT].getChannels();
+		float gateMix = 0.f;
 		for (int i = 0; i < 8; i++) {
 			if (i < gateChannels) {
-				outputs[GATE1_OUTPUT + i].setVoltage(inputs[GATE_INPUT].getVoltage(i));
+				float gateVoltage = inputs[GATE_INPUT].getVoltage(i);
+				outputs[GATE1_OUTPUT + i].setVoltage(gateVoltage);
+				gateMix = std::max(gateMix, gateVoltage);  // OR-like behavior
 			} else {
 				outputs[GATE1_OUTPUT + i].setVoltage(0.f);
 			}
 		}
+		outputs[GATE_MIX_OUTPUT].setVoltage(gateMix);
 
 		// Mix output using horizontal sum for efficiency
 		float_4 mixSum = 0.f;
@@ -805,9 +811,8 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 
 		// VCO1 CV inputs and additional controls (below 3x3 grid)
 		const float vco1Y4 = 82.f;
-		// Sub waveform switch and output
+		// Sub waveform switch
 		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X1, vco1Y4)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y4)), module, HydraQuartetVCO::SUB_OUTPUT));
 
 		// CV inputs row
 		const float vco1Y5 = 95.f;
@@ -826,10 +831,13 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// Center Global Section (40HP center = 101.6mm)
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 100.0)), module, HydraQuartetVCO::GATE_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 115.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 125.0)), module, HydraQuartetVCO::MIX_OUTPUT));
+		// V/Oct and Gate inputs in center area
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.6, 60.0)), module, HydraQuartetVCO::VOCT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(111.6, 60.0)), module, HydraQuartetVCO::GATE_INPUT));
+		// Polyphonic audio output
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 80.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
+		// Sub output in center area
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 95.0)), module, HydraQuartetVCO::SUB_OUTPUT));
 
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
 		// Grid spacing: 15mm horizontal, 20mm vertical
@@ -869,26 +877,28 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X2, vco2Y4)), module, HydraQuartetVCO::FM_INPUT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco2X2 + 4.f, vco2Y4)), module, HydraQuartetVCO::FM_CV_LIGHT));
 
-		// Per-voice outputs (bottom of panel, split left/right around global section)
-		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right (shifted for 40HP)
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.0, 103.0)), module, HydraQuartetVCO::VOICE1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.0, 103.0)), module, HydraQuartetVCO::VOICE2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.0, 103.0)), module, HydraQuartetVCO::VOICE3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.0, 103.0)), module, HydraQuartetVCO::VOICE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(145.0, 103.0)), module, HydraQuartetVCO::VOICE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(158.0, 103.0)), module, HydraQuartetVCO::VOICE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(171.0, 103.0)), module, HydraQuartetVCO::VOICE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(184.0, 103.0)), module, HydraQuartetVCO::VOICE8_OUTPUT));
+		// Bottom output section - centered layout
+		// Row 1 (y=110): Gates 1-4 | Gate Mix | Gates 5-8
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.0, 110.0)), module, HydraQuartetVCO::GATE1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.0, 110.0)), module, HydraQuartetVCO::GATE2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(51.0, 110.0)), module, HydraQuartetVCO::GATE3_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(64.0, 110.0)), module, HydraQuartetVCO::GATE4_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 110.0)), module, HydraQuartetVCO::GATE_MIX_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(139.0, 110.0)), module, HydraQuartetVCO::GATE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(152.0, 110.0)), module, HydraQuartetVCO::GATE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(165.0, 110.0)), module, HydraQuartetVCO::GATE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(178.0, 110.0)), module, HydraQuartetVCO::GATE8_OUTPUT));
 
-		// Gate outputs row (y=118) - gates 1-4 left, 5-8 right (shifted for 40HP)
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.0, 118.0)), module, HydraQuartetVCO::GATE1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.0, 118.0)), module, HydraQuartetVCO::GATE2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.0, 118.0)), module, HydraQuartetVCO::GATE3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.0, 118.0)), module, HydraQuartetVCO::GATE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(145.0, 118.0)), module, HydraQuartetVCO::GATE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(158.0, 118.0)), module, HydraQuartetVCO::GATE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(171.0, 118.0)), module, HydraQuartetVCO::GATE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(184.0, 118.0)), module, HydraQuartetVCO::GATE8_OUTPUT));
+		// Row 2 (y=123): Voices 1-4 | Audio Mix | Voices 5-8
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.0, 123.0)), module, HydraQuartetVCO::VOICE1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.0, 123.0)), module, HydraQuartetVCO::VOICE2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(51.0, 123.0)), module, HydraQuartetVCO::VOICE3_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(64.0, 123.0)), module, HydraQuartetVCO::VOICE4_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 123.0)), module, HydraQuartetVCO::MIX_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(139.0, 123.0)), module, HydraQuartetVCO::VOICE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(152.0, 123.0)), module, HydraQuartetVCO::VOICE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(165.0, 123.0)), module, HydraQuartetVCO::VOICE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(178.0, 123.0)), module, HydraQuartetVCO::VOICE8_OUTPUT));
 	}
 };
 
