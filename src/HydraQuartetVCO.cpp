@@ -69,31 +69,36 @@ struct MinBlepBuffer {
 // Encapsulates all per-oscillator state for dual VCO architecture
 struct VcoEngine {
 	float_4 phase[4] = {};
+	float_4 oldPhase[4] = {};
+	float_4 deltaPhase[4] = {};
 	MinBlepBuffer<32> sawMinBlepBuffer[4];
 	MinBlepBuffer<32> sqrMinBlepBuffer[4];
+	MinBlepBuffer<32> triMinBlepBuffer[4];
 
 	// Process one SIMD group (4 voices), returns 4 waveforms via output parameters
 	// g: SIMD group index (0-3)
 	// freq: frequency for 4 voices
 	// sampleTime: 1/sampleRate
 	// pwm: pulse width for 4 voices
+	// wrapMask: output parameter indicating which lanes wrapped
 	void process(int g, float_4 freq, float sampleTime, float_4 pwm,
-	             float_4& saw, float_4& sqr, float_4& tri, float_4& sine) {
+	             float_4& saw, float_4& sqr, float_4& tri, float_4& sine,
+	             int& wrapMask) {
 		// Phase accumulation with SIMD
-		float_4 deltaPhase = simd::clamp(freq * sampleTime, 0.f, 0.49f);
-		float_4 oldPhase = phase[g];
-		phase[g] += deltaPhase;
+		deltaPhase[g] = simd::clamp(freq * sampleTime, 0.f, 0.49f);
+		oldPhase[g] = phase[g];
+		phase[g] += deltaPhase[g];
 
 		// Detect phase wrap
 		float_4 wrapped = phase[g] >= 1.f;
 		phase[g] -= simd::floor(phase[g]);  // Handles large FM jumps
 
 		// === SAWTOOTH with strided MinBLEP ===
-		int wrapMask = simd::movemask(wrapped);
+		wrapMask = simd::movemask(wrapped);
 		if (wrapMask) {
 			for (int i = 0; i < 4; i++) {
-				if ((wrapMask & (1 << i)) && deltaPhase[i] > 0.f) {
-					float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
+				if ((wrapMask & (1 << i)) && deltaPhase[g][i] > 0.f) {
+					float subsample = (1.f - oldPhase[g][i]) / deltaPhase[g][i] - 1.f;
 					sawMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
 				}
 			}
@@ -102,12 +107,12 @@ struct VcoEngine {
 
 		// === SQUARE with PWM using strided MinBLEP ===
 		// Falling edge detection (phase crosses PWM threshold)
-		float_4 fallingEdge = (oldPhase < pwm) & (phase[g] >= pwm);
+		float_4 fallingEdge = (oldPhase[g] < pwm) & (phase[g] >= pwm);
 		int fallMask = simd::movemask(fallingEdge);
 		if (fallMask) {
 			for (int i = 0; i < 4; i++) {
-				if ((fallMask & (1 << i)) && deltaPhase[i] > 0.f) {
-					float subsample = (pwm[i] - oldPhase[i]) / deltaPhase[i] - 1.f;
+				if ((fallMask & (1 << i)) && deltaPhase[g][i] > 0.f) {
+					float subsample = (pwm[i] - oldPhase[g][i]) / deltaPhase[g][i] - 1.f;
 					sqrMinBlepBuffer[g].insertDiscontinuity(subsample, -2.f, i);
 				}
 			}
@@ -116,8 +121,8 @@ struct VcoEngine {
 		// Rising edge on wrap
 		if (wrapMask) {
 			for (int i = 0; i < 4; i++) {
-				if ((wrapMask & (1 << i)) && deltaPhase[i] > 0.f) {
-					float subsample = (1.f - oldPhase[i]) / deltaPhase[i] - 1.f;
+				if ((wrapMask & (1 << i)) && deltaPhase[g][i] > 0.f) {
+					float subsample = (1.f - oldPhase[g][i]) / deltaPhase[g][i] - 1.f;
 					sqrMinBlepBuffer[g].insertDiscontinuity(subsample, 2.f, i);
 				}
 			}
@@ -130,6 +135,7 @@ struct VcoEngine {
 		tri = simd::ifelse(phase[g] < 0.5f,
 			4.f * phase[g] - 1.f,           // -1 to +1 as phase goes 0 to 0.5
 			3.f - 4.f * phase[g]);          // +1 to -1 as phase goes 0.5 to 1
+		tri = tri + triMinBlepBuffer[g].process();
 
 		// === SINE (no antialiasing needed) ===
 		sine = simd::sin(2.f * float(M_PI) * phase[g]);
@@ -377,8 +383,9 @@ struct HydraQuartetVCO : Module {
 			// Process both VCO engines
 			float_4 saw1, sqr1, tri1, sine1;
 			float_4 saw2, sqr2, tri2, sine2;
-			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1);
-			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2);
+			int vco1WrapMask, vco2WrapMask;
+			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1, vco1WrapMask);
+			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2, vco2WrapMask);
 
 			// Sub-oscillator: -1 octave below VCO1 base (simplified, no MinBLEP)
 			float_4 subPitch = basePitch + octave1 - 1.f;
