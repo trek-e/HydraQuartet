@@ -522,10 +522,42 @@ struct HydraQuartetVCO : Module {
 
 			// Phase 1: Process both VCO engines to get wrap masks (stores oldPhase, deltaPhase internally)
 			float_4 saw1, sqr1, tri1, sine1;
-			float_4 saw2, sqr2, tri2, sine2;
+			float_4 saw2, sqr2, tri2, sine2, xorOut;
 			int vco1WrapMask, vco2WrapMask;
 			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1, vco1WrapMask);
-			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2, vco2WrapMask);
+			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2, vco2WrapMask, sqr1, &xorOut);
+
+			// Track VCO1 square edges for XOR MinBLEP (XOR = sqr1 * sqr2)
+			// When sqr1 transitions, XOR changes by 2 * sqr2
+
+			// VCO1 rising edge (wrap)
+			if (vco1WrapMask) {
+				for (int i = 0; i < 4; i++) {
+					if ((vco1WrapMask & (1 << i)) && vco1.deltaPhase[g][i] > 0.f) {
+						float subsample = (1.f - vco1.oldPhase[g][i]) / vco1.deltaPhase[g][i] - 1.f;
+						// sqr1: -1 -> +1, so XOR changes by 2 * sqr2
+						float xorDisc = 2.f * sqr2[i];
+						xorFromVco1MinBlep[g].insertDiscontinuity(subsample, xorDisc, i);
+					}
+				}
+			}
+
+			// VCO1 falling edge (PWM threshold)
+			float_4 vco1FallingEdge = (vco1.oldPhase[g] < pwm1_4) & (vco1.phase[g] >= pwm1_4);
+			int vco1FallMask = simd::movemask(vco1FallingEdge);
+			if (vco1FallMask) {
+				for (int i = 0; i < 4; i++) {
+					if ((vco1FallMask & (1 << i)) && vco1.deltaPhase[g][i] > 0.f) {
+						float subsample = (pwm1_4[i] - vco1.oldPhase[g][i]) / vco1.deltaPhase[g][i] - 1.f;
+						// sqr1: +1 -> -1, so XOR changes by -2 * sqr2
+						float xorDisc = -2.f * sqr2[i];
+						xorFromVco1MinBlep[g].insertDiscontinuity(subsample, xorDisc, i);
+					}
+				}
+			}
+
+			// Combine MinBLEP corrections from both VCO1 and VCO2 edges
+			xorOut += xorFromVco1MinBlep[g].process();
 
 			// Phase 2: Apply sync resets AFTER both VCOs have processed (order matters for bidirectional)
 			if (sync1Enabled && vco2WrapMask) {
