@@ -316,6 +316,9 @@ struct HydraQuartetVCO : Module {
 	VcoEngine vco1;
 	VcoEngine vco2;
 
+	// XOR MinBLEP tracking for VCO1 square edges (module-level, not in VcoEngine)
+	MinBlepBuffer<32> xorFromVco1MinBlep[4];  // Track VCO1 sqr transitions for XOR
+
 	// Sub-oscillator state (tracks VCO1 at -1 octave)
 	float_4 subPhase[4] = {};
 
@@ -408,16 +411,12 @@ struct HydraQuartetVCO : Module {
 		// Read VCO1 parameters
 		float pwm1 = params[PWM1_PARAM].getValue();
 		float triVol1 = params[TRI1_PARAM].getValue();
-		float sqrVol1 = params[SQR1_PARAM].getValue();
 		float sinVol1 = params[SIN1_PARAM].getValue();
-		float sawVol1 = params[SAW1_PARAM].getValue();
 
 		// Read VCO2 parameters
 		float pwm2 = params[PWM2_PARAM].getValue();
 		float triVol2 = params[TRI2_PARAM].getValue();
-		float sqrVol2 = params[SQR2_PARAM].getValue();
 		float sinVol2 = params[SIN2_PARAM].getValue();
-		float sawVol2 = params[SAW2_PARAM].getValue();
 
 		// Read PWM CV attenuverters
 		float pwm1Att = params[PWM1_ATT_PARAM].getValue();
@@ -429,7 +428,6 @@ struct HydraQuartetVCO : Module {
 
 		// Read sub-oscillator parameters
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
-		float subLevel = params[SUB_LEVEL_PARAM].getValue();
 
 		// Fixed output scaling - divide by 3 (typical number of active waveforms)
 		// User controls final level via individual waveform volumes
@@ -506,6 +504,22 @@ struct HydraQuartetVCO : Module {
 			pwm1_4 = simd::clamp(pwm1_4, 0.01f, 0.99f);
 			pwm2_4 = simd::clamp(pwm2_4, 0.01f, 0.99f);
 
+			// Read waveform volume CVs (polyphonic)
+			float_4 saw1CV = inputs[SAW1_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 sqr1CV = inputs[SQR1_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 subCV = inputs[SUB_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 xorCV = inputs[XOR_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 sqr2CV = inputs[SQR2_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+			float_4 saw2CV = inputs[SAW2_CV_INPUT].getPolyVoltageSimd<float_4>(c);
+
+			// CV replaces knob when patched, 0-10V maps to 0-10 volume
+			float_4 saw1Vol_4 = saw1CVConnected ? simd::clamp(saw1CV, 0.f, 10.f) : float_4(saw1Knob);
+			float_4 sqr1Vol_4 = sqr1CVConnected ? simd::clamp(sqr1CV, 0.f, 10.f) : float_4(sqr1Knob);
+			float_4 subVol_4 = subCVConnected ? simd::clamp(subCV, 0.f, 10.f) : float_4(subKnob);
+			float_4 xorVol_4 = xorCVConnected ? simd::clamp(xorCV, 0.f, 10.f) : float_4(0.f); // XOR default 0 until knob added
+			float_4 sqr2Vol_4 = sqr2CVConnected ? simd::clamp(sqr2CV, 0.f, 10.f) : float_4(sqr2Knob);
+			float_4 saw2Vol_4 = saw2CVConnected ? simd::clamp(saw2CV, 0.f, 10.f) : float_4(saw2Knob);
+
 			// Phase 1: Process both VCO engines to get wrap masks (stores oldPhase, deltaPhase internally)
 			float_4 saw1, sqr1, tri1, sine1;
 			float_4 saw2, sqr2, tri2, sine2;
@@ -549,10 +563,13 @@ struct HydraQuartetVCO : Module {
 			}
 			outputs[SUB_OUTPUT].setVoltageSimd(subVoltage, c);
 
-			// Mix both VCOs with independent volume controls, plus sub-oscillator
-			float_4 mixed = (tri1 * triVol1 + sqr1 * sqrVol1 + sine1 * sinVol1 + saw1 * sawVol1
-			              + tri2 * triVol2 + sqr2 * sqrVol2 + sine2 * sinVol2 + saw2 * sawVol2
-			              + subOut * subLevel) * outputScale;
+			// Mix both VCOs with CV-controlled volumes, plus sub-oscillator
+			// Note: tri and sine still use scalar knob values (no CV per Context decision)
+			float_4 mixed = (tri1 * triVol1 + sqr1 * sqr1Vol_4 + sine1 * sinVol1 + saw1 * saw1Vol_4
+			              + tri2 * triVol2 + sqr2 * sqr2Vol_4 + sine2 * sinVol2 + saw2 * saw2Vol_4
+			              + subOut * subVol_4
+			              // XOR will be added in Plan 03 after it's wired
+			              ) * outputScale;
 
 			// DC filtering - process per-voice
 			for (int i = 0; i < groupChannels; i++) {
