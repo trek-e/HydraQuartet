@@ -450,11 +450,11 @@ struct HydraQuartetVCO : Module {
 		float fineTuneKnob = params[FINE2_PARAM].getValue();
 		float fineTuneSemitones;
 		if (fineTuneKnob <= 5.f) {
-			// 0-5 maps to 0-1 semitone (fine tuning)
+			// 0-50% (0-5): 0 to +1 semitone (fine tuning for staying in tune)
 			fineTuneSemitones = fineTuneKnob / 5.f;
 		} else {
-			// 5-10 maps to 1-13 semitones (+12 more)
-			fineTuneSemitones = 1.f + (fineTuneKnob - 5.f) * 12.f / 5.f;
+			// 51-100% (5-10): +2 to +12 semitones (FM frequency ratios)
+			fineTuneSemitones = 2.f + (fineTuneKnob - 5.f) * 2.f;
 		}
 		float fineTuneVolts = fineTuneSemitones / 12.f;  // Convert semitones to V/Oct
 
