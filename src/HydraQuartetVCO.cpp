@@ -224,23 +224,23 @@ struct HydraQuartetVCO : Module {
 		// VCO1 Parameters
 		configSwitch(OCTAVE1_PARAM, -2.f, 2.f, 0.f, "VCO1 Octave", {"-2", "-1", "0", "+1", "+2"});
 		configParam(DETUNE1_PARAM, 0.f, 1.f, 0.f, "VCO1 Detune");
-		configParam(TRI1_PARAM, 0.f, 1.f, 0.f, "VCO1 Triangle");
-		configParam(SQR1_PARAM, 0.f, 1.f, 1.f, "VCO1 Square");
-		configParam(SIN1_PARAM, 0.f, 1.f, 1.f, "VCO1 Sine");
-		configParam(SAW1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sawtooth");
+		configParam(TRI1_PARAM, 0.f, 10.f, 0.f, "VCO1 Triangle");
+		configParam(SQR1_PARAM, 0.f, 10.f, 1.f, "VCO1 Square");
+		configParam(SIN1_PARAM, 0.f, 10.f, 1.f, "VCO1 Sine");
+		configParam(SAW1_PARAM, 0.f, 10.f, 0.f, "VCO1 Sawtooth");
 		configParam(PWM1_PARAM, 0.f, 1.f, 0.5f, "VCO1 Pulse Width", "%", 0.f, 100.f);
 		configParam(PWM1_ATT_PARAM, -1.f, 1.f, 0.f, "VCO1 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
-		configParam(SUB_LEVEL_PARAM, 0.f, 1.f, 0.f, "Sub Level", "%", 0.f, 100.f);
+		configParam(SUB_LEVEL_PARAM, 0.f, 10.f, 0.f, "Sub Level");
 
 		// VCO2 Parameters
 		configSwitch(OCTAVE2_PARAM, -2.f, 2.f, 0.f, "VCO2 Octave", {"-2", "-1", "0", "+1", "+2"});
 		configParam(FINE2_PARAM, -1.f, 1.f, 0.f, "VCO2 Fine Tune", " cents", 0.f, 100.f);
-		configParam(TRI2_PARAM, 0.f, 1.f, 0.f, "VCO2 Triangle");
-		configParam(SQR2_PARAM, 0.f, 1.f, 1.f, "VCO2 Square");
-		configParam(SIN2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sine");
-		configParam(SAW2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sawtooth");
+		configParam(TRI2_PARAM, 0.f, 10.f, 0.f, "VCO2 Triangle");
+		configParam(SQR2_PARAM, 0.f, 10.f, 1.f, "VCO2 Square");
+		configParam(SIN2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sine");
+		configParam(SAW2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sawtooth");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
 		configParam(PWM2_ATT_PARAM, -1.f, 1.f, 0.f, "VCO2 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
@@ -448,7 +448,8 @@ struct HydraQuartetVCO : Module {
 		}
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
 		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
-		float mixOut = mixSum[0] / channels;
+		// Proportional mix: voices sum together (more voices = louder mix)
+		float mixOut = mixSum[0];
 		// Sanitize mix output
 		outputs[MIX_OUTPUT].setVoltage(std::isfinite(mixOut) ? mixOut : 0.f);
 
