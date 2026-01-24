@@ -82,9 +82,13 @@ struct VcoEngine {
 	// sampleTime: 1/sampleRate
 	// pwm: pulse width for 4 voices
 	// wrapMask: output parameter indicating which lanes wrapped
+	// sqr1Input: square wave from VCO1 (for XOR calculation in VCO2)
+	// xorOut: optional XOR output pointer
 	void process(int g, float_4 freq, float sampleTime, float_4 pwm,
 	             float_4& saw, float_4& sqr, float_4& tri, float_4& sine,
-	             int& wrapMask) {
+	             int& wrapMask,
+	             float_4 sqr1Input = float_4(0.f),  // Square from VCO1 (for XOR)
+	             float_4* xorOut = nullptr) {        // Optional XOR output
 		// Phase accumulation with SIMD
 		deltaPhase[g] = simd::clamp(freq * sampleTime, 0.f, 0.49f);
 		oldPhase[g] = phase[g];
