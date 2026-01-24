@@ -147,6 +147,7 @@ struct HydraQuartetVCO : Module {
 		PWM2_ATT_PARAM,
 		SYNC2_PARAM,
 		FM_PARAM,
+		FM_ATT_PARAM,  // FM CV attenuverter
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -187,6 +188,7 @@ struct HydraQuartetVCO : Module {
 	enum LightId {
 		PWM1_CV_LIGHT,
 		PWM2_CV_LIGHT,
+		FM_CV_LIGHT,  // FM CV activity indicator
 		LIGHTS_LEN
 	};
 
@@ -227,6 +229,7 @@ struct HydraQuartetVCO : Module {
 		configParam(PWM2_ATT_PARAM, -1.f, 1.f, 0.f, "VCO2 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
 		configParam(FM_PARAM, 0.f, 1.f, 0.f, "FM Amount");
+		configParam(FM_ATT_PARAM, -1.f, 1.f, 0.f, "FM CV Attenuverter", "%", 0.f, 100.f);
 
 		// Inputs
 		configInput(VOCT_INPUT, "V/Oct");
