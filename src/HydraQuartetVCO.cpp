@@ -456,6 +456,18 @@ struct HydraQuartetVCO : Module {
 		} else {
 			lights[PWM2_CV_LIGHT].setBrightness(0.f);
 		}
+
+		// FM CV activity indicator
+		if (inputs[FM_INPUT].isConnected()) {
+			float peakCV = 0.f;
+			int fmChannels = inputs[FM_INPUT].getChannels();
+			for (int i = 0; i < fmChannels; i++) {
+				peakCV = std::max(peakCV, std::abs(inputs[FM_INPUT].getVoltage(i)));
+			}
+			lights[FM_CV_LIGHT].setBrightness(peakCV / 5.f);
+		} else {
+			lights[FM_CV_LIGHT].setBrightness(0.f);
+		}
 	}
 };
 
@@ -519,7 +531,11 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, HydraQuartetVCO::PWM2_INPUT));
 		// PWM2 CV activity LED - positioned near the input port
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(131.0, 85.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
+		// FM attenuverter - small knob above the CV input
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(147.32, 75.0)), module, HydraQuartetVCO::FM_ATT_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, HydraQuartetVCO::FM_INPUT));
+		// FM CV activity LED - positioned near the input port
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(151.32, 85.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
 
 		// Per-voice outputs (bottom of panel, split left/right around global section)
 		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right
