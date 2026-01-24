@@ -329,6 +329,10 @@ struct HydraQuartetVCO : Module {
 		// User controls final level via individual waveform volumes
 		const float outputScale = 1.f / 3.f;
 
+		// Read sync switch states
+		bool sync1Enabled = params[SYNC1_PARAM].getValue() > 0.5f;  // VCO1 syncs to VCO2
+		bool sync2Enabled = params[SYNC2_PARAM].getValue() > 0.5f;  // VCO2 syncs to VCO1
+
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
 			int groupChannels = std::min(channels - c, 4);
@@ -380,12 +384,24 @@ struct HydraQuartetVCO : Module {
 			pwm1_4 = simd::clamp(pwm1_4, 0.01f, 0.99f);
 			pwm2_4 = simd::clamp(pwm2_4, 0.01f, 0.99f);
 
-			// Process both VCO engines
+			// Phase 1: Process both VCO engines to get wrap masks (stores oldPhase, deltaPhase internally)
 			float_4 saw1, sqr1, tri1, sine1;
 			float_4 saw2, sqr2, tri2, sine2;
 			int vco1WrapMask, vco2WrapMask;
 			vco1.process(g, freq1, sampleTime, pwm1_4, saw1, sqr1, tri1, sine1, vco1WrapMask);
 			vco2.process(g, freq2, sampleTime, pwm2_4, saw2, sqr2, tri2, sine2, vco2WrapMask);
+
+			// Phase 2: Apply sync resets AFTER both VCOs have processed (order matters for bidirectional)
+			if (sync1Enabled && vco2WrapMask) {
+				// VCO1 syncs to VCO2: when VCO2 wraps, reset VCO1
+				vco1.applySync(g, vco2WrapMask, vco2.oldPhase[g], vco2.deltaPhase[g], pwm1_4,
+				               saw1, sqr1, tri1);  // Output params modified by reference
+			}
+			if (sync2Enabled && vco1WrapMask) {
+				// VCO2 syncs to VCO1: when VCO1 wraps, reset VCO2
+				vco2.applySync(g, vco1WrapMask, vco1.oldPhase[g], vco1.deltaPhase[g], pwm2_4,
+				               saw2, sqr2, tri2);  // Output params modified by reference
+			}
 
 			// Sub-oscillator: -1 octave below VCO1 base (simplified, no MinBLEP)
 			float_4 subPitch = basePitch + octave1 - 1.f;
