@@ -824,8 +824,8 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// 3-position horizontal switches: Hard - Off - Soft
 		// Using CKSSThree rotated via SVG or custom component for horizontal
 		// VCO1 Sync on top, VCO2 Sync below
-		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 25.0)), module, HydraQuartetVCO::SYNC1_PARAM));
-		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(101.6, 25.0)), module, HydraQuartetVCO::SYNC1_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// Center Global Section (40HP center = 101.6mm)
 		// Gate input in center
