@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
 **Updated:** 2026-01-23
-**Session:** Phase 5 Plan 1 complete (PWM CV Inputs)
+**Session:** Phase 5 complete (PWM & Sub-Oscillator)
 
 ---
 
@@ -19,31 +19,31 @@
 
 ## Current Position
 
-**Phase:** 5 - PWM & Sub-Oscillator IN PROGRESS
-**Plan:** 1 of 2 complete (PWM CV Inputs)
-**Status:** Plan 1 complete, ready for Plan 2
-**Progress:** 4.5/8 phases complete
+**Phase:** 5 - PWM & Sub-Oscillator COMPLETE
+**Plan:** 2 of 2 complete
+**Status:** Phase 5 complete, ready for Phase 6
+**Progress:** 5/8 phases complete
 
 ```
-[████████████████████████░░░░░░░░░░░░░] 56%
+[██████████████████████████████░░░░░░░] 63%
 ```
 
-**Next Action:** Execute Phase 5 Plan 2 (Sub-Oscillator)
+**Next Action:** Plan Phase 6 (Through-Zero FM)
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 4/8 (Phase 5 in progress)
-- Phases in progress: 1/8
+- Phases complete: 5/8
+- Phases in progress: 0/8
 - Phases pending: 3/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 18 + PWM CV (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, PITCH-01, PITCH-02, PITCH-03, partial PWM-01)
-- Remaining: 15
+- Completed: 23 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, WAVE-04, PITCH-01, PITCH-02, PITCH-03, PWM-01, PWM-02, PWM-03, PWM-04)
+- Remaining: 11
 
 **Quality Gates:**
 - Panel design verified: YES (36 HP, all controls, outputs distinguished)
@@ -53,6 +53,7 @@
 - CPU budget verified: YES (<5% target, achieved ~1.6% with dual VCO)
 - Dual VCO verified: YES (VcoEngine struct, independent pitch control)
 - PWM CV modulation verified: YES (polyphonic CV, attenuverters, LED indicators)
+- Sub-oscillator verified: YES (-1 octave tracking, square/sine switch, dedicated output)
 - Through-zero FM quality verified: No (Phase 6)
 
 ---
@@ -61,12 +62,15 @@
 
 ### Key Decisions Made
 
-**Phase 5 Plan 1 Complete (2026-01-23):**
+**Phase 5 Complete (2026-01-23):**
 - PWM CV scaled at 0.1 factor: +/-5V * att gives +/-0.5 PWM contribution (full sweep)
 - PWM clamped to 0.01-0.99 to avoid DC offset at extremes
 - LED brightness based on peak CV across all polyphonic channels
 - Trimpot used for attenuverters (smaller than main knobs)
 - Bipolar CV pattern: base + cv * att * scale, clamped to safe range
+- Sub-oscillator ignores VCO1 detune for stable foundation (uses basePitch + octave1 - 1.f)
+- Sub-oscillator uses simple phase accumulator (no MinBLEP - frequencies low enough)
+- Sub output at ±2V (reduced during testing)
 
 **Phase 4 Complete (2026-01-23):**
 - VcoEngine struct encapsulates all per-oscillator state (phase, MinBLEP buffers, triState)
@@ -111,22 +115,20 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 5 Plan 1 (PWM CV Inputs) executed successfully
-- PWM1_ATT_PARAM and PWM2_ATT_PARAM added for bipolar attenuverters
-- PWM1_CV_LIGHT and PWM2_CV_LIGHT added for CV activity indicators
-- Polyphonic PWM CV processing via getPolyVoltageSimd
-- PWM clamped to 0.01-0.99 for DC safety
-- Widget updated with Trimpot and SmallLight<GreenLight> components
+- Phase 5 (PWM & Sub-Oscillator) complete
+- Plan 1: PWM CV inputs with attenuverters and LED indicators
+- Plan 2: Sub-oscillator at -1 octave with square/sine switch and dedicated output
+- Human verified: sub tracks VCO1, waveform switch works, ignores detune
 
 ### What Comes Next
-1. Execute Phase 5 Plan 2 (Sub-Oscillator)
-2. Add sub-oscillator derived from VCO1 frequency
-3. Waveform switch (square/sine) and dedicated output
+1. Plan Phase 6 (Through-Zero FM)
+2. Research through-zero FM algorithms and antialiasing strategies
+3. Implement VCO2 receiving FM from VCO1
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - PWM CV attenuverters, LED lights, polyphonic CV processing
-- .planning/phases/05-pwm-sub-oscillator/05-01-SUMMARY.md - created
+- src/HydraQuartetVCO.cpp - Sub-oscillator params, DSP, output, widget controls
+- .planning/phases/05-pwm-sub-oscillator/05-02-SUMMARY.md - created
 
 ---
 
-*Last updated: 2026-01-23 after Phase 5 Plan 1 completion*
+*Last updated: 2026-01-23 after Phase 5 completion*
