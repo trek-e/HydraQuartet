@@ -140,6 +140,57 @@ struct VcoEngine {
 		// === SINE (no antialiasing needed) ===
 		sine = simd::sin(2.f * float(M_PI) * phase[g]);
 	}
+
+	// Apply hard sync: reset phase and insert MinBLEP discontinuities
+	// Called after process() when master oscillator wraps
+	void applySync(int g, int syncMask, float_4 masterOldPhase, float_4 masterDeltaPhase, float_4 pwm,
+	               float_4& saw, float_4& sqr, float_4& tri) {
+		for (int i = 0; i < 4; i++) {
+			if (!(syncMask & (1 << i))) continue;
+			if (deltaPhase[g][i] <= 0.f) continue;  // Skip if negative freq (FM)
+			if (masterDeltaPhase[i] <= 0.f) continue;  // Skip if master freq negative
+
+			// Calculate subsample position of master wrap
+			float subsample = (1.f - masterOldPhase[i]) / masterDeltaPhase[i] - 1.f;
+			subsample = clamp(subsample, -1.f + 1e-6f, 0.f);  // Ensure valid range
+
+			// Calculate old waveform values (at current phase, before reset)
+			float currentPhase = phase[g][i];
+			float oldSaw = 2.f * currentPhase - 1.f;
+			float oldSqr = (currentPhase < pwm[i]) ? 1.f : -1.f;
+			float oldTri = (currentPhase < 0.5f)
+				? (4.f * currentPhase - 1.f)
+				: (3.f - 4.f * currentPhase);
+
+			// Reset phase to subsample-accurate position
+			float newPhase = deltaPhase[g][i] * (-subsample);
+			phase[g][i] = newPhase;
+
+			// Calculate new waveform values (at reset phase)
+			float newSaw = 2.f * newPhase - 1.f;
+			float newSqr = (newPhase < pwm[i]) ? 1.f : -1.f;
+			float newTri = (newPhase < 0.5f)
+				? (4.f * newPhase - 1.f)
+				: (3.f - 4.f * newPhase);
+
+			// Insert MinBLEP discontinuities for all geometric waveforms
+			sawMinBlepBuffer[g].insertDiscontinuity(subsample, newSaw - oldSaw, i);
+
+			// Square: only insert if value actually changed
+			if (oldSqr != newSqr) {
+				sqrMinBlepBuffer[g].insertDiscontinuity(subsample, newSqr - oldSqr, i);
+			}
+
+			// Triangle: uses dedicated triMinBlepBuffer (added in Task 1)
+			// Insert amplitude discontinuity for sync-induced phase reset
+			triMinBlepBuffer[g].insertDiscontinuity(subsample, newTri - oldTri, i);
+
+			// Update waveform output values for this lane to reflect synced phase
+			saw[i] = newSaw;
+			sqr[i] = newSqr;
+			tri[i] = newTri;
+		}
+	}
 };
 
 // Maximum polyphony: 16 voices (4 SIMD groups of 4 voices each)
