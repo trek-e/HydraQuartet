@@ -709,18 +709,24 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(15.24, 28.0)), module, HydraQuartetVCO::OCTAVE1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.0, 28.0)), module, HydraQuartetVCO::DETUNE1_PARAM));
 
+		// VCO1 waveform volume knobs
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 48.0)), module, HydraQuartetVCO::TRI1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.4, 48.0)), module, HydraQuartetVCO::SQR1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(40.64, 48.0)), module, HydraQuartetVCO::SIN1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.88, 48.0)), module, HydraQuartetVCO::SAW1_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 68.0)), module, HydraQuartetVCO::PWM1_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 68.0)), module, HydraQuartetVCO::SYNC1_PARAM));
+		// VCO1 waveform CV inputs (below SQR and SAW knobs)
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.4, 58.0)), module, HydraQuartetVCO::SQR1_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 58.0)), module, HydraQuartetVCO::SAW1_CV_INPUT));
+
+		// VCO1 PWM and Sync row
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 78.0)), module, HydraQuartetVCO::PWM1_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(35.56, 78.0)), module, HydraQuartetVCO::SYNC1_PARAM));
 		// PWM1 attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(55.88, 58.0)), module, HydraQuartetVCO::PWM1_ATT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 68.0)), module, HydraQuartetVCO::PWM1_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(55.88, 68.0)), module, HydraQuartetVCO::PWM1_ATT_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55.88, 78.0)), module, HydraQuartetVCO::PWM1_INPUT));
 		// PWM1 CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 68.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(60.0, 78.0)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
 
 		// Sub-oscillator controls (VCO1 section, near bottom)
 		// Sub level knob
@@ -729,56 +735,66 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(25.4, 88.0)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
 		// Sub output jack
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64, 88.0)), module, HydraQuartetVCO::SUB_OUTPUT));
+		// Sub CV input
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 98.0)), module, HydraQuartetVCO::SUB_CV_INPUT));
 
-		// Center Global Section
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.44, 100.0)), module, HydraQuartetVCO::GATE_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 115.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(91.44, 125.0)), module, HydraQuartetVCO::MIX_OUTPUT));
+		// Center Global Section (40HP center = 101.6mm)
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 100.0)), module, HydraQuartetVCO::GATE_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 115.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 125.0)), module, HydraQuartetVCO::MIX_OUTPUT));
 
-		// VCO2 Section (right side) - positions match SVG component layer
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(137.0, 28.0)), module, HydraQuartetVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 28.0)), module, HydraQuartetVCO::FINE2_PARAM));
+		// VCO2 Section (right side) - positions shifted right for 40HP panel
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(147.16, 28.0)), module, HydraQuartetVCO::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(177.8, 28.0)), module, HydraQuartetVCO::FINE2_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 48.0)), module, HydraQuartetVCO::TRI2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(142.24, 48.0)), module, HydraQuartetVCO::SQR2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(157.48, 48.0)), module, HydraQuartetVCO::SIN2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(172.72, 48.0)), module, HydraQuartetVCO::SAW2_PARAM));
+		// VCO2 waveform volume knobs (including XOR)
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(137.16, 48.0)), module, HydraQuartetVCO::TRI2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(152.4, 48.0)), module, HydraQuartetVCO::SQR2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 48.0)), module, HydraQuartetVCO::SIN2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(182.88, 48.0)), module, HydraQuartetVCO::SAW2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(198.12, 48.0)), module, HydraQuartetVCO::XOR_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.0, 68.0)), module, HydraQuartetVCO::PWM2_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(147.32, 68.0)), module, HydraQuartetVCO::SYNC2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 68.0)), module, HydraQuartetVCO::FM_PARAM));
+		// VCO2 waveform CV inputs (below SQR, SAW, and XOR knobs)
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(152.4, 58.0)), module, HydraQuartetVCO::SQR2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(182.88, 58.0)), module, HydraQuartetVCO::SAW2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(198.12, 58.0)), module, HydraQuartetVCO::XOR_CV_INPUT));
+
+		// VCO2 PWM and Sync row
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(137.16, 78.0)), module, HydraQuartetVCO::PWM2_PARAM));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(157.48, 78.0)), module, HydraQuartetVCO::SYNC2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(177.8, 78.0)), module, HydraQuartetVCO::FM_PARAM));
 		// PWM2 attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(127.0, 75.0)), module, HydraQuartetVCO::PWM2_ATT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.0, 85.0)), module, HydraQuartetVCO::PWM2_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(137.16, 88.0)), module, HydraQuartetVCO::PWM2_ATT_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(137.16, 98.0)), module, HydraQuartetVCO::PWM2_INPUT));
 		// PWM2 CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(131.0, 85.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(141.16, 98.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
 		// FM attenuverter - small knob above the CV input
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(147.32, 75.0)), module, HydraQuartetVCO::FM_ATT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.32, 85.0)), module, HydraQuartetVCO::FM_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(157.48, 88.0)), module, HydraQuartetVCO::FM_ATT_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(157.48, 98.0)), module, HydraQuartetVCO::FM_INPUT));
 		// FM CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(151.32, 85.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(161.48, 98.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
 
 		// Per-voice outputs (bottom of panel, split left/right around global section)
-		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right
+		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right (shifted for 40HP)
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.0, 103.0)), module, HydraQuartetVCO::VOICE1_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.0, 103.0)), module, HydraQuartetVCO::VOICE2_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.0, 103.0)), module, HydraQuartetVCO::VOICE3_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.0, 103.0)), module, HydraQuartetVCO::VOICE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(135.0, 103.0)), module, HydraQuartetVCO::VOICE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(148.0, 103.0)), module, HydraQuartetVCO::VOICE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(161.0, 103.0)), module, HydraQuartetVCO::VOICE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.0, 103.0)), module, HydraQuartetVCO::VOICE8_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(145.0, 103.0)), module, HydraQuartetVCO::VOICE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(158.0, 103.0)), module, HydraQuartetVCO::VOICE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(171.0, 103.0)), module, HydraQuartetVCO::VOICE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(184.0, 103.0)), module, HydraQuartetVCO::VOICE8_OUTPUT));
 
-		// Gate outputs row (y=118) - gates 1-4 left, 5-8 right
+		// Gate outputs row (y=118) - gates 1-4 left, 5-8 right (shifted for 40HP)
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.0, 118.0)), module, HydraQuartetVCO::GATE1_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(23.0, 118.0)), module, HydraQuartetVCO::GATE2_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.0, 118.0)), module, HydraQuartetVCO::GATE3_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.0, 118.0)), module, HydraQuartetVCO::GATE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(135.0, 118.0)), module, HydraQuartetVCO::GATE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(148.0, 118.0)), module, HydraQuartetVCO::GATE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(161.0, 118.0)), module, HydraQuartetVCO::GATE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.0, 118.0)), module, HydraQuartetVCO::GATE8_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(145.0, 118.0)), module, HydraQuartetVCO::GATE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(158.0, 118.0)), module, HydraQuartetVCO::GATE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(171.0, 118.0)), module, HydraQuartetVCO::GATE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(184.0, 118.0)), module, HydraQuartetVCO::GATE8_OUTPUT));
 	}
 };
 
