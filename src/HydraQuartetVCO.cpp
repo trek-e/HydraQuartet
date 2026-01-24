@@ -804,10 +804,9 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y2)), module, HydraQuartetVCO::SIN1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X4, vco1Y2)), module, HydraQuartetVCO::VIBRATO1_PARAM));
 
-		// Row 3: PW, Square, Saw
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y3)), module, HydraQuartetVCO::PWM1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y3)), module, HydraQuartetVCO::SQR1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y3)), module, HydraQuartetVCO::SAW1_PARAM));
+		// Row 3: Square, Saw (PWM1 moved to lower left corner)
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y3)), module, HydraQuartetVCO::SQR1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y3)), module, HydraQuartetVCO::SAW1_PARAM));
 
 		// VCO1 CV inputs and additional controls (below 3x3 grid)
 		const float vco1Y4 = 82.f;
@@ -831,13 +830,16 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// Center Global Section (40HP center = 101.6mm)
-		// V/Oct and Gate inputs in center area
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.6, 60.0)), module, HydraQuartetVCO::VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(111.6, 60.0)), module, HydraQuartetVCO::GATE_INPUT));
+		// Gate input in center
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 60.0)), module, HydraQuartetVCO::GATE_INPUT));
 		// Polyphonic audio output
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 80.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
 		// Sub output in center area
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 95.0)), module, HydraQuartetVCO::SUB_OUTPUT));
+
+		// Lower left corner: PWM1 knob above V/Oct input
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.0, 110.0)), module, HydraQuartetVCO::PWM1_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 123.0)), module, HydraQuartetVCO::VOCT_INPUT));
 
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
 		// Grid spacing: 15mm horizontal, 20mm vertical
