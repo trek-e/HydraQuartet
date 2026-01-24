@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
-**Updated:** 2026-01-24
-**Session:** Phase 7 Plan 1 complete (Hard Sync)
+**Updated:** 2026-01-23
+**Session:** Phase 8 Plan 2 complete (Waveform Volume CV Inputs)
 
 ---
 
@@ -19,16 +19,16 @@
 
 ## Current Position
 
-**Phase:** 7 - Hard Sync (COMPLETE)
-**Plan:** 1 of 1 complete
-**Status:** Phase 7 verified and complete, ready for Phase 8
-**Progress:** 7/8 phases complete
+**Phase:** 8 - XOR Waveshaping (IN PROGRESS)
+**Plan:** 2 of 3 complete
+**Status:** Plan 08-02 complete, ready for Plan 08-03
+**Progress:** 7.67/8 phases complete (Phase 8 is 67% complete)
 
 ```
-[█████████████████████████████████████████░░] 87.5%
+[█████████████████████████████████████████▓░] 95.8%
 ```
 
-**Next Action:** Plan Phase 8 (XOR Waveshaping - Final phase)
+**Next Action:** Execute Plan 08-03 (XOR Volume Knob & Integration)
 
 ---
 
@@ -62,6 +62,14 @@
 ## Accumulated Context
 
 ### Key Decisions Made
+
+**Phase 8 Plan 2 Complete (2026-01-23):**
+- CV replaces knob when patched (not additive) for SAW1, SQR1, SUB, XOR, SQR2, SAW2
+- 0-10V direct mapping to 0-10 volume without scaling factors (intuitive 1:1 correspondence)
+- Connection checks outside loop for efficiency (matches PWM/FM CV pattern)
+- XOR volume defaults to 0 until knob added in Plan 03 (safe default, prevents unintended audio)
+- Volume variable naming: waveformVol_4 for SIMD, waveformKnob for scalar knob reading
+- CV input pattern: enum → configInput → isConnected → getPolyVoltageSimd → clamp → ternary
 
 **Phase 7 Plan 1 Complete (2026-01-24):**
 - Separate waveform generation phase: process() generates waveforms, applySync() resets and regenerates
@@ -127,22 +135,22 @@
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 7 Plan 1 (Hard Sync) complete
-- Bidirectional hard sync: VCO1 syncs to VCO2, VCO2 syncs to VCO1
-- applySync() method with subsample-accurate phase reset
-- MinBLEP antialiasing for sawtooth, square, and triangle waveforms
-- Triangle gets dedicated triMinBlepBuffer for sync discontinuities
-- Negative frequency protection (skip sync if FM drives freq negative)
+- Phase 8 Plan 2 (Waveform Volume CV Inputs) complete
+- 6 polyphonic CV inputs: SAW1_CV, SQR1_CV, SUB_CV, XOR_CV, SQR2_CV, SAW2_CV
+- CV-replaces-knob pattern with 0-10V direct mapping to 0-10 volume
+- Per-voice volume automation via getPolyVoltageSimd<float_4>
+- Updated mix calculation to use float_4 volume variables
+- Removed duplicate volume variable declarations (auto-fix)
 
 ### What Comes Next
-1. Plan Phase 8 (final phase)
-2. Complete any remaining requirements
-3. Final testing and verification
+1. Execute Plan 08-03 (XOR Volume Knob & Integration)
+2. Complete Phase 8 (final phase)
+3. Final module verification
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - triMinBlepBuffer, applySync() method, bidirectional sync logic, wrapMask return
-- .planning/phases/07-hard-sync/07-01-SUMMARY.md - created
+- src/HydraQuartetVCO.cpp - 6 CV inputs, CV-replaces-knob logic, updated mix calculation
+- .planning/phases/08-xor-waveshaping/08-02-SUMMARY.md - created
 
 ---
 
-*Last updated: 2026-01-24 after Phase 7 verified and complete*
+*Last updated: 2026-01-23 after Phase 8 Plan 2 complete*
