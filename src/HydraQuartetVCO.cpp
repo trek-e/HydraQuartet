@@ -142,16 +142,16 @@ struct VcoEngine {
 	}
 
 	// Apply hard sync: reset phase and insert MinBLEP discontinuities
-	// Called after process() when master oscillator wraps
-	void applySync(int g, int syncMask, float_4 masterOldPhase, float_4 masterDeltaPhase, float_4 pwm,
+	// Called after process() when primary oscillator wraps
+	void applySync(int g, int syncMask, float_4 primaryOldPhase, float_4 primaryDeltaPhase, float_4 pwm,
 	               float_4& saw, float_4& sqr, float_4& tri) {
 		for (int i = 0; i < 4; i++) {
 			if (!(syncMask & (1 << i))) continue;
 			if (deltaPhase[g][i] <= 0.f) continue;  // Skip if negative freq (FM)
-			if (masterDeltaPhase[i] <= 0.f) continue;  // Skip if master freq negative
+			if (primaryDeltaPhase[i] <= 0.f) continue;  // Skip if primary freq negative
 
-			// Calculate subsample position of master wrap
-			float subsample = (1.f - masterOldPhase[i]) / masterDeltaPhase[i] - 1.f;
+			// Calculate subsample position of primary wrap
+			float subsample = (1.f - primaryOldPhase[i]) / primaryDeltaPhase[i] - 1.f;
 			subsample = clamp(subsample, -1.f + 1e-6f, 0.f);  // Ensure valid range
 
 			// Calculate old waveform values (at current phase, before reset)
