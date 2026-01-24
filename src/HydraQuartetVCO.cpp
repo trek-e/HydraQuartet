@@ -256,6 +256,7 @@ struct HydraQuartetVCO : Module {
 		SQR2_PARAM,
 		SIN2_PARAM,
 		SAW2_PARAM,
+		XOR_PARAM,  // XOR volume control
 		PWM2_PARAM,
 		PWM2_ATT_PARAM,
 		SYNC2_PARAM,
@@ -348,6 +349,7 @@ struct HydraQuartetVCO : Module {
 		configParam(SQR2_PARAM, 0.f, 10.f, 1.f, "VCO2 Square");
 		configParam(SIN2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sine");
 		configParam(SAW2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sawtooth");
+		configParam(XOR_PARAM, 0.f, 10.f, 0.f, "XOR Volume");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
 		configParam(PWM2_ATT_PARAM, -1.f, 1.f, 0.f, "VCO2 PWM CV Attenuverter", "%", 0.f, 100.f);
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
@@ -441,7 +443,7 @@ struct HydraQuartetVCO : Module {
 		float saw1Knob = params[SAW1_PARAM].getValue();
 		float sqr1Knob = params[SQR1_PARAM].getValue();
 		float subKnob = params[SUB_LEVEL_PARAM].getValue();
-		// Note: XOR knob will be added in Plan 03
+		float xorKnob = params[XOR_PARAM].getValue();
 		float sqr2Knob = params[SQR2_PARAM].getValue();
 		float saw2Knob = params[SAW2_PARAM].getValue();
 
@@ -516,7 +518,7 @@ struct HydraQuartetVCO : Module {
 			float_4 saw1Vol_4 = saw1CVConnected ? simd::clamp(saw1CV, 0.f, 10.f) : float_4(saw1Knob);
 			float_4 sqr1Vol_4 = sqr1CVConnected ? simd::clamp(sqr1CV, 0.f, 10.f) : float_4(sqr1Knob);
 			float_4 subVol_4 = subCVConnected ? simd::clamp(subCV, 0.f, 10.f) : float_4(subKnob);
-			float_4 xorVol_4 = xorCVConnected ? simd::clamp(xorCV, 0.f, 10.f) : float_4(0.f); // XOR default 0 until knob added
+			float_4 xorVol_4 = xorCVConnected ? simd::clamp(xorCV, 0.f, 10.f) : float_4(xorKnob);
 			float_4 sqr2Vol_4 = sqr2CVConnected ? simd::clamp(sqr2CV, 0.f, 10.f) : float_4(sqr2Knob);
 			float_4 saw2Vol_4 = saw2CVConnected ? simd::clamp(saw2CV, 0.f, 10.f) : float_4(saw2Knob);
 
@@ -595,12 +597,12 @@ struct HydraQuartetVCO : Module {
 			}
 			outputs[SUB_OUTPUT].setVoltageSimd(subVoltage, c);
 
-			// Mix both VCOs with CV-controlled volumes, plus sub-oscillator
+			// Mix both VCOs with CV-controlled volumes, plus sub-oscillator and XOR
 			// Note: tri and sine still use scalar knob values (no CV per Context decision)
 			float_4 mixed = (tri1 * triVol1 + sqr1 * sqr1Vol_4 + sine1 * sinVol1 + saw1 * saw1Vol_4
 			              + tri2 * triVol2 + sqr2 * sqr2Vol_4 + sine2 * sinVol2 + saw2 * saw2Vol_4
 			              + subOut * subVol_4
-			              // XOR will be added in Plan 03 after it's wired
+			              + xorOut * xorVol_4
 			              ) * outputScale;
 
 			// DC filtering - process per-voice
