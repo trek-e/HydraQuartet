@@ -135,6 +135,41 @@ struct VcoEngine {
 
 		sqr = simd::ifelse(phase[g] < pwm, 1.f, -1.f) + sqrMinBlepBuffer[g].process();
 
+		// === XOR ring modulation (only if requested) ===
+		if (xorOut != nullptr) {
+			// Raw ring modulation: sqr1 * sqr2
+			*xorOut = sqr1Input * sqr;
+
+			// Track XOR edges from THIS oscillator's square transitions
+			// (sqr1Input edges are tracked separately in VCO1's call)
+
+			// Falling edge detection (PWM threshold crossing)
+			// When sqr transitions from +1 to -1, XOR changes by -2 * sqr1Input
+			if (fallMask) {
+				for (int i = 0; i < 4; i++) {
+					if ((fallMask & (1 << i)) && deltaPhase[g][i] > 0.f) {
+						float subsample = (pwm[i] - oldPhase[g][i]) / deltaPhase[g][i] - 1.f;
+						float xorDisc = -2.f * sqr1Input[i];  // sqr: +1 -> -1
+						xorMinBlepBuffer[g].insertDiscontinuity(subsample, xorDisc, i);
+					}
+				}
+			}
+
+			// Rising edge on wrap (when phase wraps, sqr goes from -1 to +1)
+			if (wrapMask) {
+				for (int i = 0; i < 4; i++) {
+					if ((wrapMask & (1 << i)) && deltaPhase[g][i] > 0.f) {
+						float subsample = (1.f - oldPhase[g][i]) / deltaPhase[g][i] - 1.f;
+						float xorDisc = 2.f * sqr1Input[i];  // sqr: -1 -> +1
+						xorMinBlepBuffer[g].insertDiscontinuity(subsample, xorDisc, i);
+					}
+				}
+			}
+
+			// Apply MinBLEP correction
+			*xorOut += xorMinBlepBuffer[g].process();
+		}
+
 		// === TRIANGLE via direct calculation (normalized to ±1) ===
 		// Triangle from phase: rises 0->0.5, falls 0.5->1
 		tri = simd::ifelse(phase[g] < 0.5f,
@@ -403,6 +438,22 @@ struct HydraQuartetVCO : Module {
 		// Read sync switch states
 		bool sync1Enabled = params[SYNC1_PARAM].getValue() > 0.5f;  // VCO1 syncs to VCO2
 		bool sync2Enabled = params[SYNC2_PARAM].getValue() > 0.5f;  // VCO2 syncs to VCO1
+
+		// Read waveform volume knobs (for CV-replaces-knob pattern)
+		float saw1Knob = params[SAW1_PARAM].getValue();
+		float sqr1Knob = params[SQR1_PARAM].getValue();
+		float subKnob = params[SUB_LEVEL_PARAM].getValue();
+		// Note: XOR knob will be added in Plan 03
+		float sqr2Knob = params[SQR2_PARAM].getValue();
+		float saw2Knob = params[SAW2_PARAM].getValue();
+
+		// Check CV connections (outside loop for efficiency)
+		bool saw1CVConnected = inputs[SAW1_CV_INPUT].isConnected();
+		bool sqr1CVConnected = inputs[SQR1_CV_INPUT].isConnected();
+		bool subCVConnected = inputs[SUB_CV_INPUT].isConnected();
+		bool xorCVConnected = inputs[XOR_CV_INPUT].isConnected();
+		bool sqr2CVConnected = inputs[SQR2_CV_INPUT].isConnected();
+		bool saw2CVConnected = inputs[SAW2_CV_INPUT].isConnected();
 
 		// Process in SIMD groups of 4 voices
 		for (int c = 0; c < channels; c += 4) {
