@@ -141,16 +141,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PITCH-01 | Phase 4 | Complete |
 | PITCH-02 | Phase 4 | Complete |
 | PITCH-03 | Phase 4 | Complete |
-| PWM-01 | Phase 5 | Pending |
-| PWM-02 | Phase 5 | Pending |
-| PWM-03 | Phase 5 | Pending |
-| PWM-04 | Phase 5 | Pending |
-| WAVE-04 | Phase 5 | Pending |
-| FM-01 | Phase 6 | Pending |
-| FM-02 | Phase 6 | Pending |
-| FM-03 | Phase 6 | Pending |
-| FM-04 | Phase 6 | Pending |
-| FM-05 | Phase 6 | Pending |
+| PWM-01 | Phase 5 | Complete |
+| PWM-02 | Phase 5 | Complete |
+| PWM-03 | Phase 5 | Complete |
+| PWM-04 | Phase 5 | Complete |
+| WAVE-04 | Phase 5 | Complete |
+| FM-01 | Phase 6 | Complete |
+| FM-02 | Phase 6 | Complete |
+| FM-03 | Phase 6 | Complete |
+| FM-04 | Phase 6 | Complete |
+| FM-05 | Phase 6 | Complete |
 | SYNC-01 | Phase 7 | Pending |
 | SYNC-02 | Phase 7 | Pending |
 | SYNC-03 | Phase 7 | Pending |
@@ -166,4 +166,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-23 after Phase 4 completion*
+*Last updated: 2026-01-24 after Phase 6 completion*
