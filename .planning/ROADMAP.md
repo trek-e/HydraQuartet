@@ -159,6 +159,11 @@ Plans:
 
 **Dependencies:** Phase 5 (requires stable dual VCO with pitch control)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md - Through-zero linear FM with CV control and attenuverter
+
 **Requirements:**
 - FM-01: VCO2 receives through-zero FM from VCO1
 - FM-02: VCO2 has FM Amount knob controlling modulation depth
@@ -225,7 +230,7 @@ Plans:
 | 3 - SIMD Polyphony | Complete | 1 | 100% |
 | 4 - Dual VCO Architecture | Complete | 5 | 100% |
 | 5 - PWM & Sub-Oscillator | Complete | 5 | 100% |
-| 6 - Through-Zero FM | Pending | 5 | 0% |
+| 6 - Through-Zero FM | Planned | 5 | 0% |
 | 7 - Hard Sync | Pending | 4 | 0% |
 | 8 - XOR Waveshaping | Pending | 3 | 0% |
 
