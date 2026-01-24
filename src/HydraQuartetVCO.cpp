@@ -349,7 +349,7 @@ struct HydraQuartetVCO : Module {
 		configParam(SQR1_PARAM, 0.f, 10.f, 1.f, "VCO1 Square");
 		configParam(SAW1_PARAM, 0.f, 10.f, 0.f, "VCO1 Sawtooth");
 		// Other VCO1 controls
-		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
+		configSwitch(SYNC1_PARAM, 0.f, 2.f, 1.f, "VCO1 Sync", {"Hard", "Off", "Soft"});  // Center = Off
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
 
 		// VCO2 Parameters (3x3 grid layout)
@@ -366,7 +366,7 @@ struct HydraQuartetVCO : Module {
 		configParam(SQR2_PARAM, 0.f, 10.f, 1.f, "VCO2 Square");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
 		// Other VCO2 controls
-		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
+		configSwitch(SYNC2_PARAM, 0.f, 2.f, 1.f, "VCO2 Sync", {"Hard", "Off", "Soft"});  // Center = Off
 
 		// Inputs
 		configInput(VOCT_INPUT, "V/Oct");
@@ -456,9 +456,13 @@ struct HydraQuartetVCO : Module {
 		// User controls final level via individual waveform volumes
 		const float outputScale = 1.f / 3.f;
 
-		// Read sync switch states
-		bool sync1Enabled = params[SYNC1_PARAM].getValue() > 0.5f;  // VCO1 syncs to VCO2
-		bool sync2Enabled = params[SYNC2_PARAM].getValue() > 0.5f;  // VCO2 syncs to VCO1
+		// Read sync switch states (0=Hard, 1=Off, 2=Soft)
+		int sync1Mode = (int)std::round(params[SYNC1_PARAM].getValue());  // VCO1 syncs to VCO2
+		int sync2Mode = (int)std::round(params[SYNC2_PARAM].getValue());  // VCO2 syncs to VCO1
+		bool sync1Hard = (sync1Mode == 0);
+		bool sync1Soft = (sync1Mode == 2);
+		bool sync2Hard = (sync2Mode == 0);
+		bool sync2Soft = (sync2Mode == 2);
 
 		// Read waveform volume knobs (for CV-replaces-knob pattern)
 		float saw1Knob = params[SAW1_PARAM].getValue();
@@ -604,15 +608,39 @@ struct HydraQuartetVCO : Module {
 			xorOut += xorFromVco1MinBlep[g].process();
 
 			// Phase 2: Apply sync resets AFTER both VCOs have processed (order matters for bidirectional)
-			if (sync1Enabled && vco2WrapMask) {
-				// VCO1 syncs to VCO2: when VCO2 wraps, reset VCO1
+			// Hard sync: oscillator resets at the start of the other oscillator's cycle
+			// Soft sync: sync amount based on master waveform magnitude
+			if (sync1Hard && vco2WrapMask) {
+				// VCO1 hard syncs to VCO2: when VCO2 wraps, reset VCO1
 				vco1.applySync(g, vco2WrapMask, vco2.oldPhase[g], vco2.deltaPhase[g], pwm1_4,
-				               saw1, sqr1, tri1);  // Output params modified by reference
+				               saw1, sqr1, tri1);
 			}
-			if (sync2Enabled && vco1WrapMask) {
-				// VCO2 syncs to VCO1: when VCO1 wraps, reset VCO2
+			if (sync1Soft && vco2WrapMask) {
+				// VCO1 soft syncs to VCO2: sync amount proportional to VCO2 waveform magnitude
+				for (int i = 0; i < 4; i++) {
+					if (vco2WrapMask & (1 << i)) {
+						// Use sine2 magnitude to determine sync strength (0-1)
+						float magnitude = std::abs(sine2[i]);
+						// Blend between current phase and reset phase based on magnitude
+						vco1.phase[g][i] = vco1.phase[g][i] * (1.f - magnitude);
+					}
+				}
+			}
+			if (sync2Hard && vco1WrapMask) {
+				// VCO2 hard syncs to VCO1: when VCO1 wraps, reset VCO2
 				vco2.applySync(g, vco1WrapMask, vco1.oldPhase[g], vco1.deltaPhase[g], pwm2_4,
-				               saw2, sqr2, tri2);  // Output params modified by reference
+				               saw2, sqr2, tri2);
+			}
+			if (sync2Soft && vco1WrapMask) {
+				// VCO2 soft syncs to VCO1: sync amount proportional to VCO1 waveform magnitude
+				for (int i = 0; i < 4; i++) {
+					if (vco1WrapMask & (1 << i)) {
+						// Use sine1 magnitude to determine sync strength (0-1)
+						float magnitude = std::abs(sine1[i]);
+						// Blend between current phase and reset phase based on magnitude
+						vco2.phase[g][i] = vco2.phase[g][i] * (1.f - magnitude);
+					}
+				}
 			}
 
 			// Output sub to dedicated SUB jack (reduced to ±2V for testing)
@@ -757,8 +785,6 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// Sub waveform switch and output
 		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X1, vco1Y4)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y4)), module, HydraQuartetVCO::SUB_OUTPUT));
-		// Sync switch
-		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X3, vco1Y4)), module, HydraQuartetVCO::SYNC1_PARAM));
 
 		// CV inputs row
 		const float vco1Y5 = 95.f;
@@ -768,6 +794,13 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		// PWM CV input
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1 + 10.f, vco1Y5)), module, HydraQuartetVCO::PWM1_INPUT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco1X1 + 14.f, vco1Y5)), module, HydraQuartetVCO::PWM1_CV_LIGHT));
+
+		// Center Sync Section (top middle, 40HP center = 101.6mm)
+		// 3-position horizontal switches: Hard - Off - Soft
+		// Using CKSSThree rotated via SVG or custom component for horizontal
+		// VCO1 Sync on top, VCO2 Sync below
+		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 25.0)), module, HydraQuartetVCO::SYNC1_PARAM));
+		addParam(createParamCentered<CKSSThree>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// Center Global Section (40HP center = 101.6mm)
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::VOCT_INPUT));
@@ -798,8 +831,6 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 
 		// VCO2 additional controls (below 3x3 grid)
 		const float vco2Y4 = 82.f;
-		// Sync switch
-		addParam(createParamCentered<CKSS>(mm2px(Vec(vco2X1, vco2Y4)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// CV inputs row
 		const float vco2Y5 = 95.f;
