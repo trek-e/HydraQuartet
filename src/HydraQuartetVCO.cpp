@@ -253,17 +253,21 @@ struct HydraQuartetVCO : Module {
 		// Other VCO1 controls
 		SYNC1_PARAM,
 		SUB_WAVE_PARAM,
-		// VCO2 Section
+		// VCO2 Section (3x3 grid)
+		// Row 1: FM, Pipe Length (Octave), Fine Tune
+		FM_PARAM,
 		OCTAVE2_PARAM,
 		FINE2_PARAM,
-		TRI2_PARAM,
-		SQR2_PARAM,
+		// Row 2: Sin, Triangle, XOR
 		SIN2_PARAM,
+		TRI2_PARAM,
+		XOR_PARAM,
+		// Row 3: Saw, Square, PWM
 		SAW2_PARAM,
-		XOR_PARAM,  // XOR volume control
+		SQR2_PARAM,
 		PWM2_PARAM,
+		// Other VCO2 controls
 		SYNC2_PARAM,
-		FM_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -348,17 +352,21 @@ struct HydraQuartetVCO : Module {
 		configSwitch(SYNC1_PARAM, 0.f, 1.f, 0.f, "VCO1 Sync", {"Off", "Hard"});
 		configSwitch(SUB_WAVE_PARAM, 0.f, 1.f, 0.f, "Sub Waveform", {"Square", "Sine"});
 
-		// VCO2 Parameters
-		configSwitch(OCTAVE2_PARAM, -2.f, 2.f, 0.f, "VCO2 Octave", {"-2", "-1", "0", "+1", "+2"});
-		configParam(FINE2_PARAM, -1.f, 1.f, 0.f, "VCO2 Fine Tune", " cents", 0.f, 100.f);
-		configParam(TRI2_PARAM, 0.f, 10.f, 0.f, "VCO2 Triangle");
-		configParam(SQR2_PARAM, 0.f, 10.f, 1.f, "VCO2 Square");
+		// VCO2 Parameters (3x3 grid layout)
+		// Row 1: FM, Pipe Length (Octave), Fine Tune
+		configParam(FM_PARAM, 0.f, 10.f, 0.f, "FM Amount");
+		configSwitch(OCTAVE2_PARAM, -2.f, 1.f, 0.f, "VCO2 Pipe Length", {"16'", "8'", "4'", "2'"});
+		configParam(FINE2_PARAM, 0.f, 10.f, 0.f, "VCO2 Fine Tune");  // 0-5=0-1st, 5-10=+12st
+		// Row 2: Sin, Triangle, XOR
 		configParam(SIN2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sine");
-		configParam(SAW2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sawtooth");
+		configParam(TRI2_PARAM, 0.f, 10.f, 0.f, "VCO2 Triangle");
 		configParam(XOR_PARAM, 0.f, 10.f, 0.f, "XOR Volume");
+		// Row 3: Saw, Square, PWM
+		configParam(SAW2_PARAM, 0.f, 10.f, 0.f, "VCO2 Sawtooth");
+		configParam(SQR2_PARAM, 0.f, 10.f, 1.f, "VCO2 Square");
 		configParam(PWM2_PARAM, 0.f, 1.f, 0.5f, "VCO2 Pulse Width", "%", 0.f, 100.f);
+		// Other VCO2 controls
 		configSwitch(SYNC2_PARAM, 0.f, 1.f, 0.f, "VCO2 Sync", {"Off", "Hard"});
-		configParam(FM_PARAM, 0.f, 1.f, 0.f, "FM Amount");
 
 		// Inputs
 		configInput(VOCT_INPUT, "V/Oct");
@@ -425,8 +433,21 @@ struct HydraQuartetVCO : Module {
 		float sinVol2 = params[SIN2_PARAM].getValue();
 
 		// Read FM parameters
-		float fmKnob = params[FM_PARAM].getValue();  // 0 to 1
+		float fmKnob = params[FM_PARAM].getValue() * 0.1f;  // 0-10 knob scaled to 0-1
 		int fmSource = (int)std::round(params[FM_SOURCE_PARAM].getValue());  // 0=Sin, 1=Tri, 2=Saw, 3=Sqr, 4=Sub
+
+		// Read VCO2 fine tune with special scaling
+		// 0-5 = 0-1 semitone (fine), 5-10 = +1 to +13 semitones (coarse)
+		float fineTuneKnob = params[FINE2_PARAM].getValue();
+		float fineTuneSemitones;
+		if (fineTuneKnob <= 5.f) {
+			// 0-5 maps to 0-1 semitone (fine tuning)
+			fineTuneSemitones = fineTuneKnob / 5.f;
+		} else {
+			// 5-10 maps to 1-13 semitones (+12 more)
+			fineTuneSemitones = 1.f + (fineTuneKnob - 5.f) * 12.f / 5.f;
+		}
+		float fineTuneVolts = fineTuneSemitones / 12.f;  // Convert semitones to V/Oct
 
 		// Read sub-oscillator parameters
 		float subWave = params[SUB_WAVE_PARAM].getValue();  // 0 = square, 1 = sine
@@ -468,8 +489,8 @@ struct HydraQuartetVCO : Module {
 			float_4 freq1 = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch1);
 			freq1 = simd::clamp(freq1, 0.1f, sampleRate / 2.f);
 
-			// VCO2: base + octave (reference oscillator, no detune)
-			float_4 pitch2 = basePitch + octave2;
+			// VCO2: base + octave + fine tune
+			float_4 pitch2 = basePitch + octave2 + fineTuneVolts;
 			float_4 freq2Base = dsp::FREQ_C4 * dsp::exp2_taylor5(pitch2);
 
 			// Read polyphonic PWM CV
@@ -754,32 +775,43 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 115.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 125.0)), module, HydraQuartetVCO::MIX_OUTPUT));
 
-		// VCO2 Section (right side) - positions shifted right for 40HP panel
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(147.16, 28.0)), module, HydraQuartetVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(177.8, 28.0)), module, HydraQuartetVCO::FINE2_PARAM));
+		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
+		// Grid spacing: 15mm horizontal, 20mm vertical
+		// Starting position: x=161mm, y=25mm (mirroring VCO1 from right)
+		const float vco2X1 = 161.f, vco2X2 = 176.f, vco2X3 = 191.f;
+		const float vco2Y1 = 25.f, vco2Y2 = 45.f, vco2Y3 = 65.f;
 
-		// VCO2 waveform volume knobs (including XOR)
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(137.16, 48.0)), module, HydraQuartetVCO::TRI2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(152.4, 48.0)), module, HydraQuartetVCO::SQR2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(167.64, 48.0)), module, HydraQuartetVCO::SIN2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(182.88, 48.0)), module, HydraQuartetVCO::SAW2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(198.12, 48.0)), module, HydraQuartetVCO::XOR_PARAM));
+		// Row 1: FM, Pipe Length (Octave), Fine Tune
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y1)), module, HydraQuartetVCO::FM_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco2X2, vco2Y1)), module, HydraQuartetVCO::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y1)), module, HydraQuartetVCO::FINE2_PARAM));
 
-		// VCO2 waveform CV inputs (below SQR, SAW, and XOR knobs)
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(152.4, 58.0)), module, HydraQuartetVCO::SQR2_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(182.88, 58.0)), module, HydraQuartetVCO::SAW2_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(198.12, 58.0)), module, HydraQuartetVCO::XOR_CV_INPUT));
+		// Row 2: Sin, Triangle, XOR
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y2)), module, HydraQuartetVCO::SIN2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y2)), module, HydraQuartetVCO::TRI2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y2)), module, HydraQuartetVCO::XOR_PARAM));
 
-		// VCO2 PWM and Sync row
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(137.16, 78.0)), module, HydraQuartetVCO::PWM2_PARAM));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(157.48, 78.0)), module, HydraQuartetVCO::SYNC2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(177.8, 78.0)), module, HydraQuartetVCO::FM_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(137.16, 88.0)), module, HydraQuartetVCO::PWM2_INPUT));
-		// PWM2 CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(141.16, 88.0)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(157.48, 88.0)), module, HydraQuartetVCO::FM_INPUT));
-		// FM CV activity LED - positioned near the input port
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(161.48, 88.0)), module, HydraQuartetVCO::FM_CV_LIGHT));
+		// Row 3: Saw, Square, PWM
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y3)), module, HydraQuartetVCO::SAW2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y3)), module, HydraQuartetVCO::SQR2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y3)), module, HydraQuartetVCO::PWM2_PARAM));
+
+		// VCO2 additional controls (below 3x3 grid)
+		const float vco2Y4 = 82.f;
+		// Sync switch
+		addParam(createParamCentered<CKSS>(mm2px(Vec(vco2X1, vco2Y4)), module, HydraQuartetVCO::SYNC2_PARAM));
+
+		// CV inputs row
+		const float vco2Y5 = 95.f;
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X1, vco2Y5)), module, HydraQuartetVCO::SAW2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X2, vco2Y5)), module, HydraQuartetVCO::SQR2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X3, vco2Y5)), module, HydraQuartetVCO::XOR_CV_INPUT));
+		// PWM CV input
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X3 - 10.f, vco2Y4)), module, HydraQuartetVCO::PWM2_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco2X3 - 6.f, vco2Y4)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
+		// FM CV input
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X2, vco2Y4)), module, HydraQuartetVCO::FM_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco2X2 + 4.f, vco2Y4)), module, HydraQuartetVCO::FM_CV_LIGHT));
 
 		// Per-voice outputs (bottom of panel, split left/right around global section)
 		// Voice outputs row (y=103) - voices 1-4 left, 5-8 right (shifted for 40HP)
