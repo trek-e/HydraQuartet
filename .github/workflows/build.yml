@@ -23,22 +23,14 @@ jobs:
         include:
           - platform: win-x64
             os: windows-latest
-            arch-flags: ""
             install-dependencies: |
               choco install zip
-          - platform: mac-x64
-            os: macos-15
-            arch-flags: -target x86_64-apple-macos10.9
-            install-dependencies: |
-              brew install zstd
           - platform: mac-arm64
             os: macos-latest
-            arch-flags: ""
             install-dependencies: |
               brew install zstd
           - platform: lin-x64
             os: ubuntu-latest
-            arch-flags: ""
             install-dependencies: |
               sudo apt-get update
               sudo apt-get install -y libgl1-mesa-dev zstd
@@ -60,23 +52,11 @@ jobs:
       - name: Build plugin
         run: |
           export RACK_DIR=$PWD/Rack-SDK
-          # For cross-compilation, patch SDK to use correct arch flags
-          if [ "${{ matrix.platform }}" = "mac-x64" ]; then
-            sed -i.bak 's/-march=armv8-a+fp+simd/-march=x86-64/g' $RACK_DIR/arch.mk 2>/dev/null || true
-            sed -i.bak 's/-march=armv8-a+fp+simd/-march=x86-64/g' $RACK_DIR/plugin.mk 2>/dev/null || true
-            export CXXFLAGS="-arch x86_64"
-            export LDFLAGS="-arch x86_64"
-          fi
           make -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
 
       - name: Create distribution
         run: |
           export RACK_DIR=$PWD/Rack-SDK
-          if [ "${{ matrix.platform }}" = "mac-x64" ]; then
-            export CXXFLAGS="-arch x86_64"
-            export LDFLAGS="-arch x86_64"
-          fi
-          export ARCH=${{ matrix.platform }}
           make dist
 
       - name: Upload artifact
