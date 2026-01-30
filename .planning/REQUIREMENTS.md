@@ -155,9 +155,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-02 | Phase 7 | Complete |
 | SYNC-03 | Phase 7 | Complete |
 | SYNC-04 | Phase 7 | Complete |
-| WAVE-05 | Phase 8 | Pending |
-| PWM-05 | Phase 8 | Pending |
-| CV-03 | Phase 8 | Pending |
+| WAVE-05 | Phase 8 | Complete |
+| PWM-05 | Phase 8 | Complete |
+| CV-03 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 34 total
@@ -166,4 +166,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-24 after Phase 7 completion*
+*Last updated: 2026-01-29 after Phase 8 completion - All v1 requirements complete*
