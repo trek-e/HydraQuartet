@@ -1,0 +1,95 @@
+name: Build VCV Rack Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  rack-sdk-version: 2.6.1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: win-x64
+            os: windows-latest
+            install-dependencies: |
+              choco install zip
+          - platform: mac-x64
+            os: macos-13
+            install-dependencies: |
+              brew install zstd
+          - platform: mac-arm64
+            os: macos-latest
+            install-dependencies: |
+              brew install zstd
+          - platform: lin-x64
+            os: ubuntu-latest
+            install-dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y libgl1-mesa-dev zstd
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: ${{ matrix.install-dependencies }}
+
+      - name: Download Rack SDK
+        run: |
+          curl -L https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}-${{ matrix.platform }}.zip -o rack-sdk.zip
+          unzip -q rack-sdk.zip
+
+      - name: Build plugin
+        run: |
+          export RACK_DIR=$PWD/Rack-SDK
+          make -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+
+      - name: Create distribution
+        run: |
+          export RACK_DIR=$PWD/Rack-SDK
+          make dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ matrix.platform }}
+          path: dist/*.vcvplugin
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: plugin-*
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*.vcvplugin
+          draft: false
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
