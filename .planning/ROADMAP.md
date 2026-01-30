@@ -11,9 +11,9 @@
 
 This roadmap delivers the HydraQuartet VCO module in 8 phases, progressing from foundation through dual-oscillator architecture to advanced cross-modulation features. The phase structure respects critical architectural dependencies: antialiasing and SIMD optimization must be established early and cannot be retrofitted. Through-zero FM and hard sync receive dedicated phases due to their complexity and quality requirements.
 
-**Total Requirements:** 34 v1 requirements
-**Phase Count:** 8 phases
-**Coverage:** 34/34 requirements mapped (100%)
+**Total Requirements:** 38 v1 requirements
+**Phase Count:** 9 phases
+**Coverage:** 38/38 requirements mapped (100%)
 
 ---
 
@@ -233,6 +233,31 @@ Plans:
 
 ---
 
+### Phase 9: Branding
+
+**Goal:** Rebrand plugin to "Synth-etic Intelligence" with proper VCV Library metadata
+
+**Dependencies:** Phase 8 (all functionality complete)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 9 to break down)
+
+**Requirements:**
+- BRAND-01: Plugin branded as "Synth-etic Intelligence" in VCV Library
+- BRAND-02: plugin.json updated with correct slug, name, brand fields
+- BRAND-03: Panel SVG updated with brand name if applicable
+- BRAND-04: Folder structure matches VCV plugin requirements
+
+**Success Criteria:**
+1. User sees "Synth-etic Intelligence" as manufacturer in VCV Library
+2. Module name remains descriptive (e.g., "Triax VCO" or current name)
+3. Plugin installs correctly with new folder structure
+4. All metadata fields properly formatted for VCV Library submission
+
+---
+
 ## Progress
 
 | Phase | Status | Requirements | Completion |
@@ -245,8 +270,9 @@ Plans:
 | 6 - Through-Zero FM | Complete | 5 | 100% |
 | 7 - Hard Sync | Complete | 4 | 100% |
 | 8 - XOR Waveshaping | Complete | 3 | 100% |
+| 9 - Branding | Planned | 4 | 0% |
 
-**Overall:** 34/34 requirements complete (100%)
+**Overall:** 34/38 requirements complete (89%)
 
 ---
 
