@@ -828,16 +828,17 @@ struct HydraQuartetVCOWidget : ModuleWidget {
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
 
 		// Center Global Section (40HP center = 101.6mm)
-		// Gate input in center
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 60.0)), module, HydraQuartetVCO::GATE_INPUT));
-		// Polyphonic audio output
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 80.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
-		// Sub output in center area
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 95.0)), module, HydraQuartetVCO::SUB_OUTPUT));
+		// V/Oct input (primary pitch input) - below sync switches
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 55.0)), module, HydraQuartetVCO::VOCT_INPUT));
+		// Gate input
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 70.0)), module, HydraQuartetVCO::GATE_INPUT));
+		// Polyphonic audio output - above output plate section
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
 
-		// Lower left corner: PWM CV above V/Oct
+		// Lower left corner: PWM CV and Sub output
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 110.0)), module, HydraQuartetVCO::PWM1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 123.0)), module, HydraQuartetVCO::VOCT_INPUT));
+		// Sub output in VCO1 area
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64, 88.0)), module, HydraQuartetVCO::SUB_OUTPUT));
 
 		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
 		// Grid spacing: 15mm horizontal, 20mm vertical
