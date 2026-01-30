@@ -215,9 +215,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 08-01-PLAN.md - XOR ring modulation DSP with MinBLEP antialiasing
-- [ ] 08-02-PLAN.md - Waveform volume CV inputs (6 polyphonic inputs)
-- [ ] 08-03-PLAN.md - Panel update to 40HP, XOR UI, soft clipping
+- [x] 08-01-PLAN.md - XOR ring modulation DSP with MinBLEP antialiasing
+- [x] 08-02-PLAN.md - Waveform volume CV inputs (6 polyphonic inputs)
+- [x] 08-03-PLAN.md - Panel update to 40HP, XOR UI, soft clipping
 
 **Requirements:**
 - WAVE-05: VCO2 has XOR output (combines pulse waves of VCO1 and VCO2)
@@ -244,9 +244,9 @@ Plans:
 | 5 - PWM & Sub-Oscillator | Complete | 5 | 100% |
 | 6 - Through-Zero FM | Complete | 5 | 100% |
 | 7 - Hard Sync | Complete | 4 | 100% |
-| 8 - XOR Waveshaping | Planned | 3 | 0% |
+| 8 - XOR Waveshaping | Complete | 3 | 100% |
 
-**Overall:** 31/34 requirements complete (91%)
+**Overall:** 34/34 requirements complete (100%)
 
 ---
 

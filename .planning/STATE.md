@@ -1,7 +1,7 @@
 # Project State: HydraQuartet VCO
 
-**Updated:** 2026-01-23
-**Session:** Phase 8 Plan 1 complete (XOR Ring Modulation DSP)
+**Updated:** 2026-01-29
+**Session:** Phase 8 COMPLETE - All phases finished
 
 ---
 
@@ -13,42 +13,43 @@
 - 16 oscillators total (2 VCOs per voice x 8 voices)
 - Through-zero FM that produces wave shaping in tune when VCOs at same pitch
 - Hard sync with MinBLEP antialiasing for classic sync sweeps
+- XOR ring modulation output combining pulse waves from both VCOs
 - SIMD-optimized for acceptable CPU usage with massive oscillator count
 
 ---
 
 ## Current Position
 
-**Phase:** 8 - XOR Waveshaping (IN PROGRESS)
-**Plan:** 2 of 3 complete (Plan 08-01 just completed)
-**Status:** Plan 08-01 complete, Plan 08-02 already complete, ready for Plan 08-03
-**Progress:** 7.67/8 phases complete (Phase 8 is 67% complete)
+**Phase:** 8 of 8 - COMPLETE
+**Plan:** 3 of 3 complete
+**Status:** ALL PHASES COMPLETE - MILESTONE READY
+**Progress:** 8/8 phases complete (100%)
 
 ```
-[█████████████████████████████████████████▓░] 95.8%
+[████████████████████████████████████████████] 100%
 ```
 
-**Next Action:** Execute Plan 08-03 (XOR Volume Knob & Integration)
+**Next Action:** Audit milestone and complete v1.0
 
 ---
 
 ## Performance Metrics
 
 **Roadmap Progress:**
-- Phases complete: 7/8
+- Phases complete: 8/8
 - Phases in progress: 0/8
-- Phases pending: 1/8
+- Phases pending: 0/8
 
 **Requirements Coverage:**
 - v1 requirements: 34 total
 - Mapped to phases: 34 (100%)
-- Completed: 31 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, WAVE-04, PITCH-01, PITCH-02, PITCH-03, PWM-01, PWM-02, PWM-03, PWM-04, FM-01, FM-02, FM-03, FM-04, FM-05, SYNC-01, SYNC-02, SYNC-03, SYNC-04)
-- Remaining: 3
+- Completed: 34 (PANEL-01, PANEL-02, PANEL-03, FOUND-01, FOUND-02, FOUND-03, FOUND-04, CV-01, CV-02, CV-03, OUT-01, OUT-02, WAVE-01, WAVE-02, WAVE-03, WAVE-04, WAVE-05, PITCH-01, PITCH-02, PITCH-03, PWM-01, PWM-02, PWM-03, PWM-04, PWM-05, FM-01, FM-02, FM-03, FM-04, FM-05, SYNC-01, SYNC-02, SYNC-03, SYNC-04)
+- Remaining: 0
 
 **Quality Gates:**
-- Panel design verified: YES (36 HP, all controls, outputs distinguished)
+- Panel design verified: YES (40 HP, all controls, outputs distinguished)
 - Polyphonic I/O verified: YES (8 voices, V/Oct tracking, mix output)
-- Antialiasing verified: YES (MinBLEP on saw/square, triangle via integration)
+- Antialiasing verified: YES (MinBLEP on saw/square/XOR, triangle via integration)
 - SIMD optimization verified: YES (0.8% CPU at 8 voices, float_4 processing)
 - CPU budget verified: YES (<5% target, achieved ~1.6% with dual VCO)
 - Dual VCO verified: YES (VcoEngine struct, independent pitch control)
@@ -56,6 +57,7 @@
 - Sub-oscillator verified: YES (-1 octave tracking, square/sine switch, dedicated output)
 - Through-zero FM quality verified: YES (linear FM, maintains pitch at unison, poly/mono CV)
 - Hard sync verified: YES (bidirectional, MinBLEP antialiased, subsample-accurate)
+- XOR waveshaping verified: YES (ring modulation, MinBLEP antialiased, 6 CV inputs)
 
 ---
 
@@ -63,105 +65,73 @@
 
 ### Key Decisions Made
 
-**Phase 8 Plan 1 Complete (2026-01-23):**
-- XOR calculated as raw multiplication (sqr1 * sqr2) with MinBLEP antialiasing
-- Split edge tracking: VCO2 edges in VcoEngine, VCO1 edges at module level
-- VcoEngine::process() extended with optional sqr1Input and xorOut parameters
-- Variable named 'xorOut' not 'xor' (xor is C++ reserved keyword)
-- Optional output pattern: nullptr check enables XOR generation only when needed
-- Discontinuity magnitude: 2 * other_sqr (correctly accounts for square wave amplitude)
-- Four edge types tracked: VCO1 wrap, VCO1 PWM fall, VCO2 wrap, VCO2 PWM fall
+**Phase 8 Plan 3 Complete (2026-01-29):**
+- V/Oct moved from bottom-left corner to center GLOBAL section for visibility
+- Center column layout: Sync switches (25, 40) → V/Oct (55) → Gate (70) → Audio (85)
+- All 6 waveform CV inputs verified working (CV replaces knob when patched)
+- Soft clipping via tanh() at ±3V prevents harsh digital distortion
+- Human verified: XOR ring modulation, PWM interaction, CV control, soft clipping
 
 **Phase 8 Plan 2 Complete (2026-01-23):**
 - CV replaces knob when patched (not additive) for SAW1, SQR1, SUB, XOR, SQR2, SAW2
-- 0-10V direct mapping to 0-10 volume without scaling factors (intuitive 1:1 correspondence)
-- Connection checks outside loop for efficiency (matches PWM/FM CV pattern)
-- XOR volume defaults to 0 until knob added in Plan 03 (safe default, prevents unintended audio)
-- Volume variable naming: waveformVol_4 for SIMD, waveformKnob for scalar knob reading
+- 0-10V direct mapping to 0-10 volume without scaling factors
 - CV input pattern: enum → configInput → isConnected → getPolyVoltageSimd → clamp → ternary
 
-**Phase 7 Plan 1 Complete (2026-01-24):**
-- Separate waveform generation phase: process() generates waveforms, applySync() resets and regenerates
-- Triangle gets dedicated triMinBlepBuffer for sync antialiasing (parallel to saw/sqr buffers)
-- Sine excluded from MinBLEP antialiasing (continuous waveform, accepted aliasing limitation)
-- Skip sync when slave or master frequency is negative (FM protection, prevents crashes)
-- Output params passed by reference and updated in applySync() (no one-sample delay)
-- Bidirectional sync order: both VCOs process() first, then both applySync() calls (prevents order dependency)
+**Phase 8 Plan 1 Complete (2026-01-23):**
+- XOR calculated as raw multiplication (sqr1 * sqr2) with MinBLEP antialiasing
+- Split edge tracking: VCO2 edges in VcoEngine, VCO1 edges at module level
+- Four edge types tracked: VCO1 wrap, VCO1 PWM fall, VCO2 wrap, VCO2 PWM fall
 
-**Phase 6 Plan 1 Complete (2026-01-24):**
-- Linear FM applied after exponential pitch conversion (maintains tuning at unison)
-- FM depth clamped to 0-2 range (allows up to 2x frequency modulation)
-- Single FM_INPUT auto-detects poly/mono instead of separate inputs
-- Clamp freq2 to positive 0.1Hz minimum (quasi through-zero, not true phase reversal)
-- 0.1 CV scaling factor: +/-5V * 1.0 att * 0.1 = +/-0.5 contribution (matches PWM pattern)
-- Auto-detect poly/mono pattern: check getChannels(), use getPolyVoltageSimd or broadcast
+**Phase 7 Complete (2026-01-24):**
+- Hard sync with MinBLEP antialiasing, bidirectional between VCO1 and VCO2
+- Separate waveform generation and sync phases for clean antialiasing
+
+**Phase 6 Complete (2026-01-24):**
+- Through-zero linear FM maintains tuning at unison
+- FM depth CV with poly/mono auto-detection
 
 **Phase 5 Complete (2026-01-23):**
-- PWM CV scaled at 0.1 factor: +/-5V * att gives +/-0.5 PWM contribution (full sweep)
-- PWM clamped to 0.01-0.99 to avoid DC offset at extremes
-- LED brightness based on peak CV across all polyphonic channels
-- Trimpot used for attenuverters (smaller than main knobs)
-- Bipolar CV pattern: base + cv * att * scale, clamped to safe range
-- Sub-oscillator ignores VCO1 detune for stable foundation (uses basePitch + octave1 - 1.f)
-- Sub-oscillator uses simple phase accumulator (no MinBLEP - frequencies low enough)
-- Sub output at ±2V (reduced during testing)
+- PWM CV with attenuverters and LED indicators
+- Sub-oscillator at -1 octave with dedicated output
 
 **Phase 4 Complete (2026-01-23):**
-- VcoEngine struct encapsulates all per-oscillator state (phase, MinBLEP buffers, triState)
-- DC filters remain module members (operate on mixed output, not per-VCO)
-- VCO1 receives detune, VCO2 is reference oscillator (0 detune = perfect unison)
-- Detune range 0-50 cents via V/Oct conversion (detuneVolts = knob * 50/1200)
-- Both VCOs processed in same SIMD loop with independent frequency calculations
-- Human verified: dual oscillators, beating effect, octave switches, ~1.6% CPU
+- VcoEngine struct for dual oscillator architecture
+- Detune for VCO1, VCO2 as reference oscillator
 
 **Phase 3 Complete (2026-01-23):**
-- Custom MinBlepBuffer<32> template struct with lane-based discontinuity insertion
-- Process loop iterates in groups of 4 using getPolyVoltageSimd<float_4>
-- All 4 waveforms using float_4 SIMD (saw, square, triangle, sine)
-- simd::movemask() to identify lanes needing MinBLEP insertions
-- simd::ifelse() for branchless PWM edge detection
-- Horizontal sum via _mm_hadd_ps for efficient mix output
-- DC filters kept scalar (not in hot path)
-- Human verified: 0.8% CPU (far below 5% target), all waveforms clean
+- SIMD float_4 processing for 8-voice polyphony
+- 0.8% CPU usage (far below 5% target)
 
 **Phase 2 Complete (2026-01-23):**
-- MinBLEP antialiasing using dsp::MinBlepGenerator<16, 16, float>
-- Triangle wave via leaky integrator (0.999 decay) of antialiased square
-- PWM edge detection avoids VCV Fundamental click bug (only insert on phase crossing)
-- DC filtering on mixed output with 10Hz highpass
+- MinBLEP antialiasing on saw/square
+- Triangle via leaky integrator of antialiased square
 
 **Phase 1 Complete (2026-01-23):**
-- SDK 2.6.6 installed at /Users/trekkie/projects/vcvrack_modules/Rack-SDK
-- Panel is 36 HP (182.88mm x 128.5mm)
-- Dark industrial blue theme (#1a1a2e)
+- 40HP panel with dark industrial blue theme
 - Three-column layout: VCO1 | Global | VCO2
-- V/Oct uses dsp::FREQ_C4 and dsp::exp2_taylor5() for accuracy
-
-**Known Issue:** Panel labels use SVG text elements which don't render in VCV Rack. User must convert to paths in Inkscape.
+- V/Oct tracking with dsp::exp2_taylor5()
 
 ---
 
 ## Session Continuity
 
 ### What We Just Completed
-- Phase 8 Plan 1 (XOR Ring Modulation DSP) complete
-- XOR output calculated via ring modulation (sqr1 * sqr2)
-- Full MinBLEP antialiasing with 4 edge types tracked
-- VcoEngine extended with xorMinBlepBuffer and optional XOR parameters
-- Module-level xorFromVco1MinBlep buffer for VCO1 edge tracking
-- XOR discontinuity magnitude correctly calculated as 2 * other_sqr
+- Phase 8 Plan 3 (XOR Volume Knob & Integration) - COMPLETE
+- All 8 phases of v1.0 milestone - COMPLETE
+- Full verification passed (5/5 must-haves)
+- Human approval received for XOR, CV inputs, soft clipping
 
 ### What Comes Next
-1. Plan 08-02 already complete (Waveform Volume CV Inputs)
-2. Execute Plan 08-03 (XOR Volume Knob & Integration)
-3. Complete Phase 8 (final phase)
-4. Final module verification
+1. Run `/gsd:audit-milestone` to verify all requirements
+2. Complete milestone with `/gsd:complete-milestone`
 
 ### Files Modified This Session
-- src/HydraQuartetVCO.cpp - XOR ring modulation DSP with MinBLEP antialiasing
-- .planning/phases/08-xor-waveshaping/08-01-SUMMARY.md - created
-- .planning/STATE.md - updated with Plan 08-01 completion
+- src/HydraQuartetVCO.cpp - V/Oct positioning fix
+- .planning/phases/08-xor-waveshaping/08-03-SUMMARY.md - created
+- .planning/phases/08-xor-waveshaping/08-VERIFICATION.md - created
+- .planning/STATE.md - updated to milestone complete
+- .planning/ROADMAP.md - Phase 8 marked complete
 
 ---
 
-*Last updated: 2026-01-23 after Phase 8 Plan 1 complete*
+*Last updated: 2026-01-29 after Phase 8 complete - MILESTONE READY*
