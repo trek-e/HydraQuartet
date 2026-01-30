@@ -23,18 +23,22 @@ jobs:
         include:
           - platform: win-x64
             os: windows-latest
+            arch-flags: ""
             install-dependencies: |
               choco install zip
           - platform: mac-x64
             os: macos-15
+            arch-flags: -arch x86_64
             install-dependencies: |
               brew install zstd
           - platform: mac-arm64
             os: macos-latest
+            arch-flags: ""
             install-dependencies: |
               brew install zstd
           - platform: lin-x64
             os: ubuntu-latest
+            arch-flags: ""
             install-dependencies: |
               sudo apt-get update
               sudo apt-get install -y libgl1-mesa-dev zstd
@@ -56,11 +60,16 @@ jobs:
       - name: Build plugin
         run: |
           export RACK_DIR=$PWD/Rack-SDK
+          export CXXFLAGS="${{ matrix.arch-flags }}"
+          export LDFLAGS="${{ matrix.arch-flags }}"
           make -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
 
       - name: Create distribution
         run: |
           export RACK_DIR=$PWD/Rack-SDK
+          export CXXFLAGS="${{ matrix.arch-flags }}"
+          export LDFLAGS="${{ matrix.arch-flags }}"
+          export ARCH=${{ matrix.platform }}
           make dist
 
       - name: Upload artifact
