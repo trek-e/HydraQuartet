@@ -12,7 +12,7 @@
 This roadmap delivers the HydraQuartet VCO module in 8 phases, progressing from foundation through dual-oscillator architecture to advanced cross-modulation features. The phase structure respects critical architectural dependencies: antialiasing and SIMD optimization must be established early and cannot be retrofitted. Through-zero FM and hard sync receive dedicated phases due to their complexity and quality requirements.
 
 **Total Requirements:** 38 v1 requirements
-**Phase Count:** 9 phases
+**Phase Count:** 13 phases
 **Coverage:** 38/38 requirements mapped (100%)
 
 ---
@@ -258,6 +258,70 @@ Plans:
 
 ---
 
+### Phase 10: Refine and Create Faceplate and Branding
+
+**Goal:** [To be planned]
+
+**Dependencies:** Phase 9
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 10 to break down)
+
+**Details:**
+[To be added during planning]
+
+---
+
+### Phase 11: Beta Release 0.9.0
+
+**Goal:** [To be planned]
+
+**Dependencies:** Phase 10
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 11 to break down)
+
+**Details:**
+[To be added during planning]
+
+---
+
+### Phase 12: Initial v1.0 Release
+
+**Goal:** [To be planned]
+
+**Dependencies:** Phase 11
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 12 to break down)
+
+**Details:**
+[To be added during planning]
+
+---
+
+### Phase 13: v1.1 Post-Release Bugfixes
+
+**Goal:** Address bugs discovered after v1.0 release
+
+**Dependencies:** Phase 12
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 13 to break down)
+
+**Details:**
+[To be added as bugs are discovered post-release]
+
+---
+
 ## Progress
 
 | Phase | Status | Requirements | Completion |
@@ -271,6 +335,10 @@ Plans:
 | 7 - Hard Sync | Complete | 4 | 100% |
 | 8 - XOR Waveshaping | Complete | 3 | 100% |
 | 9 - Branding | Complete | 4 | 100% |
+| 10 - Faceplate & Branding | Planned | TBD | 0% |
+| 11 - Beta Release 0.9.0 | Planned | TBD | 0% |
+| 12 - Initial v1.0 Release | Planned | TBD | 0% |
+| 13 - v1.1 Post-Release Bugfixes | Planned | TBD | 0% |
 
 **Overall:** 38/38 requirements complete (100%)
 
