@@ -239,10 +239,10 @@ Plans:
 
 **Dependencies:** Phase 8 (all functionality complete)
 
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 9 to break down)
+- [ ] 09-01-PLAN.md - Update plugin.json metadata for Synth-etic Intelligence branding
 
 **Requirements:**
 - BRAND-01: Plugin branded as "Synth-etic Intelligence" in VCV Library
@@ -308,4 +308,4 @@ The following requirements are deferred to v2 and not in this roadmap:
 
 ---
 
-*Last updated: 2026-01-24*
+*Last updated: 2026-01-29*
