@@ -116,8 +116,9 @@
   <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="157.48" y="92">FM CV</text>
 
   <!-- Global Section Labels -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="80">V/OCT</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="95">GATE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="50">V/OCT</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="65">GATE</text>
+  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="80">AUDIO</text>
 
   <!-- Output Section - Darker plate for outputs (PANEL-03) -->
   <rect
@@ -165,8 +166,8 @@
     <circle cx="177.8" cy="78.0" r="4" style="fill:#ff0000" inkscape:label="FM" />
 
     <!-- Input ports (green) -->
-    <circle cx="101.6" cy="85.0" r="4" style="fill:#00ff00" inkscape:label="VOCT" />
-    <circle cx="101.6" cy="100.0" r="4" style="fill:#00ff00" inkscape:label="GATE" />
+    <circle cx="101.6" cy="55.0" r="4" style="fill:#00ff00" inkscape:label="VOCT" />
+    <circle cx="101.6" cy="70.0" r="4" style="fill:#00ff00" inkscape:label="GATE" />
     <circle cx="55.88" cy="78.0" r="4" style="fill:#00ff00" inkscape:label="PWM1_CV" />
     <circle cx="137.16" cy="98.0" r="4" style="fill:#00ff00" inkscape:label="PWM2_CV" />
     <circle cx="157.48" cy="98.0" r="4" style="fill:#00ff00" inkscape:label="FM_CV" />
@@ -180,7 +181,7 @@
     <circle cx="198.12" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="XOR_CV" />
 
     <!-- Output ports (blue) -->
-    <circle cx="101.6" cy="115.0" r="4" style="fill:#0000ff" inkscape:label="AUDIO" />
+    <circle cx="101.6" cy="85.0" r="4" style="fill:#0000ff" inkscape:label="AUDIO" />
     <circle cx="101.6" cy="125.0" r="4" style="fill:#0000ff" inkscape:label="MIX" />
     <circle cx="40.64" cy="88.0" r="4" style="fill:#0000ff" inkscape:label="SUB_OUTPUT" />
 

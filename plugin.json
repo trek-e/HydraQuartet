@@ -1,22 +1,22 @@
 {
   "slug": "HydraQuartet",
   "name": "HydraQuartet",
-  "version": "2.0.0",
+  "version": "0.8.0",
   "license": "GPL-3.0-or-later",
-  "brand": "HydraQuartet",
-  "author": "",
-  "authorEmail": "",
+  "brand": "Synth-etic Intelligence",
+  "author": "Synth-etic Intelligence",
+  "authorEmail": "syntheticint@thepainterofsilence.com",
   "authorUrl": "",
-  "pluginUrl": "",
+  "pluginUrl": "https://github.com/trek-e/HydraQuartet",
   "manualUrl": "",
-  "sourceUrl": "",
+  "sourceUrl": "https://github.com/trek-e/HydraQuartet",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
     {
       "slug": "HydraQuartetVCO",
       "name": "HydraQuartet VCO",
-      "description": "8-voice polyphonic dual-VCO with through-zero FM",
+      "description": "8-voice polyphonic dual-VCO with through-zero FM, inspired by Tiptop Audio Triax8",
       "tags": ["Oscillator", "Polyphonic", "Hardware Clone"]
     }
   ]
