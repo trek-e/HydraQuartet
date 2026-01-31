@@ -36,5 +36,5 @@ endif
 install: dist
 	mkdir -p "$(RACK_PLUGINS_DIR)"
 	rm -rf "$(RACK_PLUGINS_DIR)/$(PLUGIN_SLUG)"
-	unzip -o dist/$(PLUGIN_SLUG)-*.zip -d "$(RACK_PLUGINS_DIR)"
+	cp -r dist/$(PLUGIN_SLUG) "$(RACK_PLUGINS_DIR)/"
 	@echo "Installed $(PLUGIN_SLUG) to $(RACK_PLUGINS_DIR)"
