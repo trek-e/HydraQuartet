@@ -25,11 +25,11 @@ include $(RACK_DIR)/plugin.mk
 # Installation directories for VCV Rack 2
 PLUGIN_SLUG := $(shell jq -r .slug plugin.json)
 ifeq ($(ARCH_OS),mac)
-    RACK_PLUGINS_DIR ?= $(HOME)/Documents/Rack2/plugins
+    RACK_PLUGINS_DIR ?= $(HOME)/Library/Application Support/Rack2/plugins-mac-$(ARCH_CPU)
 else ifeq ($(ARCH_OS),win)
-    RACK_PLUGINS_DIR ?= $(USERPROFILE)/Documents/Rack2/plugins
+    RACK_PLUGINS_DIR ?= $(USERPROFILE)/Documents/Rack2/plugins-win-$(ARCH_CPU)
 else
-    RACK_PLUGINS_DIR ?= $(HOME)/.local/share/Rack2/plugins
+    RACK_PLUGINS_DIR ?= $(HOME)/.Rack2/plugins-lin-$(ARCH_CPU)
 endif
 
 .PHONY: install
