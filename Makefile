@@ -21,3 +21,20 @@ DISTRIBUTABLES += $(wildcard presets)
 
 # Include the Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk
+
+# Installation directories for VCV Rack 2
+PLUGIN_SLUG := $(shell jq -r .slug plugin.json)
+ifeq ($(ARCH_OS),mac)
+    RACK_PLUGINS_DIR ?= $(HOME)/Documents/Rack2/plugins
+else ifeq ($(ARCH_OS),win)
+    RACK_PLUGINS_DIR ?= $(USERPROFILE)/Documents/Rack2/plugins
+else
+    RACK_PLUGINS_DIR ?= $(HOME)/.local/share/Rack2/plugins
+endif
+
+.PHONY: install
+install: dist
+	mkdir -p "$(RACK_PLUGINS_DIR)"
+	rm -rf "$(RACK_PLUGINS_DIR)/$(PLUGIN_SLUG)"
+	unzip -o dist/$(PLUGIN_SLUG)-*.zip -d "$(RACK_PLUGINS_DIR)"
+	@echo "Installed $(PLUGIN_SLUG) to $(RACK_PLUGINS_DIR)"
