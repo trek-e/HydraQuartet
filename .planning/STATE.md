@@ -63,6 +63,9 @@
 
 ## Accumulated Context
 
+### Pending Todos
+1. Curtis 3340 emulation (area: general) — analog character modeling for v2
+
 ### Key Decisions Made
 
 **Phase 8 Plan 3 Complete (2026-01-29):**
