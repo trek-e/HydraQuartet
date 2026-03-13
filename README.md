@@ -53,7 +53,7 @@ An 8-voice polyphonic dual-VCO module for VCV Rack, inspired by the Tiptop Audio
 
 ### Building from Source
 ```bash
-# Clone the repository
+# Clone the repository and go into the plugin directory
 git clone https://github.com/trek-e/HydraQuartet.git
 cd HydraQuartet
 
@@ -64,6 +64,7 @@ make
 # Install
 make install
 ```
+If the repo root is a parent folder (e.g. `vcvrack_modules/vco`), run `make` from the directory that contains `Makefile` and `plugin.json`.
 
 ## Requirements
 

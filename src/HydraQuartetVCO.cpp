@@ -1,24 +1,31 @@
 /*
- * Copyright 2026 HydraQuartet
+ * HydraQuartet VCO - 8-voice polyphonic dual-VCO for VCV Rack
+ * Copyright (C) 2026 Synth-etic Intelligence
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "plugin.hpp"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
+using namespace rack;
 using simd::float_4;
+
+// Portable pi constant (avoids M_PI portability issues)
+static constexpr float kPi = 3.14159265358979323846f;
 
 // Constants for MinBLEP generation
 static constexpr int MINBLEP_Z = 16;  // Zero crossings
@@ -178,7 +185,7 @@ struct VcoEngine {
 		tri = tri + triMinBlepBuffer[g].process();
 
 		// === SINE (no antialiasing needed) ===
-		sine = simd::sin(2.f * float(M_PI) * phase[g]);
+		sine = simd::sin(2.f * kPi * phase[g]);
 	}
 
 	// Apply hard sync: reset phase and insert MinBLEP discontinuities
@@ -192,7 +199,7 @@ struct VcoEngine {
 
 			// Calculate subsample position of primary wrap
 			float subsample = (1.f - primaryOldPhase[i]) / primaryDeltaPhase[i] - 1.f;
-			subsample = clamp(subsample, -1.f + 1e-6f, 0.f);  // Ensure valid range
+			subsample = std::max(-1.f + 1e-6f, std::min(subsample, 0.f));  // Ensure valid range
 
 			// Calculate old waveform values (at current phase, before reset)
 			float currentPhase = phase[g][i];
@@ -362,6 +369,7 @@ struct HydraQuartetVCO : Module {
 		// VCO2 Parameters (3x3 grid layout)
 		// Row 1: FM, Pipe Length (Octave), Fine Tune
 		configParam(FM_PARAM, 0.f, 10.f, 0.f, "FM Amount");
+		// VCO2 octave: -2..+1 (4 steps) by design; +2 (1') omitted for FM ratio ergonomics
 		configSwitch(OCTAVE2_PARAM, -2.f, 1.f, 0.f, "VCO2 Pipe Length", {"16'", "8'", "4'", "2'"});
 		configParam(FINE2_PARAM, 0.f, 10.f, 0.f, "VCO2 Fine Tune");  // 0-5=0-1st, 5-10=+12st
 		// Row 2: Sin, Triangle, XOR
@@ -420,7 +428,7 @@ struct HydraQuartetVCO : Module {
 
 	void process(const ProcessArgs& args) override {
 		// Get channel count from V/Oct input (bounded to valid range 1-16)
-		int channels = clamp(inputs[VOCT_INPUT].getChannels(), 1, 16);
+		int channels = std::max(1, std::min(inputs[VOCT_INPUT].getChannels(), 16));
 
 		float sampleTime = args.sampleTime;
 		float sampleRate = args.sampleRate;
@@ -481,7 +489,7 @@ struct HydraQuartetVCO : Module {
 		const float vibratoRate = 5.5f;
 		vibratoPhase += vibratoRate * sampleTime;
 		if (vibratoPhase >= 1.f) vibratoPhase -= 1.f;
-		float vibratoLfo = std::sin(vibratoPhase * 2.f * M_PI);
+		float vibratoLfo = std::sin(vibratoPhase * 2.f * kPi);
 
 		// Vibrato modulation in V/Oct (max +/- 0.5 semitone = +/- 1/24 volt)
 		float vibratoMod1 = vibratoLfo * vibrato1Depth * (0.5f / 12.f);
@@ -560,7 +568,7 @@ struct HydraQuartetVCO : Module {
 			subPhase[g] += subFreq * sampleTime;
 			subPhase[g] -= simd::floor(subPhase[g]);
 			float_4 subSquare = simd::ifelse(subPhase[g] < 0.5f, 1.f, -1.f);
-			float_4 subSine = simd::sin(2.f * float(M_PI) * subPhase[g]);
+			float_4 subSine = simd::sin(2.f * kPi * subPhase[g]);
 			float_4 subOut = (subWave < 0.5f) ? subSquare : subSine;
 
 			// Select FM source waveform (0=Sin, 1=Tri, 2=Saw, 3=Sqr, 4=Sub)
@@ -706,6 +714,10 @@ struct HydraQuartetVCO : Module {
 				}
 			}
 
+			// When groupChannels < 4, zero unused lanes so poly buffer has no garbage
+			for (int i = groupChannels; i < 4; i++)
+				mixed[i] = 0.f;
+
 			outputs[AUDIO_OUTPUT].setVoltageSimd(mixed, c);
 		}
 
@@ -727,15 +739,14 @@ struct HydraQuartetVCO : Module {
 		}
 		outputs[GATE_MIX_OUTPUT].setVoltage(gateMix);
 
-		// Mix output using horizontal sum for efficiency
-		float_4 mixSum = 0.f;
+		// Mix output: portable horizontal sum (no SSE intrinsics for ARM compatibility)
+		float mixOut = 0.f;
 		for (int g = 0; g < (channels + 3) / 4; g++) {
-			mixSum += outputs[AUDIO_OUTPUT].getVoltageSimd<float_4>(g * 4);
+			float_4 chunk = outputs[AUDIO_OUTPUT].getVoltageSimd<float_4>(g * 4);
+			int n = std::min(4, channels - g * 4);
+			for (int i = 0; i < n; i++)
+				mixOut += chunk[i];
 		}
-		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
-		mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
-		// Proportional mix: voices sum together (more voices = louder mix)
-		float mixOut = mixSum[0];
 		// Sanitize mix output
 		outputs[MIX_OUTPUT].setVoltage(std::isfinite(mixOut) ? mixOut : 0.f);
 
