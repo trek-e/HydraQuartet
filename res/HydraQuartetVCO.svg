@@ -1,190 +1,825 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   width="203.2mm"
-   height="128.5mm"
-   viewBox="0 0 203.2 128.5"
-   version="1.1"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="203.2mm" height="128.5mm" viewBox="0 0 203.2 128.5">
   <defs>
-    <linearGradient id="outputPlate" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#2a4858;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a3040;stop-opacity:1" />
+    <linearGradient id="panelBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2a2e"/>
+      <stop offset="100%" stop-color="#1e1e22"/>
+    </linearGradient>
+    <linearGradient id="sectionBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#33333a"/>
+      <stop offset="100%" stop-color="#2a2a30"/>
     </linearGradient>
   </defs>
 
-  <!-- Panel Background - Dark industrial blue -->
-  <rect
-     style="fill:#1a1a2e;fill-opacity:1;stroke:none"
-     width="203.2"
-     height="128.5"
-     x="0"
-     y="0" />
+  <!-- Panel background -->
+  <rect width="203.2" height="128.5" fill="url(#panelBg)"/>
 
-  <!-- Panel Border -->
-  <rect
-     style="fill:none;stroke:#3a3a5e;stroke-width:0.5"
-     width="202.2"
-     height="127.5"
-     x="0.5"
-     y="0.5" />
+  <!-- Panel border -->
+  <rect x="0.5" y="0.5" width="202.2" height="127.5" fill="none" stroke="#444" stroke-width="0.5" rx="0.5"/>
 
-  <!-- Title -->
-  <text
-     style="font-size:8px;font-family:sans-serif;font-weight:bold;fill:#8888aa;text-anchor:middle"
-     x="101.6"
-     y="9">TRIAX VCO</text>
+  <!-- ============================================ -->
+  <!-- MODULE TITLE BAR                             -->
+  <!-- ============================================ -->
+  <rect x="3" y="3" width="100" height="7" rx="1" fill="#c06020" opacity="0.9"/>
 
-  <!-- VCO1 Section Label -->
-  <text
-     style="font-size:5px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
-     x="35"
-     y="17">VCO 1</text>
+  <!-- "HYDRA QUARTET" title -->
+  <!-- H -->
+  <path d="M5.5,4.5 v4.5 M5.5,6.75 h2 M7.5,4.5 v4.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>
+  <!-- Y -->
+  <path d="M9.5,4.5 l1,2 l1,-2 M10.5,6.5 v2.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- D -->
+  <path d="M14,4.5 v4.5 h1 a2.25,2.25 0 0,0 0,-4.5 z" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- R -->
+  <path d="M18.5,9 v-4.5 h1.5 a1,1 0 0,1 0,2 h-1.5 l2,2.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- A -->
+  <path d="M23.5,9 l1.5,-4.5 l1.5,4.5 M24.25,7.5 h1.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- VCO2 Section Label -->
-  <text
-     style="font-size:5px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
-     x="162"
-     y="17">VCO 2</text>
+  <!-- space -->
 
-  <!-- Center Section Label -->
-  <text
-     style="font-size:4px;font-family:sans-serif;font-weight:bold;fill:#6688aa;text-anchor:middle"
-     x="101.6"
-     y="75">GLOBAL</text>
+  <!-- Q -->
+  <path d="M30,6.75 a2,2 0 1,0 3.6,0 a2,2 0 1,0 -3.6,0 M32.5,7.5 l1.5,1.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>
+  <!-- U -->
+  <path d="M36,4.5 v3.2 a1.2,1.2 0 0,0 2.4,0 v-3.2" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>
+  <!-- A -->
+  <path d="M40.5,9 l1.5,-4.5 l1.5,4.5 M41.25,7.5 h1.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- R -->
+  <path d="M45.5,9 v-4.5 h1.5 a1,1 0 0,1 0,2 h-1.5 l2,2.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- T -->
+  <path d="M50.5,4.5 h3 M52,4.5 v4.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>
+  <!-- E -->
+  <path d="M57,4.5 h-2 v4.5 h2 M55,6.75 h1.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- T -->
+  <path d="M59.5,4.5 h3 M61,4.5 v4.5" fill="none" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>
 
-  <!-- VCO1 Octave Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="15.24" y="21">OCTAVE</text>
+  <!-- ============================================ -->
+  <!-- VCO1 SECTION HEADER                         -->
+  <!-- ============================================ -->
+  <rect x="3" y="12" width="63" height="3.5" rx="0.5" fill="#c06020" opacity="0.6"/>
+  <!-- V -->
+  <path d="M5,12.5 l1,2.5 l1,-2.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- C -->
+  <path d="M9,13 a1,1 0 0,0 -1,0.75 a1,1 0 0,0 1,0.75" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>
+  <!-- O -->
+  <path d="M10.5,13.75 a0.8,0.8 0 1,0 1.6,0 a0.8,0.8 0 1,0 -1.6,0" fill="none" stroke="#fff" stroke-width="0.4"/>
+  <!-- space + 1 -->
+  <path d="M14.5,12.5 v2.5" fill="none" stroke="#fff" stroke-width="0.5" stroke-linecap="round"/>
 
-  <!-- VCO1 Detune Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="45" y="21">DETUNE</text>
-
-  <!-- VCO1 Waveform Labels -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="10.16" y="38">TRI</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="25.4" y="38">SQR</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="40.64" y="38">SIN</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="55.88" y="38">SAW</text>
-
-  <!-- VCO1 Waveform CV Labels (below knobs) -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="25.4" y="62">CV</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="55.88" y="62">CV</text>
-
-  <!-- VCO1 PWM Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="15.24" y="72">PWM</text>
-
-  <!-- VCO1 Sync Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="35.56" y="72">SYNC</text>
-
-  <!-- VCO1 PWM CV Label -->
-  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="55.88" y="72">PWM CV</text>
-
-  <!-- Sub-oscillator labels -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="10.16" y="82">SUB</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="10.16" y="105">CV</text>
-
-  <!-- VCO2 Octave Label (shifted right by 10.16mm) -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="147.16" y="21">OCTAVE</text>
-
-  <!-- VCO2 Fine Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aaaacc;text-anchor:middle" x="177.8" y="21">FINE</text>
-
-  <!-- VCO2 Waveform Labels (shifted right) -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="137.16" y="38">TRI</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="152.4" y="38">SQR</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="167.64" y="38">SIN</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#66aa88;text-anchor:middle" x="182.88" y="38">SAW</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa66aa;text-anchor:middle" x="198.12" y="38">XOR</text>
-
-  <!-- VCO2 Waveform CV Labels (below knobs) -->
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="152.4" y="62">CV</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="182.88" y="62">CV</text>
-  <text style="font-size:2.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="198.12" y="62">CV</text>
-
-  <!-- VCO2 PWM Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa8866;text-anchor:middle" x="137.16" y="72">PWM</text>
-
-  <!-- VCO2 Sync Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa6688;text-anchor:middle" x="157.48" y="72">SYNC</text>
-
-  <!-- VCO2 FM Label -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#aa66aa;text-anchor:middle" x="177.8" y="72">FM AMT</text>
-
-  <!-- VCO2 PWM CV Label -->
-  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="137.16" y="92">PWM CV</text>
-
-  <!-- VCO2 FM CV Label -->
-  <text style="font-size:3px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="157.48" y="92">FM CV</text>
-
-  <!-- Global Section Labels -->
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="50">V/OCT</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="65">GATE</text>
-  <text style="font-size:3.5px;font-family:sans-serif;fill:#88aa88;text-anchor:middle" x="101.6" y="80">AUDIO</text>
-
-  <!-- Output Section - Darker plate for outputs (PANEL-03) -->
-  <rect
-     style="fill:url(#outputPlate);fill-opacity:1;stroke:#4a6878;stroke-width:0.3"
-     width="28"
-     height="24"
-     x="87.6"
-     y="103"
-     rx="1"
-     ry="1" />
-
-  <!-- Output Labels on plate -->
-  <text style="font-size:3.5px;font-family:sans-serif;font-weight:bold;fill:#aaddff;text-anchor:middle" x="101.6" y="110">AUDIO</text>
-  <text style="font-size:3.5px;font-family:sans-serif;font-weight:bold;fill:#aaddff;text-anchor:middle" x="101.6" y="122">MIX</text>
-
-  <!-- Section divider lines -->
-  <line x1="71" y1="12" x2="71" y2="118" style="stroke:#3a3a5e;stroke-width:0.3" />
-  <line x1="132" y1="12" x2="132" y2="118" style="stroke:#3a3a5e;stroke-width:0.3" />
-
-  <!-- Components layer for helper.py parsing -->
-  <g inkscape:label="components" id="components" style="display:none">
-
-    <!-- VCO1 Parameters (red) -->
-    <circle cx="15.24" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE1" />
-    <circle cx="45" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="DETUNE1" />
-    <circle cx="10.16" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="TRI1" />
-    <circle cx="25.4" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SQR1" />
-    <circle cx="40.64" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SIN1" />
-    <circle cx="55.88" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SAW1" />
-    <circle cx="15.24" cy="78.0" r="4" style="fill:#ff0000" inkscape:label="PWM1" />
-    <circle cx="35.56" cy="78.0" r="2" style="fill:#ff0000" inkscape:label="SYNC1" />
-    <circle cx="10.16" cy="88.0" r="4" style="fill:#ff0000" inkscape:label="SUB_LEVEL" />
-    <circle cx="25.4" cy="88.0" r="2" style="fill:#ff0000" inkscape:label="SUB_WAVE" />
-
-    <!-- VCO2 Parameters (red) - shifted right -->
-    <circle cx="147.16" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="OCTAVE2" />
-    <circle cx="177.8" cy="28.0" r="4" style="fill:#ff0000" inkscape:label="FINE2" />
-    <circle cx="137.16" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="TRI2" />
-    <circle cx="152.4" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SQR2" />
-    <circle cx="167.64" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SIN2" />
-    <circle cx="182.88" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="SAW2" />
-    <circle cx="198.12" cy="48.0" r="4" style="fill:#ff0000" inkscape:label="XOR" />
-    <circle cx="137.16" cy="78.0" r="4" style="fill:#ff0000" inkscape:label="PWM2" />
-    <circle cx="157.48" cy="78.0" r="2" style="fill:#ff0000" inkscape:label="SYNC2" />
-    <circle cx="177.8" cy="78.0" r="4" style="fill:#ff0000" inkscape:label="FM" />
-
-    <!-- Input ports (green) -->
-    <circle cx="101.6" cy="55.0" r="4" style="fill:#00ff00" inkscape:label="VOCT" />
-    <circle cx="101.6" cy="70.0" r="4" style="fill:#00ff00" inkscape:label="GATE" />
-    <circle cx="55.88" cy="78.0" r="4" style="fill:#00ff00" inkscape:label="PWM1_CV" />
-    <circle cx="137.16" cy="98.0" r="4" style="fill:#00ff00" inkscape:label="PWM2_CV" />
-    <circle cx="157.48" cy="98.0" r="4" style="fill:#00ff00" inkscape:label="FM_CV" />
-
-    <!-- Waveform CV inputs (green) -->
-    <circle cx="25.4" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="SQR1_CV" />
-    <circle cx="55.88" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="SAW1_CV" />
-    <circle cx="10.16" cy="98.0" r="3" style="fill:#00ff00" inkscape:label="SUB_CV" />
-    <circle cx="152.4" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="SQR2_CV" />
-    <circle cx="182.88" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="SAW2_CV" />
-    <circle cx="198.12" cy="58.0" r="3" style="fill:#00ff00" inkscape:label="XOR_CV" />
-
-    <!-- Output ports (blue) -->
-    <circle cx="101.6" cy="85.0" r="4" style="fill:#0000ff" inkscape:label="AUDIO" />
-    <circle cx="101.6" cy="125.0" r="4" style="fill:#0000ff" inkscape:label="MIX" />
-    <circle cx="40.64" cy="88.0" r="4" style="fill:#0000ff" inkscape:label="SUB_OUTPUT" />
-
+  <!-- VCO1 knob labels using geometric rect letterforms -->
+  <!-- DETUNE at x=12, y=17 -->
+  <g transform="translate(7,17)" fill="#aaa" stroke="none">
+    <!-- D -->
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="0" width="1" height="0.35"/>
+    <rect x="0" y="2.15" width="1" height="0.35"/>
+    <rect x="1" y="0.35" width="0.35" height="1.8"/>
+    <!-- E -->
+    <rect x="1.8" y="0" width="0.35" height="2.5"/>
+    <rect x="1.8" y="0" width="1.2" height="0.35"/>
+    <rect x="1.8" y="1.05" width="1" height="0.35"/>
+    <rect x="1.8" y="2.15" width="1.2" height="0.35"/>
+    <!-- T -->
+    <rect x="3.5" y="0" width="1.5" height="0.35"/>
+    <rect x="4.1" y="0" width="0.35" height="2.5"/>
   </g>
 
+  <!-- OCTAVE at x=27, y=17 -->
+  <g transform="translate(21.5,17)" fill="#aaa" stroke="none">
+    <!-- O -->
+    <rect x="0" y="0.35" width="0.35" height="1.8"/>
+    <rect x="1.15" y="0.35" width="0.35" height="1.8"/>
+    <rect x="0" y="0" width="1.5" height="0.35"/>
+    <rect x="0" y="2.15" width="1.5" height="0.35"/>
+    <!-- C -->
+    <rect x="2" y="0" width="1.2" height="0.35"/>
+    <rect x="2" y="0" width="0.35" height="2.5"/>
+    <rect x="2" y="2.15" width="1.2" height="0.35"/>
+    <!-- T -->
+    <rect x="3.7" y="0" width="1.5" height="0.35"/>
+    <rect x="4.3" y="0" width="0.35" height="2.5"/>
+  </g>
+
+  <!-- FM SRC at x=42, y=17 -->
+  <g transform="translate(37,17)" fill="#aaa" stroke="none">
+    <!-- F -->
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="1.05" width="1" height="0.35"/>
+    <!-- M -->
+    <rect x="1.7" y="0" width="0.35" height="2.5"/>
+    <rect x="2.05" y="0" width="0.5" height="0.35"/>
+    <rect x="2.55" y="0.35" width="0.35" height="0.7"/>
+    <rect x="2.9" y="0" width="0.5" height="0.35"/>
+    <rect x="3.4" y="0" width="0.35" height="2.5"/>
+  </g>
+
+  <!-- VCO1 Row 2 labels: SUB TRI SIN VIB -->
+  <!-- SUB at x=12, y=37 -->
+  <g transform="translate(7.5,37)" fill="#999" stroke="none">
+    <!-- S -->
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <!-- U -->
+    <rect x="1.7" y="0" width="0.3" height="2.2"/>
+    <rect x="2.7" y="0" width="0.3" height="2.2"/>
+    <rect x="1.7" y="2.2" width="1.3" height="0.3"/>
+    <!-- B -->
+    <rect x="3.5" y="0" width="0.3" height="2.5"/>
+    <rect x="3.5" y="0" width="1.2" height="0.3"/>
+    <rect x="3.5" y="1.05" width="1.2" height="0.3"/>
+    <rect x="3.5" y="2.2" width="1.2" height="0.3"/>
+    <rect x="4.4" y="0" width="0.3" height="1.25"/>
+    <rect x="4.4" y="1.25" width="0.3" height="1.25"/>
+  </g>
+
+  <!-- TRI at x=27, y=37 -->
+  <g transform="translate(23.5,37)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.5" height="0.3"/>
+    <rect x="0.6" y="0" width="0.3" height="2.5"/>
+    <!-- R -->
+    <rect x="2" y="0" width="0.3" height="2.5"/>
+    <rect x="2" y="0" width="1.2" height="0.3"/>
+    <rect x="2" y="1.05" width="1.2" height="0.3"/>
+    <rect x="2.9" y="0" width="0.3" height="1.25"/>
+    <!-- I -->
+    <rect x="3.8" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- SIN at x=42, y=37 -->
+  <g transform="translate(38.5,37)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <!-- I -->
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <!-- N -->
+    <rect x="2.5" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="1.5" height="0.3"/>
+    <rect x="3.7" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- VIB at x=57, y=37 -->
+  <g transform="translate(53.5,37)" fill="#999" stroke="none">
+    <!-- V -->
+    <rect x="0" y="0" width="0.3" height="1.8"/>
+    <rect x="0.9" y="0" width="0.3" height="1.8"/>
+    <rect x="0.3" y="2.2" width="0.6" height="0.3"/>
+    <!-- I -->
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <!-- B -->
+    <rect x="2.5" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="1.2" height="0.3"/>
+    <rect x="2.5" y="1.05" width="1.2" height="0.3"/>
+    <rect x="2.5" y="2.2" width="1.2" height="0.3"/>
+    <rect x="3.4" y="0" width="0.3" height="1.25"/>
+    <rect x="3.4" y="1.25" width="0.3" height="1.25"/>
+  </g>
+
+  <!-- VCO1 Row 3 labels: PWM SQR SAW -->
+  <!-- PWM at x=12, y=57 -->
+  <g transform="translate(7.5,57)" fill="#999" stroke="none">
+    <!-- P -->
+    <rect x="0" y="0" width="0.3" height="2.5"/>
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="0" width="0.3" height="1.25"/>
+    <!-- W -->
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="0.3" height="2.5"/>
+    <rect x="3.3" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="2.2" width="0.6" height="0.3"/>
+    <rect x="2.8" y="2.2" width="0.6" height="0.3"/>
+    <!-- M -->
+    <rect x="4.1" y="0" width="0.3" height="2.5"/>
+    <rect x="4.4" y="0" width="0.5" height="0.3"/>
+    <rect x="4.9" y="0.3" width="0.3" height="0.7"/>
+    <rect x="5.2" y="0" width="0.5" height="0.3"/>
+    <rect x="5.7" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- SQR at x=27, y=57 -->
+  <g transform="translate(23.5,57)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <!-- Q -->
+    <rect x="1.7" y="0" width="1.5" height="0.3"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.9" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="2.2" width="1.5" height="0.3"/>
+    <rect x="2.6" y="1.8" width="0.6" height="0.3" transform="rotate(30,2.9,1.95)"/>
+    <!-- R -->
+    <rect x="3.8" y="0" width="0.3" height="2.5"/>
+    <rect x="3.8" y="0" width="1.2" height="0.3"/>
+    <rect x="3.8" y="1.05" width="1.2" height="0.3"/>
+    <rect x="4.7" y="0" width="0.3" height="1.25"/>
+  </g>
+
+  <!-- SAW at x=42, y=57 -->
+  <g transform="translate(38.5,57)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <!-- A -->
+    <rect x="1.7" y="0" width="1.5" height="0.3"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.9" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="1.05" width="1.5" height="0.3"/>
+    <!-- W -->
+    <rect x="3.7" y="0" width="0.3" height="2.5"/>
+    <rect x="4.5" y="0" width="0.3" height="2.5"/>
+    <rect x="5.3" y="0" width="0.3" height="2.5"/>
+    <rect x="3.7" y="2.2" width="0.6" height="0.3"/>
+    <rect x="4.8" y="2.2" width="0.6" height="0.3"/>
+  </g>
+
+  <!-- VCO1 Row 4: SUB WAVE switch label -->
+  <g transform="translate(7.5,76)" fill="#888" stroke="none">
+    <!-- W -->
+    <rect x="0" y="0" width="0.25" height="1.8"/>
+    <rect x="0.6" y="0" width="0.25" height="1.8"/>
+    <rect x="1.2" y="0" width="0.25" height="1.8"/>
+    <rect x="0" y="1.5" width="0.5" height="0.25"/>
+    <rect x="0.85" y="1.5" width="0.5" height="0.25"/>
+    <!-- A -->
+    <rect x="1.8" y="0" width="1" height="0.25"/>
+    <rect x="1.8" y="0" width="0.25" height="1.8"/>
+    <rect x="2.55" y="0" width="0.25" height="1.8"/>
+    <rect x="1.8" y="0.8" width="1" height="0.25"/>
+    <!-- V -->
+    <rect x="3.3" y="0" width="0.25" height="1.3"/>
+    <rect x="3.85" y="0" width="0.25" height="1.3"/>
+    <rect x="3.5" y="1.5" width="0.4" height="0.25"/>
+  </g>
+
+  <!-- VCO1 CV input labels -->
+  <g transform="translate(8,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+  <g transform="translate(23.5,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+  <g transform="translate(39,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+
+  <!-- VCO1 knob position dots -->
+  <circle cx="12" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="27" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="42" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="12" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="27" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="42" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="57" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="12" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="27" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="42" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+
+  <!-- VCO1 CV jack position dots -->
+  <circle cx="12" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="27" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="42" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+
+  <!-- ============================================ -->
+  <!-- CENTER / GLOBAL SECTION                     -->
+  <!-- ============================================ -->
+  <!-- Vertical dividers -->
+  <line x1="68" y1="12" x2="68" y2="100" stroke="#444" stroke-width="0.3"/>
+  <line x1="135" y1="12" x2="135" y2="100" stroke="#444" stroke-width="0.3"/>
+
+  <!-- GLOBAL section header -->
+  <rect x="70" y="12" width="63" height="3.5" rx="0.5" fill="#c06020" opacity="0.6"/>
+  <!-- G -->
+  <path d="M72,12.5 h1.5 v-0.01 M72,12.5 v2.5 h1.5 v-1 h-0.8" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- L -->
+  <path d="M75,12.5 v2.5 h1.2" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- O -->
+  <path d="M77.5,13.75 a0.8,0.8 0 1,0 1.6,0 a0.8,0.8 0 1,0 -1.6,0" fill="none" stroke="#fff" stroke-width="0.4"/>
+  <!-- B -->
+  <path d="M80.5,12.5 v2.5 h0.8 a0.6,0.6 0 0,0 0,-1.2 h-0.8 h0.7 a0.6,0.6 0 0,0 0,-1.3 z" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- SYNC1 label -->
+  <g transform="translate(94,19)" fill="#999" stroke="none">
+    <!-- S -->
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1"/>
+    <rect x="0" y="0.85" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1" width="0.3" height="1"/>
+    <rect x="0" y="1.7" width="1.2" height="0.3"/>
+    <!-- 1 -->
+    <rect x="1.7" y="0" width="0.3" height="2"/>
+  </g>
+
+  <!-- SYNC2 label -->
+  <g transform="translate(94,34)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1"/>
+    <rect x="0" y="0.85" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1" width="0.3" height="1"/>
+    <rect x="0" y="1.7" width="1.2" height="0.3"/>
+    <!-- 2 -->
+    <rect x="1.7" y="0" width="1.2" height="0.3"/>
+    <rect x="2.6" y="0" width="0.3" height="1"/>
+    <rect x="1.7" y="0.85" width="1.2" height="0.3"/>
+    <rect x="1.7" y="1" width="0.3" height="1"/>
+    <rect x="1.7" y="1.7" width="1.2" height="0.3"/>
+  </g>
+
+  <!-- V/OCT label -->
+  <g transform="translate(95,49)" fill="#888" stroke="none">
+    <!-- V -->
+    <rect x="0" y="0" width="0.3" height="1.5"/>
+    <rect x="0.9" y="0" width="0.3" height="1.5"/>
+    <rect x="0.3" y="1.7" width="0.6" height="0.3"/>
+    <!-- / -->
+    <rect x="1.7" y="0.5" width="0.25" height="1.5" transform="rotate(-20,1.8,1.25)"/>
+    <!-- O -->
+    <rect x="2.8" y="0" width="0.3" height="2"/>
+    <rect x="3.7" y="0" width="0.3" height="2"/>
+    <rect x="2.8" y="0" width="1.2" height="0.3"/>
+    <rect x="2.8" y="1.7" width="1.2" height="0.3"/>
+  </g>
+
+  <!-- GATE label -->
+  <g transform="translate(95.5,64)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="2"/>
+    <rect x="0" y="1.7" width="1.2" height="0.3"/>
+    <rect x="0.9" y="0.9" width="0.3" height="1.1"/>
+    <rect x="0.5" y="0.9" width="0.7" height="0.3"/>
+  </g>
+
+  <!-- AUDIO label -->
+  <g transform="translate(95.5,79)" fill="#888" stroke="none">
+    <!-- A -->
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="2"/>
+    <rect x="0.9" y="0" width="0.3" height="2"/>
+    <rect x="0" y="0.9" width="1.2" height="0.3"/>
+    <!-- U -->
+    <rect x="1.7" y="0" width="0.3" height="1.7"/>
+    <rect x="2.5" y="0" width="0.3" height="1.7"/>
+    <rect x="1.7" y="1.7" width="1.1" height="0.3"/>
+    <!-- D -->
+    <rect x="3.3" y="0" width="0.3" height="2"/>
+    <rect x="3.3" y="0" width="1" height="0.3"/>
+    <rect x="3.3" y="1.7" width="1" height="0.3"/>
+    <rect x="4.0" y="0.3" width="0.3" height="1.4"/>
+  </g>
+
+  <!-- Center section position dots -->
+  <circle cx="101.6" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="101.6" cy="40" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="101.6" cy="55" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="101.6" cy="70" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="101.6" cy="85" r="0.5" fill="#20a050" opacity="0.4"/>
+
+  <!-- ============================================ -->
+  <!-- VCO2 SECTION HEADER                         -->
+  <!-- ============================================ -->
+  <rect x="137" y="12" width="63.2" height="3.5" rx="0.5" fill="#c06020" opacity="0.6"/>
+  <!-- V -->
+  <path d="M139,12.5 l1,2.5 l1,-2.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- C -->
+  <path d="M143,13 a1,1 0 0,0 -1,0.75 a1,1 0 0,0 1,0.75" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>
+  <!-- O -->
+  <path d="M144.5,13.75 a0.8,0.8 0 1,0 1.6,0 a0.8,0.8 0 1,0 -1.6,0" fill="none" stroke="#fff" stroke-width="0.4"/>
+  <!-- space + 2 -->
+  <path d="M148.5,12.5 h1.5 v1.25 h-1.5 v1.25 h1.5" fill="none" stroke="#fff" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- VCO2 knob labels -->
+  <!-- FM at x=161, y=17 -->
+  <g transform="translate(157,17)" fill="#aaa" stroke="none">
+    <!-- F -->
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="1.05" width="1" height="0.35"/>
+    <!-- M -->
+    <rect x="1.8" y="0" width="0.35" height="2.5"/>
+    <rect x="2.15" y="0" width="0.5" height="0.35"/>
+    <rect x="2.65" y="0.35" width="0.35" height="0.7"/>
+    <rect x="3.0" y="0" width="0.5" height="0.35"/>
+    <rect x="3.5" y="0" width="0.35" height="2.5"/>
+  </g>
+
+  <!-- OCTAVE at x=176, y=17 -->
+  <g transform="translate(170.5,17)" fill="#aaa" stroke="none">
+    <rect x="0" y="0.35" width="0.35" height="1.8"/>
+    <rect x="1.15" y="0.35" width="0.35" height="1.8"/>
+    <rect x="0" y="0" width="1.5" height="0.35"/>
+    <rect x="0" y="2.15" width="1.5" height="0.35"/>
+    <rect x="2" y="0" width="1.2" height="0.35"/>
+    <rect x="2" y="0" width="0.35" height="2.5"/>
+    <rect x="2" y="2.15" width="1.2" height="0.35"/>
+    <rect x="3.7" y="0" width="1.5" height="0.35"/>
+    <rect x="4.3" y="0" width="0.35" height="2.5"/>
+  </g>
+
+  <!-- FINE at x=191, y=17 -->
+  <g transform="translate(187,17)" fill="#aaa" stroke="none">
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="1.05" width="1" height="0.35"/>
+    <!-- I -->
+    <rect x="1.7" y="0" width="0.35" height="2.5"/>
+    <!-- N -->
+    <rect x="2.5" y="0" width="0.35" height="2.5"/>
+    <rect x="2.5" y="0" width="1.5" height="0.35"/>
+    <rect x="3.65" y="0" width="0.35" height="2.5"/>
+    <!-- E -->
+    <rect x="4.5" y="0" width="0.35" height="2.5"/>
+    <rect x="4.5" y="0" width="1.2" height="0.35"/>
+    <rect x="4.5" y="1.05" width="1" height="0.35"/>
+    <rect x="4.5" y="2.15" width="1.2" height="0.35"/>
+  </g>
+
+  <!-- VCO2 Row 2 labels: VIB SIN TRI XOR -->
+  <g transform="translate(142.5,37)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="0.25" height="1.8"/>
+    <rect x="0.6" y="0" width="0.25" height="1.8"/>
+    <rect x="0.15" y="2.0" width="0.4" height="0.25"/>
+    <rect x="1.3" y="0" width="0.25" height="2.25"/>
+    <rect x="2" y="0" width="0.25" height="2.25"/>
+    <rect x="2" y="0" width="1.2" height="0.25"/>
+    <rect x="2" y="1" width="1.2" height="0.25"/>
+    <rect x="2" y="2.0" width="1.2" height="0.25"/>
+    <rect x="2.95" y="0" width="0.25" height="1"/>
+    <rect x="2.95" y="1" width="0.25" height="1.25"/>
+  </g>
+
+  <!-- SIN at x=161 -->
+  <g transform="translate(157.5,37)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="1.5" height="0.3"/>
+    <rect x="3.7" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- TRI at x=176 -->
+  <g transform="translate(172.5,37)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.5" height="0.3"/>
+    <rect x="0.6" y="0" width="0.3" height="2.5"/>
+    <rect x="2" y="0" width="0.3" height="2.5"/>
+    <rect x="2" y="0" width="1.2" height="0.3"/>
+    <rect x="2" y="1.05" width="1.2" height="0.3"/>
+    <rect x="2.9" y="0" width="0.3" height="1.25"/>
+    <rect x="3.8" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- XOR at x=191 (special color for XOR) -->
+  <g transform="translate(187.5,37)" fill="#aa66aa" stroke="none">
+    <!-- X -->
+    <rect x="0" y="0" width="0.3" height="1"/>
+    <rect x="0.9" y="0" width="0.3" height="1"/>
+    <rect x="0.35" y="1" width="0.5" height="0.3"/>
+    <rect x="0" y="1.5" width="0.3" height="1"/>
+    <rect x="0.9" y="1.5" width="0.3" height="1"/>
+    <!-- O -->
+    <rect x="1.7" y="0.3" width="0.3" height="1.9"/>
+    <rect x="2.6" y="0.3" width="0.3" height="1.9"/>
+    <rect x="1.7" y="0" width="1.2" height="0.3"/>
+    <rect x="1.7" y="2.2" width="1.2" height="0.3"/>
+    <!-- R -->
+    <rect x="3.5" y="0" width="0.3" height="2.5"/>
+    <rect x="3.5" y="0" width="1.2" height="0.3"/>
+    <rect x="3.5" y="1.05" width="1.2" height="0.3"/>
+    <rect x="4.4" y="0" width="0.3" height="1.25"/>
+  </g>
+
+  <!-- VCO2 Row 3 labels: SAW SQR PWM -->
+  <g transform="translate(157.5,57)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <rect x="1.7" y="0" width="1.2" height="0.3"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.6" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="1.05" width="1.2" height="0.3"/>
+    <rect x="3.7" y="0" width="0.3" height="2.5"/>
+    <rect x="3.7" y="0.3" width="0.6" height="0.3"/>
+    <rect x="4.3" y="0" width="0.3" height="2.5"/>
+    <rect x="4.3" y="2.2" width="0.6" height="0.3"/>
+    <rect x="4.9" y="0" width="0.3" height="2.5"/>
+  </g>
+
+  <!-- SQR at x=176 -->
+  <g transform="translate(172.5,57)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="0" width="0.3" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="1.25" width="0.3" height="1.25"/>
+    <rect x="0" y="2.2" width="1.2" height="0.3"/>
+    <rect x="1.7" y="0" width="1.5" height="0.3"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.9" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="2.2" width="1.5" height="0.3"/>
+    <rect x="3.8" y="0" width="0.3" height="2.5"/>
+    <rect x="3.8" y="0" width="1.2" height="0.3"/>
+    <rect x="3.8" y="1.05" width="1.2" height="0.3"/>
+    <rect x="4.7" y="0" width="0.3" height="1.25"/>
+  </g>
+
+  <!-- PWM at x=191 -->
+  <g transform="translate(187.5,57)" fill="#999" stroke="none">
+    <rect x="0" y="0" width="0.3" height="2.5"/>
+    <rect x="0" y="0" width="1.2" height="0.3"/>
+    <rect x="0" y="1.05" width="1.2" height="0.3"/>
+    <rect x="0.9" y="0" width="0.3" height="1.25"/>
+    <rect x="1.7" y="0" width="0.3" height="2.5"/>
+    <rect x="2.5" y="0" width="0.3" height="2.5"/>
+    <rect x="3.3" y="0" width="0.3" height="2.5"/>
+    <rect x="1.7" y="2.2" width="0.6" height="0.3"/>
+    <rect x="2.8" y="2.2" width="0.6" height="0.3"/>
+  </g>
+
+  <!-- VCO2 knob position dots -->
+  <circle cx="161" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="176" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="191" cy="25" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="146" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="161" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="176" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="191" cy="45" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="161" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="176" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+  <circle cx="191" cy="65" r="0.6" fill="#c06020" opacity="0.5"/>
+
+  <!-- VCO2 CV section -->
+  <circle cx="161" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="176" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="191" cy="95" r="0.5" fill="#3060a0" opacity="0.4"/>
+
+  <!-- VCO2 CV labels -->
+  <g transform="translate(158,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+  <g transform="translate(173,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+  <g transform="translate(188,89)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1" height="0.25"/>
+    <rect x="0" y="0" width="0.25" height="1.5"/>
+    <rect x="0" y="1.25" width="1" height="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- SECTION: INPUTS (bottom left)               -->
+  <!-- ============================================ -->
+  <rect x="3" y="102" width="63" height="3.5" rx="0.5" fill="#3060a0" opacity="0.6"/>
+  <!-- I -->
+  <path d="M5.5,102.5 v2.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>
+  <!-- N -->
+  <path d="M7.5,105 v-2.5 l2,2.5 v-2.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- P -->
+  <path d="M11,102.5 v2.5 M11,102.5 h1 a0.7,0.7 0 0,1 0,1.4 h-1" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- PWM1 CV input position -->
+  <circle cx="10" cy="110" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <!-- SUB output position -->
+  <circle cx="40.64" cy="88" r="0.5" fill="#20a050" opacity="0.4"/>
+
+  <!-- ============================================ -->
+  <!-- SECTION: OUTPUTS (bottom)                   -->
+  <!-- ============================================ -->
+  <rect x="3" y="115" width="197.2" height="3.5" rx="0.5" fill="#20a050" opacity="0.6"/>
+  <!-- O -->
+  <path d="M5.5,116.75 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" fill="none" stroke="#fff" stroke-width="0.4"/>
+  <!-- U -->
+  <path d="M9.5,116 v1.5 a0.8,0.8 0 0,0 1.6,0 v-1.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>
+  <!-- T -->
+  <path d="M13,116 h1.6 M13.8,116 v2.5" fill="none" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>
+
+  <!-- Gate outputs row (y=110) -->
+  <circle cx="25" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="38" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="51" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="64" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="101.6" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="139" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="152" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="165" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="178" cy="110" r="0.5" fill="#20a050" opacity="0.4"/>
+
+  <!-- Voice outputs row (y=123) -->
+  <circle cx="25" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="38" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="51" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="64" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="101.6" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="139" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="152" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="165" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+  <circle cx="178" cy="123" r="0.5" fill="#20a050" opacity="0.4"/>
+
+  <!-- Voice number labels 1-8 in output rows -->
+  <g transform="translate(23.5,106)" fill="#888" stroke="none"><rect x="0" y="0" width="0.35" height="2.5"/></g>
+  <g transform="translate(36.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0.85" y="0" width="0.35" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.35"/>
+    <rect x="0" y="1.25" width="0.35" height="1.25"/>
+    <rect x="0" y="2.15" width="1.2" height="0.35"/>
+  </g>
+  <g transform="translate(49.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0.85" y="0" width="0.35" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.35"/>
+    <rect x="0.85" y="1.25" width="0.35" height="1.25"/>
+    <rect x="0" y="2.15" width="1.2" height="0.35"/>
+  </g>
+  <g transform="translate(62.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="0.35" height="1.5"/>
+    <rect x="1" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="1.05" width="1.35" height="0.35"/>
+  </g>
+
+  <!-- MIX label in center -->
+  <g transform="translate(97.5,106)" fill="#aaa" stroke="none">
+    <rect x="0" y="0" width="0.3" height="2.5"/>
+    <rect x="0.3" y="0" width="0.5" height="0.3"/>
+    <rect x="0.8" y="0.3" width="0.3" height="0.7"/>
+    <rect x="1.1" y="0" width="0.5" height="0.3"/>
+    <rect x="1.6" y="0" width="0.3" height="2.5"/>
+    <rect x="2.3" y="0" width="0.3" height="2.5"/>
+    <!-- X -->
+    <rect x="3" y="0" width="0.3" height="1"/>
+    <rect x="3.6" y="0" width="0.3" height="1"/>
+    <rect x="3.2" y="1" width="0.3" height="0.3"/>
+    <rect x="3" y="1.5" width="0.3" height="1"/>
+    <rect x="3.6" y="1.5" width="0.3" height="1"/>
+  </g>
+
+  <g transform="translate(137.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="0" width="0.35" height="1.25"/>
+    <rect x="0" y="1.05" width="1.2" height="0.35"/>
+    <rect x="0.85" y="1.25" width="0.35" height="1.25"/>
+    <rect x="0" y="2.15" width="1.2" height="0.35"/>
+  </g>
+  <g transform="translate(150.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="1.05" width="1.2" height="0.35"/>
+    <rect x="0.85" y="1.25" width="0.35" height="1.25"/>
+    <rect x="0" y="2.15" width="1.2" height="0.35"/>
+  </g>
+  <g transform="translate(163.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0.85" y="0" width="0.35" height="2.5"/>
+  </g>
+  <g transform="translate(176.5,106)" fill="#888" stroke="none">
+    <rect x="0" y="0" width="1.2" height="0.35"/>
+    <rect x="0" y="0" width="0.35" height="2.5"/>
+    <rect x="0.85" y="0" width="0.35" height="2.5"/>
+    <rect x="0" y="1.05" width="1.2" height="0.35"/>
+    <rect x="0" y="2.15" width="1.2" height="0.35"/>
+  </g>
+
+  <!-- PWM2 CV and FM CV area (VCO2 side) -->
+  <rect x="137" y="75" width="63.2" height="3.5" rx="0.5" fill="#3060a0" opacity="0.4"/>
+  <!-- tiny "CV" label -->
+  <path d="M139,76 a0.6,0.6 0 0,0 -0.5,0.75 a0.6,0.6 0 0,0 0.5,0.75" fill="none" stroke="#fff" stroke-width="0.3" stroke-linecap="round"/>
+  <path d="M140.5,76 l0.5,1.5 l0.5,-1.5" fill="none" stroke="#fff" stroke-width="0.3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- PWM2 and FM CV input dots -->
+  <circle cx="150" cy="83" r="0.5" fill="#3060a0" opacity="0.4"/>
+  <circle cx="170" cy="83" r="0.5" fill="#3060a0" opacity="0.4"/>
+
+  <!-- ============================================ -->
+  <!-- BRAND FOOTER                                -->
+  <!-- ============================================ -->
+  <rect x="105" y="3" width="95.2" height="7" rx="1" fill="#333" opacity="0.5"/>
+  <!-- "SYNTH-ETIC INTELLIGENCE" brand mark -->
+  <!-- S -->
+  <path d="M109,4.5 a0.6,0.6 0 0,0 -0.8,0.5 a0.6,0.6 0 0,0 0.8,0.5 a0.6,0.6 0 0,1 -0.8,0.5 a0.6,0.6 0 0,0 0.8,0.5" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- Y -->
+  <path d="M111,4.5 l0.6,1.5 l0.6,-1.5 M111.6,6 v1.5" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- N -->
+  <path d="M114,7.5 v-3 l1.5,3 v-3" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- T -->
+  <path d="M117,4.5 h2 M118,4.5 v3" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- H -->
+  <path d="M120.5,4.5 v3 M120.5,6 h1.3 M121.8,4.5 v3" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- - -->
+  <path d="M123.5,6 h1" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- E -->
+  <path d="M127,4.5 h-1.3 v3 h1.3 M125.7,6 h1" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- T -->
+  <path d="M128.5,4.5 h2 M129.5,4.5 v3" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- I -->
+  <path d="M132,4.5 v3" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+  <!-- C -->
+  <path d="M135,5 a1.2,1.2 0 0,0 -1,1 a1.2,1.2 0 0,0 1,1" fill="none" stroke="#666" stroke-width="0.35" stroke-linecap="round"/>
+
+  <!-- Decorative waveform in brand area -->
+  <path d="M145,6.5 q2,-2 4,0 q2,2 4,0 q2,-2 4,0 q2,2 4,0 q2,-2 4,0 q2,2 4,0 q2,-2 4,0 q2,2 4,0 q2,-2 4,0 q2,2 4,0 q2,-2 4,0"
+        fill="none" stroke="#c06020" stroke-width="0.4" opacity="0.4"/>
+
+  <!-- Screw holes -->
+  <circle cx="5.08" cy="5.08" r="2" fill="none" stroke="#555" stroke-width="0.2" opacity="0.3"/>
+  <circle cx="198.12" cy="5.08" r="2" fill="none" stroke="#555" stroke-width="0.2" opacity="0.3"/>
+  <circle cx="5.08" cy="123.42" r="2" fill="none" stroke="#555" stroke-width="0.2" opacity="0.3"/>
+  <circle cx="198.12" cy="123.42" r="2" fill="none" stroke="#555" stroke-width="0.2" opacity="0.3"/>
+
+  <!-- ============================================ -->
+  <!-- COMPONENTS LAYER (hidden - for helper.py)   -->
+  <!-- ============================================ -->
+  <g id="components" style="display:none">
+    <!-- VCO1 Parameters (red) - 3x3 grid + extras -->
+    <circle cx="12" cy="25" r="4" style="fill:#ff0000" id="DETUNE1"/>
+    <circle cx="27" cy="25" r="4" style="fill:#ff0000" id="OCTAVE1"/>
+    <circle cx="42" cy="25" r="4" style="fill:#ff0000" id="FM_SOURCE"/>
+    <circle cx="12" cy="45" r="4" style="fill:#ff0000" id="SUB_LEVEL"/>
+    <circle cx="27" cy="45" r="4" style="fill:#ff0000" id="TRI1"/>
+    <circle cx="42" cy="45" r="4" style="fill:#ff0000" id="SIN1"/>
+    <circle cx="57" cy="45" r="4" style="fill:#ff0000" id="VIBRATO1"/>
+    <circle cx="12" cy="65" r="4" style="fill:#ff0000" id="PWM1"/>
+    <circle cx="27" cy="65" r="4" style="fill:#ff0000" id="SQR1"/>
+    <circle cx="42" cy="65" r="4" style="fill:#ff0000" id="SAW1"/>
+    <!-- VCO1 switches -->
+    <circle cx="12" cy="82" r="2" style="fill:#ff0000" id="SUB_WAVE"/>
+    <circle cx="101.6" cy="25" r="2" style="fill:#ff0000" id="SYNC1"/>
+    <circle cx="101.6" cy="40" r="2" style="fill:#ff0000" id="SYNC2"/>
+
+    <!-- VCO2 Parameters (red) -->
+    <circle cx="161" cy="25" r="4" style="fill:#ff0000" id="FM"/>
+    <circle cx="176" cy="25" r="4" style="fill:#ff0000" id="OCTAVE2"/>
+    <circle cx="191" cy="25" r="4" style="fill:#ff0000" id="FINE2"/>
+    <circle cx="146" cy="45" r="4" style="fill:#ff0000" id="VIBRATO2"/>
+    <circle cx="161" cy="45" r="4" style="fill:#ff0000" id="SIN2"/>
+    <circle cx="176" cy="45" r="4" style="fill:#ff0000" id="TRI2"/>
+    <circle cx="191" cy="45" r="4" style="fill:#ff0000" id="XOR"/>
+    <circle cx="161" cy="65" r="4" style="fill:#ff0000" id="SAW2"/>
+    <circle cx="176" cy="65" r="4" style="fill:#ff0000" id="SQR2"/>
+    <circle cx="191" cy="65" r="4" style="fill:#ff0000" id="PWM2"/>
+
+    <!-- Input ports (green) -->
+    <circle cx="101.6" cy="55" r="4" style="fill:#00ff00" id="VOCT"/>
+    <circle cx="101.6" cy="70" r="4" style="fill:#00ff00" id="GATE"/>
+    <circle cx="10" cy="110" r="4" style="fill:#00ff00" id="PWM1_CV"/>
+    <circle cx="150" cy="83" r="4" style="fill:#00ff00" id="PWM2_CV"/>
+    <circle cx="170" cy="83" r="4" style="fill:#00ff00" id="FM_CV"/>
+
+    <!-- Waveform CV inputs (green) -->
+    <circle cx="12" cy="95" r="3" style="fill:#00ff00" id="SUB_CV"/>
+    <circle cx="27" cy="95" r="3" style="fill:#00ff00" id="SQR1_CV"/>
+    <circle cx="42" cy="95" r="3" style="fill:#00ff00" id="SAW1_CV"/>
+    <circle cx="161" cy="95" r="3" style="fill:#00ff00" id="SAW2_CV"/>
+    <circle cx="176" cy="95" r="3" style="fill:#00ff00" id="SQR2_CV"/>
+    <circle cx="191" cy="95" r="3" style="fill:#00ff00" id="XOR_CV"/>
+
+    <!-- Output ports (blue) -->
+    <circle cx="101.6" cy="85" r="4" style="fill:#0000ff" id="AUDIO"/>
+    <circle cx="40.64" cy="88" r="4" style="fill:#0000ff" id="SUB_OUTPUT"/>
+    <!-- Gate outputs -->
+    <circle cx="25" cy="110" r="3.5" style="fill:#0000ff" id="GATE1"/>
+    <circle cx="38" cy="110" r="3.5" style="fill:#0000ff" id="GATE2"/>
+    <circle cx="51" cy="110" r="3.5" style="fill:#0000ff" id="GATE3"/>
+    <circle cx="64" cy="110" r="3.5" style="fill:#0000ff" id="GATE4"/>
+    <circle cx="101.6" cy="110" r="3.5" style="fill:#0000ff" id="GATE_MIX"/>
+    <circle cx="139" cy="110" r="3.5" style="fill:#0000ff" id="GATE5"/>
+    <circle cx="152" cy="110" r="3.5" style="fill:#0000ff" id="GATE6"/>
+    <circle cx="165" cy="110" r="3.5" style="fill:#0000ff" id="GATE7"/>
+    <circle cx="178" cy="110" r="3.5" style="fill:#0000ff" id="GATE8"/>
+    <!-- Voice outputs -->
+    <circle cx="25" cy="123" r="3.5" style="fill:#0000ff" id="VOICE1"/>
+    <circle cx="38" cy="123" r="3.5" style="fill:#0000ff" id="VOICE2"/>
+    <circle cx="51" cy="123" r="3.5" style="fill:#0000ff" id="VOICE3"/>
+    <circle cx="64" cy="123" r="3.5" style="fill:#0000ff" id="VOICE4"/>
+    <circle cx="101.6" cy="123" r="3.5" style="fill:#0000ff" id="MIX"/>
+    <circle cx="139" cy="123" r="3.5" style="fill:#0000ff" id="VOICE5"/>
+    <circle cx="152" cy="123" r="3.5" style="fill:#0000ff" id="VOICE6"/>
+    <circle cx="165" cy="123" r="3.5" style="fill:#0000ff" id="VOICE7"/>
+    <circle cx="178" cy="123" r="3.5" style="fill:#0000ff" id="VOICE8"/>
+
+    <!-- Lights (magenta) -->
+    <circle cx="14" cy="110" r="1" style="fill:#ff00ff" id="PWM1_CV_LIGHT"/>
+    <circle cx="154" cy="83" r="1" style="fill:#ff00ff" id="PWM2_CV_LIGHT"/>
+    <circle cx="174" cy="83" r="1" style="fill:#ff00ff" id="FM_CV_LIGHT"/>
+  </g>
 </svg>
