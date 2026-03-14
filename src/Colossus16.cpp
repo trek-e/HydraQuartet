@@ -1,5 +1,5 @@
 /*
- * HydraQuartet VCO - 8-voice polyphonic dual-VCO for VCV Rack
+ * COLOSSUS · 16 - 8-voice polyphonic dual-VCO for VCV Rack
  * Copyright (C) 2026 Synth-etic Intelligence
  *
  * This program is free software: you can redistribute it and/or modify
@@ -242,7 +242,7 @@ struct VcoEngine {
 
 // Maximum polyphony: 16 voices (4 SIMD groups of 4 voices each)
 // Arrays are sized for this limit; process() enforces bounds checking
-struct HydraQuartetVCO : Module {
+struct Colossus16 : Module {
 	enum ParamId {
 		// VCO1 Section (3x3 grid)
 		// Row 1: Detune, Octave (Pipe Length), FM Source
@@ -345,7 +345,7 @@ struct HydraQuartetVCO : Module {
 	// Vibrato LFO state (shared sine LFO at ~5.5Hz)
 	float vibratoPhase = 0.f;
 
-	HydraQuartetVCO() {
+	Colossus16() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
 		// VCO1 Parameters (3x3 grid layout)
@@ -786,133 +786,127 @@ struct HydraQuartetVCO : Module {
 };
 
 
-struct HydraQuartetVCOWidget : ModuleWidget {
-	HydraQuartetVCOWidget(HydraQuartetVCO* module) {
+struct Colossus16Widget : ModuleWidget {
+	Colossus16Widget(Colossus16* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/HydraQuartetVCO.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/Colossus16.svg")));
 
-		// Screws
+		// Screws (30 HP panel)
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		// VCO1 Section - 3x3 grid in upper left
-		// Grid spacing: 15mm horizontal, 20mm vertical
-		// Starting position: x=12mm, y=25mm
-		const float vco1X1 = 12.f, vco1X2 = 27.f, vco1X3 = 42.f;
-		const float vco1X4 = 57.f;  // Extra column to right of grid for Vibrato
-		const float vco1Y1 = 25.f, vco1Y2 = 45.f, vco1Y3 = 65.f;
+		// ======================================================
+		// 30 HP LAYOUT (152.4mm wide)
+		// VCO1 left | Center global | VCO2 right
+		// 13mm column spacing, 13mm row spacing
+		// ======================================================
 
-		// Row 1: Detune, Pipe Length (Octave), FM Source
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y1)), module, HydraQuartetVCO::DETUNE1_PARAM));
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X2, vco1Y1)), module, HydraQuartetVCO::OCTAVE1_PARAM));
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco1X3, vco1Y1)), module, HydraQuartetVCO::FM_SOURCE_PARAM));
+		// VCO1 Section - 4 columns in upper left
+		const float v1c1 = 10.f, v1c2 = 23.f, v1c3 = 36.f, v1c4 = 49.f;
+		const float row1 = 21.f, row2 = 34.f, row3 = 47.f;
+		const float row4 = 59.f, row5 = 71.f;
 
-		// Row 2: Sub, Triangle, Sine, Vibrato
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y2)), module, HydraQuartetVCO::SUB_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y2)), module, HydraQuartetVCO::TRI1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y2)), module, HydraQuartetVCO::SIN1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X4, vco1Y2)), module, HydraQuartetVCO::VIBRATO1_PARAM));
+		// VCO1 Row 1: Detune, Octave, FM Source, Vibrato
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c1, row1)), module, Colossus16::DETUNE1_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(v1c2, row1)), module, Colossus16::OCTAVE1_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(v1c3, row1)), module, Colossus16::FM_SOURCE_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c4, row1)), module, Colossus16::VIBRATO1_PARAM));
 
-		// Row 3: PW, Square, Saw
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X1, vco1Y3)), module, HydraQuartetVCO::PWM1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X2, vco1Y3)), module, HydraQuartetVCO::SQR1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco1X3, vco1Y3)), module, HydraQuartetVCO::SAW1_PARAM));
+		// VCO1 Row 2: Sub, Triangle, Sine
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c1, row2)), module, Colossus16::SUB_LEVEL_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c2, row2)), module, Colossus16::TRI1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c3, row2)), module, Colossus16::SIN1_PARAM));
 
-		// VCO1 CV inputs and additional controls (below 3x3 grid)
-		const float vco1Y4 = 82.f;
-		// Sub waveform switch
-		addParam(createParamCentered<CKSS>(mm2px(Vec(vco1X1, vco1Y4)), module, HydraQuartetVCO::SUB_WAVE_PARAM));
+		// VCO1 Row 3: PWM, Square, Saw
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c1, row3)), module, Colossus16::PWM1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c2, row3)), module, Colossus16::SQR1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v1c3, row3)), module, Colossus16::SAW1_PARAM));
 
-		// CV inputs row
-		const float vco1Y5 = 95.f;
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X1, vco1Y5)), module, HydraQuartetVCO::SUB_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X2, vco1Y5)), module, HydraQuartetVCO::SQR1_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco1X3, vco1Y5)), module, HydraQuartetVCO::SAW1_CV_INPUT));
+		// VCO1 Row 4: Sub wave switch, Sub output, PWM1 CV input + light
+		addParam(createParamCentered<CKSS>(mm2px(Vec(v1c1, row4)), module, Colossus16::SUB_WAVE_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c2, row4)), module, Colossus16::SUB_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v1c3, row4)), module, Colossus16::PWM1_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(v1c3 + 5.f, row4 - 3.f)), module, Colossus16::PWM1_CV_LIGHT));
 
-		// Center Sync Section (top middle, 40HP center = 101.6mm)
-		// 3-position horizontal switches: Hard - Off - Soft
-		// Using CKSSThree rotated via SVG or custom component for horizontal
-		// VCO1 Sync on top, VCO2 Sync below
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(101.6, 25.0)), module, HydraQuartetVCO::SYNC1_PARAM));
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(101.6, 40.0)), module, HydraQuartetVCO::SYNC2_PARAM));
+		// VCO1 Row 5: CV inputs (Sub, Sqr1, Saw1)
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v1c1, row5)), module, Colossus16::SUB_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v1c2, row5)), module, Colossus16::SQR1_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v1c3, row5)), module, Colossus16::SAW1_CV_INPUT));
 
-		// Center Global Section (40HP center = 101.6mm)
-		// V/Oct input (primary pitch input) - below sync switches
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 55.0)), module, HydraQuartetVCO::VOCT_INPUT));
-		// Gate input
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(101.6, 70.0)), module, HydraQuartetVCO::GATE_INPUT));
-		// Polyphonic audio output - above output plate section
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 85.0)), module, HydraQuartetVCO::AUDIO_OUTPUT));
+		// Center Section (30 HP center = 76.2mm)
+		const float cx = 76.2f;
 
-		// Lower left corner: PWM CV and Sub output
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.0, 110.0)), module, HydraQuartetVCO::PWM1_INPUT));
-		// Sub output in VCO1 area
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64, 88.0)), module, HydraQuartetVCO::SUB_OUTPUT));
+		// Sync switches
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(cx, row1)), module, Colossus16::SYNC1_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(cx, row2)), module, Colossus16::SYNC2_PARAM));
 
-		// VCO2 Section - 3x3 grid in upper right (40HP = 203.2mm)
-		// Grid spacing: 15mm horizontal, 20mm vertical
-		// Starting position: x=161mm, y=25mm (mirroring VCO1 from right)
-		const float vco2X0 = 146.f;  // Extra column to left of grid for Vibrato
-		const float vco2X1 = 161.f, vco2X2 = 176.f, vco2X3 = 191.f;
-		const float vco2Y1 = 25.f, vco2Y2 = 45.f, vco2Y3 = 65.f;
+		// V/Oct, Gate, Audio output
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(cx, row3)), module, Colossus16::VOCT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(cx, row4)), module, Colossus16::GATE_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(cx, row5)), module, Colossus16::AUDIO_OUTPUT));
 
-		// Row 1: FM, Pipe Length (Octave), Fine Tune
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y1)), module, HydraQuartetVCO::FM_PARAM));
-		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(vco2X2, vco2Y1)), module, HydraQuartetVCO::OCTAVE2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y1)), module, HydraQuartetVCO::FINE2_PARAM));
+		// VCO2 Section - 4 columns in upper right (mirror of VCO1)
+		const float v2c1 = 103.f, v2c2 = 116.f, v2c3 = 129.f, v2c4 = 142.f;
 
-		// Row 2: Vibrato (left of grid), Sin, Triangle, XOR
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X0, vco2Y2)), module, HydraQuartetVCO::VIBRATO2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y2)), module, HydraQuartetVCO::SIN2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y2)), module, HydraQuartetVCO::TRI2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y2)), module, HydraQuartetVCO::XOR_PARAM));
+		// VCO2 Row 1: FM, Octave, Fine, Vibrato
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c1, row1)), module, Colossus16::FM_PARAM));
+		addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(v2c2, row1)), module, Colossus16::OCTAVE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c3, row1)), module, Colossus16::FINE2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c4, row1)), module, Colossus16::VIBRATO2_PARAM));
 
-		// Row 3: Saw, Square, PWM
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X1, vco2Y3)), module, HydraQuartetVCO::SAW2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X2, vco2Y3)), module, HydraQuartetVCO::SQR2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(vco2X3, vco2Y3)), module, HydraQuartetVCO::PWM2_PARAM));
+		// VCO2 Row 2: Sine, Triangle, XOR
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c1, row2)), module, Colossus16::SIN2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c2, row2)), module, Colossus16::TRI2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c3, row2)), module, Colossus16::XOR_PARAM));
 
-		// VCO2 additional controls (below 3x3 grid)
-		const float vco2Y4 = 82.f;
+		// VCO2 Row 3: Saw, Square, PWM
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c1, row3)), module, Colossus16::SAW2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c2, row3)), module, Colossus16::SQR2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(v2c3, row3)), module, Colossus16::PWM2_PARAM));
 
-		// CV inputs row
-		const float vco2Y5 = 95.f;
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X1, vco2Y5)), module, HydraQuartetVCO::SAW2_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X2, vco2Y5)), module, HydraQuartetVCO::SQR2_CV_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X3, vco2Y5)), module, HydraQuartetVCO::XOR_CV_INPUT));
-		// PWM CV input
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X3 - 10.f, vco2Y4)), module, HydraQuartetVCO::PWM2_INPUT));
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco2X3 - 6.f, vco2Y4)), module, HydraQuartetVCO::PWM2_CV_LIGHT));
-		// FM CV input
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(vco2X2, vco2Y4)), module, HydraQuartetVCO::FM_INPUT));
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(vco2X2 + 4.f, vco2Y4)), module, HydraQuartetVCO::FM_CV_LIGHT));
+		// VCO2 Row 4: FM CV input + light, PWM2 CV input + light
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v2c1, row4)), module, Colossus16::FM_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(v2c1 + 5.f, row4 - 3.f)), module, Colossus16::FM_CV_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v2c2, row4)), module, Colossus16::PWM2_INPUT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(v2c2 + 5.f, row4 - 3.f)), module, Colossus16::PWM2_CV_LIGHT));
 
-		// Bottom output section - centered layout
-		// Row 1 (y=110): Gates 1-4 | Gate Mix | Gates 5-8
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.0, 110.0)), module, HydraQuartetVCO::GATE1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.0, 110.0)), module, HydraQuartetVCO::GATE2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(51.0, 110.0)), module, HydraQuartetVCO::GATE3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(64.0, 110.0)), module, HydraQuartetVCO::GATE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 110.0)), module, HydraQuartetVCO::GATE_MIX_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(139.0, 110.0)), module, HydraQuartetVCO::GATE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(152.0, 110.0)), module, HydraQuartetVCO::GATE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(165.0, 110.0)), module, HydraQuartetVCO::GATE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(178.0, 110.0)), module, HydraQuartetVCO::GATE8_OUTPUT));
+		// VCO2 Row 5: CV inputs (Saw2, Sqr2, XOR)
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v2c1, row5)), module, Colossus16::SAW2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v2c2, row5)), module, Colossus16::SQR2_CV_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(v2c3, row5)), module, Colossus16::XOR_CV_INPUT));
 
-		// Row 2 (y=123): Voices 1-4 | Audio Mix | Voices 5-8
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.0, 123.0)), module, HydraQuartetVCO::VOICE1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.0, 123.0)), module, HydraQuartetVCO::VOICE2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(51.0, 123.0)), module, HydraQuartetVCO::VOICE3_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(64.0, 123.0)), module, HydraQuartetVCO::VOICE4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(101.6, 123.0)), module, HydraQuartetVCO::MIX_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(139.0, 123.0)), module, HydraQuartetVCO::VOICE5_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(152.0, 123.0)), module, HydraQuartetVCO::VOICE6_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(165.0, 123.0)), module, HydraQuartetVCO::VOICE7_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(178.0, 123.0)), module, HydraQuartetVCO::VOICE8_OUTPUT));
+		// ======================================================
+		// Bottom output section
+		// Gates row (y=100), Voices row (y=113)
+		// Layout: 1-4 | center mix | 5-8
+		// ======================================================
+		const float outY1 = 100.f, outY2 = 113.f;
+
+		// Gate outputs row
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c1, outY1)), module, Colossus16::GATE1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c2, outY1)), module, Colossus16::GATE2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c3, outY1)), module, Colossus16::GATE3_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c4, outY1)), module, Colossus16::GATE4_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(cx, outY1)), module, Colossus16::GATE_MIX_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c1, outY1)), module, Colossus16::GATE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c2, outY1)), module, Colossus16::GATE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c3, outY1)), module, Colossus16::GATE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c4, outY1)), module, Colossus16::GATE8_OUTPUT));
+
+		// Voice outputs row
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c1, outY2)), module, Colossus16::VOICE1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c2, outY2)), module, Colossus16::VOICE2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c3, outY2)), module, Colossus16::VOICE3_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v1c4, outY2)), module, Colossus16::VOICE4_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(cx, outY2)), module, Colossus16::MIX_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c1, outY2)), module, Colossus16::VOICE5_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c2, outY2)), module, Colossus16::VOICE6_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c3, outY2)), module, Colossus16::VOICE7_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(v2c4, outY2)), module, Colossus16::VOICE8_OUTPUT));
 	}
 };
 
 
-Model* modelHydraQuartetVCO = createModel<HydraQuartetVCO, HydraQuartetVCOWidget>("HydraQuartetVCO");
+Model* modelColossus16 = createModel<Colossus16, Colossus16Widget>("Colossus16");

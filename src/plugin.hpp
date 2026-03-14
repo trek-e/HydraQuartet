@@ -5,4 +5,4 @@
 extern rack::Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
-extern rack::Model* modelHydraQuartetVCO;
+extern rack::Model* modelColossus16;

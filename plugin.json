@@ -1,21 +1,21 @@
 {
-  "slug": "HydraQuartet",
-  "name": "HydraQuartet",
-  "version": "2.0.8",
+  "slug": "Colossus16",
+  "name": "Colossus16",
+  "version": "2.0.9",
   "license": "GPL-3.0-or-later",
   "brand": "Synth-etic Intelligence",
   "author": "Synth-etic Intelligence",
   "authorEmail": "syntheticint@thepainterofsilence.com",
   "authorUrl": "",
-  "pluginUrl": "https://github.com/trek-e/HydraQuartet",
-  "manualUrl": "https://github.com/trek-e/HydraQuartet/blob/main/docs/MANUAL.md",
-  "sourceUrl": "https://github.com/trek-e/HydraQuartet",
+  "pluginUrl": "https://github.com/trek-e/Colossus16",
+  "manualUrl": "https://github.com/trek-e/Colossus16/blob/main/docs/MANUAL.md",
+  "sourceUrl": "https://github.com/trek-e/Colossus16",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "HydraQuartetVCO",
-      "name": "HydraQuartet VCO",
+      "slug": "Colossus16",
+      "name": "COLOSSUS · 16",
       "description": "8-voice polyphonic dual-VCO with through-zero FM, inspired by Tiptop Audio Triax8",
       "tags": ["Oscillator", "Polyphonic", "Hardware Clone"]
     }

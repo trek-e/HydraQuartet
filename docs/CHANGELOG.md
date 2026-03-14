@@ -1,12 +1,23 @@
 # Changelog
 
-All notable changes to HydraQuartet VCO are documented here.
+All notable changes to COLOSSUS · 16 are documented here.
+
+## [2.0.9] — 2026-03-14
+
+### Changed
+- **Renamed from HydraQuartet VCO to COLOSSUS · 16** — new module identity under Synth-etic Intelligence
+- Plugin slug, module slug, all source files, SVG panel, and documentation updated
+- **Panel resized from 40 HP to 30 HP** (152.4mm) — eliminated dead space, tighter layout
+- Redesigned component layout with consistent 13mm grid spacing across all sections
+- Fixed FM CV / PWM2 CV collision (was 5mm apart, now 13mm)
+- Fixed Sub output / SAW1 CV collision (was 7.1mm apart, now 16.4mm)
+- All documentation updated to reflect 30 HP panel dimensions
 
 ## [2.0.8] — 2026-01-31
 
 ### Changed
 - Rebranded to **Synth-etic Intelligence** manufacturer identity
-- Panel updated to 40 HP with redesigned layout matching Synth-etic Intelligence design language
+- Panel updated with redesigned layout matching Synth-etic Intelligence design language
 
 ## [2.0.7] — 2026-01-29
 
@@ -17,7 +28,7 @@ All notable changes to HydraQuartet VCO are documented here.
 - V/Oct input repositioned to center GLOBAL section for visibility
 
 ### Changed
-- Panel expanded from 36 HP to 40 HP to accommodate new CV inputs
+- Panel expanded to accommodate new CV inputs
 - CV-replaces-knob behavior: patching a waveform CV bypasses the corresponding knob (0–10V = 0–10 volume)
 
 ## [2.0.6] — 2026-01-24

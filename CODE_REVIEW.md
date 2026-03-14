@@ -1,7 +1,7 @@
-# Code Review: HydraQuartet VCO
+# Code Review: COLOSSUS · 16
 
 **Reviewed:** 2026-03-12  
-**Scope:** `src/plugin.hpp`, `src/plugin.cpp`, `src/HydraQuartetVCO.cpp`  
+**Scope:** `src/plugin.hpp`, `src/plugin.cpp`, `src/Colossus16.cpp`  
 **Fixes applied:** 2026-03-12 (all issues addressed)
 
 ---
@@ -16,7 +16,7 @@ The module is a well-structured 8-voice polyphonic dual-VCO with SIMD, MinBLEP a
 
 ### 1. **Intel SSE intrinsic breaks ARM (e.g. Apple Silicon)**
 
-**Location:** `HydraQuartetVCO.cpp` lines 735–736
+**Location:** `Colossus16.cpp` lines 735–736
 
 ```cpp
 mixSum.v = _mm_hadd_ps(mixSum.v, mixSum.v);
@@ -37,7 +37,7 @@ If the Rack SDK exposes a SIMD horizontal-sum helper for `float_4`, use that ins
 
 ### 2. **Unqualified `clamp` may be undefined**
 
-**Location:** `HydraQuartetVCO.cpp` line 195 (inside `VcoEngine::applySync`)
+**Location:** `Colossus16.cpp` line 195 (inside `VcoEngine::applySync`)
 
 ```cpp
 subsample = clamp(subsample, -1.f + 1e-6f, 0.f);  // Ensure valid range
@@ -59,18 +59,18 @@ subsample = clamp(subsample, -1.f + 1e-6f, 0.f);  // Ensure valid range
 ### 3. **License and copyright mismatch**
 
 **Location:**  
-- `HydraQuartetVCO.cpp` lines 1–15: Apache-2.0 header  
+- `Colossus16.cpp` lines 1–15: Apache-2.0 header  
 - `README.md`, `plugin.json`, `LICENSE`: GPL-3.0-or-later
 
 The source file states Apache-2.0 while the project is GPL-3.0-or-later. This is inconsistent and can cause licensing confusion.
 
-**Recommendation:** Replace the Apache-2.0 block in `HydraQuartetVCO.cpp` with a GPL-3.0-or-later notice that matches `LICENSE` and the rest of the project (e.g. the standard GPL “How to Apply” notice).
+**Recommendation:** Replace the Apache-2.0 block in `Colossus16.cpp` with a GPL-3.0-or-later notice that matches `LICENSE` and the rest of the project (e.g. the standard GPL “How to Apply” notice).
 
 ---
 
 ### 4. **Partial polyphony when channels is not a multiple of 4**
 
-**Location:** `HydraQuartetVCO.cpp` process loop (e.g. `setVoltageSimd(mixed, c)` and per-voice DC filter loop)
+**Location:** `Colossus16.cpp` process loop (e.g. `setVoltageSimd(mixed, c)` and per-voice DC filter loop)
 
 When `channels` is not a multiple of 4 (e.g. 5, 6, 7), the last SIMD group still computes and writes four lanes via `setVoltageSimd(mixed, c)`. Lanes beyond the actual channel count (e.g. indices 5, 6, 7 when `channels == 5`) are never cleared and can contain garbage. `setChannels(channels)` tells the host how many channels are valid, but the underlying buffer may still hold undefined values for the extra lanes.
 
@@ -85,7 +85,7 @@ This keeps behavior and potential future uses of the buffer well-defined.
 
 ### 5. **VCO2 octave range vs VCO1**
 
-**Location:** `HydraQuartetVCO.cpp` line 355
+**Location:** `Colossus16.cpp` line 355
 
 - VCO1: `configSwitch(OCTAVE1_PARAM, -2.f, 2.f, 0.f, ...)` → 5 positions (16′, 8′, 4′, 2′, 1′).  
 - VCO2: `configSwitch(OCTAVE2_PARAM, -2.f, 1.f, 0.f, ...)` → 4 positions (16′, 8′, 4′, 2′).
@@ -120,7 +120,7 @@ VCO2 cannot reach the highest octave (1′). If that’s intentional (e.g. desig
 
 **Location:** `README.md` “Building from Source”
 
-The README says to clone “HydraQuartet”; the repo is under a `vco` folder. If the real repo is “HydraQuartet” and this is a subfolder, the clone path might be correct but the `cd` step may need to mention the subfolder (e.g. `cd HydraQuartet/vco` or similar) so users land in the right directory for `make`.
+The README says to clone “Colossus16”; the repo is under a `vco` folder. If the real repo is “Colossus16” and this is a subfolder, the clone path might be correct but the `cd` step may need to mention the subfolder (e.g. `cd Colossus16/vco` or similar) so users land in the right directory for `make`.
 
 ---
 

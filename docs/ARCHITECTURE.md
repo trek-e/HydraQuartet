@@ -1,4 +1,4 @@
-# HydraQuartet VCO — Architecture Guide
+# COLOSSUS · 16 — Architecture Guide
 
 This document describes the internal DSP architecture for developers who want to understand, modify, or learn from the codebase.
 
@@ -8,9 +8,9 @@ This document describes the internal DSP architecture for developers who want to
 src/
 ├── plugin.hpp          # Plugin-level declarations, Model extern
 ├── plugin.cpp          # Plugin initialization, model registration
-└── HydraQuartetVCO.cpp # All module code (918 lines)
+└── Colossus16.cpp # All module code (912 lines)
 res/
-└── HydraQuartetVCO.svg # 40 HP panel (203.2mm × 128.5mm)
+└── Colossus16.svg # 30 HP panel (152.4mm × 128.5mm)
 ```
 
 Everything lives in a single `.cpp` file. The module is self-contained with no external dependencies beyond the VCV Rack SDK.

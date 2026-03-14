@@ -1,4 +1,4 @@
-# HydraQuartet VCO
+# COLOSSUS · 16
 
 **An 8-voice polyphonic dual-VCO module for VCV Rack 2, inspired by the TipTop Audio Triax 8.**
 
@@ -8,7 +8,7 @@ Part of the **Synth-etic Intelligence** module collection.
 
 ## Overview
 
-HydraQuartet VCO packs 16 oscillators into a single 40 HP module — two independent VCOs per voice across 8 voices of polyphony. It was designed from the ground up around the idea that a dual oscillator should be more than two oscillators sitting next to each other: VCO1 and VCO2 talk to each other through through-zero FM, hard sync, and XOR ring modulation, producing the kind of rich, evolving timbres that normally require multiple modules and careful patching.
+COLOSSUS · 16 packs 16 oscillators into a single 30 HP module — two independent VCOs per voice across 8 voices of polyphony. It was designed from the ground up around the idea that a dual oscillator should be more than two oscillators sitting next to each other: VCO1 and VCO2 talk to each other through through-zero FM, hard sync, and XOR ring modulation, producing the kind of rich, evolving timbres that normally require multiple modules and careful patching.
 
 Every harmonically-rich waveform (sawtooth, square, triangle, XOR) is antialiased with MinBLEP correction. The entire DSP engine runs on SIMD `float_4` processing, keeping CPU usage well under 2% at full 8-voice polyphony.
 
@@ -30,7 +30,7 @@ Every harmonically-rich waveform (sawtooth, square, triangle, XOR) is antialiase
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  HYDRA QUARTET                SYNTH-ETIC INTELLIGENCE   │
+│  COLOSSUS · 16                SYNTH-ETIC INTELLIGENCE   │
 │                                                         │
 │  ┌─VCO 1──────┐  ┌─GLOBAL──┐  ┌─VCO 2──────┐          │
 │  │ DET OCT FM │  │  SYNC1  │  │ FM  OCT FIN │          │
@@ -185,8 +185,8 @@ Waveform volume CV inputs follow the **CV-replaces-knob** pattern (not additive)
 ### Build
 
 ```bash
-git clone https://github.com/trek-e/HydraQuartet.git
-cd HydraQuartet
+git clone https://github.com/trek-e/Colossus16.git
+cd Colossus16
 
 # Point to your Rack SDK
 export RACK_DIR=/path/to/Rack-SDK
@@ -225,5 +225,5 @@ GPL-3.0-or-later — See [LICENSE](LICENSE) for details.
 **Synth-etic Intelligence**
 syntheticint@thepainterofsilence.com
 
-- [GitHub](https://github.com/trek-e/HydraQuartet)
+- [GitHub](https://github.com/trek-e/Colossus16)
 - [VCV Rack Library](https://library.vcvrack.com/?brand=Synth-etic+Intelligence)

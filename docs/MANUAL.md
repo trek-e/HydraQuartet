@@ -1,8 +1,8 @@
-# HydraQuartet VCO — User Manual
+# COLOSSUS · 16 — User Manual
 
 ## Quick Start
 
-1. Add **HydraQuartet VCO** to your patch (find it under Oscillator → Polyphonic)
+1. Add **COLOSSUS · 16** to your patch (find it under Oscillator → Polyphonic)
 2. Patch a **V/Oct** source (keyboard, sequencer) into the V/Oct input
 3. Patch the **Audio** output to a mixer or audio device
 4. You should hear VCO1's sine wave. Turn up other waveform knobs to mix.
@@ -13,7 +13,7 @@ The module defaults to VCO1 Sine at volume 1 and VCO2 Square at volume 1 — a s
 
 ## Understanding the Dual-VCO Architecture
 
-Each voice in HydraQuartet contains **two independent oscillators** (VCO1 and VCO2). Both receive the same V/Oct pitch, but you can:
+Each voice in COLOSSUS · 16 contains **two independent oscillators** (VCO1 and VCO2). Both receive the same V/Oct pitch, but you can:
 
 - **Detune** VCO1 against VCO2 for chorusing and thickness
 - **Shift octaves** independently using the Octave knobs
